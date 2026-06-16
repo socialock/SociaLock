@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লগইন</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Supabase JS CDN - এটা যোগ করা জরুরি -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+</head>
+<body class="dark-theme">
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>🔐 লগইন করুন</h2>
+            
+            <!-- কানেকশন স্ট্যাটাস -->
+            <div id="connectionStatus" style="margin-bottom: 15px; padding: 8px; border-radius: 5px; text-align: center; font-size: 14px;"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="text" id="loginIdentifier" placeholder="ইউজারনেম বা ইমেইল" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড" required>
+                </div>
+                <button type="submit" id="loginBtn" class="btn-primary">লগইন</button>
+            </form>
+            <p style="margin-top: 1rem; text-align: center;">
+                অ্যাকাউন্ট নেই? <a href="register.html">খুলুন</a>
+            </p>
+        </div>
+    </div>
+    
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

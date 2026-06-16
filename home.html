@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>হোম</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+</head>
+<body class="dark-theme">
+    <!-- নেভবার এবং অন্যান্য HTML (আগের মতোই) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">সোশ্যাল মিডিয়া</div>
+            <div class="nav-icons">
+                <a href="home.html" class="nav-icon active">🌍</a>
+                <a href="messages.html" class="nav-icon">💬</a>
+                <a href="tools.html" class="nav-icon">🔧</a>
+                <a href="notifications.html" class="nav-icon">🔔</a>
+                <a href="others.html" class="nav-icon">⚙️</a>
+            </div>
+            <div class="user-menu">
+                <button id="userMenuBtn" class="user-menu-btn">👤</button>
+                <div id="userDropdown" class="dropdown-menu">
+                    <a href="#" id="myPostsBtn">📝 মাই পোস্ট</a>
+                    <a href="#" id="changePasswordBtn">🔒 পাসওয়ার্ড চেঞ্জ</a>
+                    <a href="#" id="deleteAccountBtn">🗑️ একাউন্ট ডিলিট</a>
+                    <a href="#" id="logoutBtn">🚪 লগআউট</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="create-post">
+            <textarea id="postContent" maxlength="300" placeholder="আপনার মনের কথা লিখুন... (সর্বোচ্চ ৩০০ অক্ষর)"></textarea>
+            <div class="post-actions">
+                <span id="charCount">0/300</span>
+                <button id="createPostBtn" class="btn-primary">📤 পোস্ট করুন</button>
+            </div>
+        </div>
+        <div id="postsContainer" class="posts-container">
+            <div style="text-align:center;padding:2rem;">পোস্ট লোড হচ্ছে...</div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

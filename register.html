@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>অ্যাকাউন্ট খুলুন</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+</head>
+<body class="dark-theme">
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>📝 অ্যাকাউন্ট খুলুন</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="ইমেইল" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="username" placeholder="ইউজারনেম (ইউনিক)" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="পাসওয়ার্ড (৬+ অক্ষর)" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <select id="country" required>
+                        <option value="">দেশ নির্বাচন করুন</option>
+                        <option value="বাংলাদেশ">বাংলাদেশ</option>
+                        <option value="ভারত">ভারত</option>
+                        <option value="পাকিস্তান">পাকিস্তান</option>
+                        <option value="আমেরিকা">আমেরিকা</option>
+                        <option value="যুক্তরাজ্য">যুক্তরাজ্য</option>
+                        <option value="কানাডা">কানাডা</option>
+                        <option value="অস্ট্রেলিয়া">অস্ট্রেলিয়া</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="captcha-wrapper">
+                        <div class="captcha-display" id="captchaDisplay"></div>
+                        <div class="captcha-input-group">
+                            <input type="text" id="captchaInput" placeholder="ক্যাপচা কোড লিখুন" autocomplete="off">
+                            <button type="button" id="refreshCaptcha" class="btn-refresh">⟳ রিফ্রেশ</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn" class="btn-primary">✅ ক্রিয়েট অ্যাকাউন্ট</button>
+            </form>
+            <p>ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="login.html">লগইন করুন</a></p>
+        </div>
+    </div>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>
