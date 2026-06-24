@@ -1,36 +1,1020 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মেসেজ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>🔧 Tools - Social Media</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    
     <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* ============================================
+           Tools Page Styles
+           ============================================ */
+        .tools-container {
+            max-width: 700px;
+            margin: 70px auto 1rem;
+            padding: 0 0.8rem;
+        }
+        
+        .tools-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .tools-header h2 {
+            font-size: 1.3rem;
+        }
+        
+        .tools-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tools-actions button {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            white-space: nowrap;
+        }
+        
+        .tools-actions button:hover {
+            background: var(--accent-hover);
+            transform: scale(1.02);
+        }
+        
+        .tools-actions button.active-filter {
+            background: #4caf50;
+        }
+        
+        .search-tools {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 30px;
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .search-tools:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .filter-chip {
+            background: var(--bg-secondary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.3s;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .filter-chip:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+        
+        .filter-chip.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .tools-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .tool-item {
+            background: var(--bg-secondary);
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .tool-item:hover {
+            background: var(--accent);
+            transform: scale(1.01);
+        }
+        
+        .tool-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .tool-name {
+            font-weight: bold;
+            font-size: 1rem;
+            word-break: break-word;
+        }
+        
+        .tool-type {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            width: fit-content;
+        }
+        
+        .tool-item:hover .tool-type {
+            color: white;
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .tool-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 0.5rem;
+        }
+        
+        .tool-share-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        
+        .tool-share-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .tool-delete-btn {
+            background: var(--danger);
+            border: none;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        
+        .tool-delete-btn:hover {
+            background: #ff4757;
+        }
+        
+        /* Tools Ad Card - Different size than home */
+        .tools-ad-card {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            padding: 0.6rem 0.8rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        
+        .tools-ad-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .tools-ad-card a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .tools-ad-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #0a0a1a;
+        }
+        
+        .tools-ad-card .ad-caption {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .tools-ad-card .ad-emoji {
+            font-size: 1.8rem;
+        }
+        
+        /* My Tools Section */
+        .my-tools-section {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--accent);
+        }
+        
+        .my-tools-section h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .my-tools-section .tools-list {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 0.5rem;
+        }
+        
+        .see-more-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin: 0.5rem auto;
+            display: block;
+            width: fit-content;
+        }
+        
+        .see-more-btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.02);
+        }
+        
+        .see-more-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .modal-overlay.open {
+            display: flex;
+        }
+        
+        .modal-box {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-box h3 {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .modal-box input,
+        .modal-box select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .modal-box input:focus,
+        .modal-box select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .modal-box .btn-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .modal-box .btn-row button {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary-modal {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary-modal:hover {
+            background: var(--accent-hover);
+        }
+        
+        .btn-danger-modal {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger-modal:hover {
+            background: #ff4757;
+        }
+        
+        .no-tools {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 480px) {
+            .tools-container {
+                margin: 65px auto 1rem;
+                padding: 0 0.5rem;
+            }
+            .tool-item {
+                padding: 0.6rem 0.8rem;
+            }
+            .tool-name {
+                font-size: 0.9rem;
+            }
+            .filter-chip {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.6rem;
+            }
+            .tools-header h2 {
+                font-size: 1.1rem;
+            }
+            .tools-actions button {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+            .tools-ad-card a {
+                font-size: 0.75rem;
+            }
+            .tools-ad-card img {
+                width: 40px;
+                height: 40px;
+            }
+            .my-tools-section .tools-list {
+                padding: 0.3rem;
+            }
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+            .tools-container {
+                margin: 70px auto 1rem;
+                padding: 0 1rem;
+            }
+        }
+    </style>
 </head>
+
 <body class="dark-theme">
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">সোশ্যাল মিডিয়া</div>
+            <div class="nav-brand">🔧 Social Media</div>
             <div class="nav-icons">
-                <a href="home.html" class="nav-icon">🏠</a>
-                <a href="messages.html" class="nav-icon active">💬</a>
-                <a href="tools.html" class="nav-icon">🔧</a>
+                <a href="home.html" class="nav-icon">🌍</a>
+                <a href="messages.html" class="nav-icon">💬</a>
+                <a href="tools.html" class="nav-icon active">🔧</a>
                 <a href="notifications.html" class="nav-icon">🔔</a>
                 <a href="others.html" class="nav-icon">⚙️</a>
             </div>
             <div class="user-menu">
                 <button id="userMenuBtn" class="user-menu-btn">👤</button>
+                <div id="userDropdown" class="dropdown-menu">
+                    <a href="#" id="logoutBtn">🚪 Logout</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="coming-soon">
-        <div class="coming-soon-content">
-            <h2>🚀 শীঘ্রই আসছে!</h2>
-            <p>We are working hard. This feature coming soon.</p>
+    <!-- Tools Main Container -->
+    <div class="tools-container" id="toolsContainer">
+        <div class="tools-header">
+            <h2>🔧 Tools</h2>
+            <div class="tools-actions">
+                <button id="addToolBtn">➕ Add Tool</button>
+                <button id="myToolsToggleBtn" class="active-filter">📁 My Tools</button>
+            </div>
+        </div>
+
+        <input type="text" class="search-tools" id="searchToolsInput" placeholder="🔍 Search tools by name...">
+
+        <div class="filter-bar" id="filterBar">
+            <span class="filter-chip active" data-type="all">All</span>
+            <span class="filter-chip" data-type="Cyber Security">🛡️ Cyber</span>
+            <span class="filter-chip" data-type="Business">💼 Business</span>
+            <span class="filter-chip" data-type="Earn">💰 Earn</span>
+            <span class="filter-chip" data-type="Job">💼 Job</span>
+            <span class="filter-chip" data-type="Web">🌐 Web</span>
+            <span class="filter-chip" data-type="Video">🎥 Video</span>
+            <span class="filter-chip" data-type="Documents">📄 Docs</span>
+            <span class="filter-chip" data-type="Government">🏛️ Gov</span>
+            <span class="filter-chip" data-type="Data">📊 Data</span>
+            <span class="filter-chip" data-type="Secret">🔒 Secret</span>
+            <span class="filter-chip" data-type="Article">📰 Article</span>
+            <span class="filter-chip" data-type="Others">📌 Other</span>
+        </div>
+
+        <div class="tools-list" id="toolsList">
+            <div class="loading-spinner">⏳ Loading tools...</div>
+        </div>
+
+        <button class="see-more-btn" id="seeMoreBtn">See More ↓</button>
+
+        <div class="my-tools-section" id="myToolsSection" style="display:none;">
+            <h3>📁 My Published Tools</h3>
+            <div class="tools-list" id="myToolsList"></div>
+        </div>
+    </div>
+
+    <!-- Add Tool Modal -->
+    <div class="modal-overlay" id="addToolModal">
+        <div class="modal-box">
+            <h3>➕ Publish New Tool</h3>
+            <input type="text" id="toolNameInput" placeholder="Tool Name *" maxlength="100">
+            <select id="toolTypeSelect">
+                <option value="Cyber Security">🛡️ Cyber Security</option>
+                <option value="Business">💼 Business</option>
+                <option value="Earn">💰 Earn</option>
+                <option value="Job">💼 Job</option>
+                <option value="Web">🌐 Web</option>
+                <option value="Video">🎥 Video</option>
+                <option value="Documents">📄 Documents</option>
+                <option value="Government">🏛️ Government</option>
+                <option value="Data">📊 Data</option>
+                <option value="Secret">🔒 Secret</option>
+                <option value="Article">📰 Article</option>
+                <option value="Others">📌 Others</option>
+            </select>
+            <input type="url" id="toolLinkInput" placeholder="Tool Link (https://...) *">
+            <div class="btn-row">
+                <button class="btn-primary-modal" id="publishToolBtn">📤 Publish</button>
+                <button class="btn-danger-modal" id="closeAddToolModal">Close</button>
+            </div>
         </div>
     </div>
 
     <script src="js/config.js"></script>
     <script src="js/common.js"></script>
+    
+    <script>
+        // ============================================================
+        // Tools Page - Complete Logic
+        // ============================================================
+        
+        let currentUser = null;
+        let allTools = [];
+        let myTools = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let showingMyTools = false;
+        let isLoading = false;
+        let currentPage = 0;
+        const TOOLS_PER_PAGE = 15;
+        let hasMoreTools = true;
+        let filteredTools = [];
+
+        const toolsListEl = document.getElementById('toolsList');
+        const myToolsListEl = document.getElementById('myToolsList');
+        const myToolsSection = document.getElementById('myToolsSection');
+        const searchInput = document.getElementById('searchToolsInput');
+        const filterBar = document.getElementById('filterBar');
+        const addToolBtn = document.getElementById('addToolBtn');
+        const myToolsToggleBtn = document.getElementById('myToolsToggleBtn');
+        const addModal = document.getElementById('addToolModal');
+        const closeAddModalBtn = document.getElementById('closeAddToolModal');
+        const publishBtn = document.getElementById('publishToolBtn');
+        const toolNameInput = document.getElementById('toolNameInput');
+        const toolTypeSelect = document.getElementById('toolTypeSelect');
+        const toolLinkInput = document.getElementById('toolLinkInput');
+        const seeMoreBtn = document.getElementById('seeMoreBtn');
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showAlert(msg, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            alert.innerHTML = `${msg}<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;">✕</button>`;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function isValidUrl(string) {
+            try {
+                const url = new URL(string);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // ============================================================
+        // FETCH TOOLS ADS (Separate from home ads)
+        // ============================================================
+        async function fetchToolsAds(country) {
+            const supabase = window.getSupabase();
+            if (!supabase) return [];
+            try {
+                const { data, error } = await supabase
+                    .from('tools_ads')
+                    .select('*')
+                    .or(`target_country.eq.${country},target_country.eq.Global`)
+                    .limit(20);
+                if (error) {
+                    console.error('Tools ads fetch error:', error);
+                    return [];
+                }
+                return data || [];
+            } catch (err) {
+                console.error('Fetch tools ads exception:', err);
+                return [];
+            }
+        }
+
+        // ============================================================
+        // FETCH TOOLS
+        // ============================================================
+        async function fetchTools() {
+            const supabase = window.getSupabase();
+            if (!supabase) return [];
+            try {
+                const { data, error } = await supabase.from('tools').select('*').order('created_at', { ascending: false });
+                if (error) return [];
+                return data || [];
+            } catch (err) {
+                return [];
+            }
+        }
+
+        async function fetchMyTools(userId) {
+            const supabase = window.getSupabase();
+            if (!supabase || !userId) return [];
+            try {
+                const { data, error } = await supabase.from('tools').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+                if (error) return [];
+                return data || [];
+            } catch (err) {
+                return [];
+            }
+        }
+
+        async function publishTool(name, type, link) {
+            const supabase = window.getSupabase();
+            if (!supabase || !currentUser) return false;
+            try {
+                const { error } = await supabase.from('tools').insert({
+                    user_id: currentUser.id,
+                    name: name.trim(),
+                    type: type,
+                    link: link.trim(),
+                    created_at: new Date().toISOString()
+                });
+                if (error) {
+                    showAlert('Publish failed: ' + error.message, 'error');
+                    return false;
+                }
+                return true;
+            } catch (err) {
+                showAlert('Publish failed!', 'error');
+                return false;
+            }
+        }
+
+        async function deleteTool(toolId) {
+            const supabase = window.getSupabase();
+            if (!supabase || !currentUser) return false;
+            try {
+                const { error } = await supabase.from('tools').delete().eq('id', toolId).eq('user_id', currentUser.id);
+                if (error) {
+                    showAlert('Delete failed: ' + error.message, 'error');
+                    return false;
+                }
+                return true;
+            } catch (err) {
+                showAlert('Delete failed!', 'error');
+                return false;
+            }
+        }
+
+        // ============================================================
+        // RENDER FUNCTIONS
+        // ============================================================
+        function renderTools(tools, container, showDelete = false, append = false) {
+            if (!append) container.innerHTML = '';
+            if (!tools || tools.length === 0) {
+                if (!append) container.innerHTML = `<div class="no-tools">🔧 No tools found</div>`;
+                return;
+            }
+
+            // Load tools ads (only for main list, not my tools)
+            if (!showDelete && !append) {
+                loadToolsAds(container);
+            }
+
+            tools.forEach((tool, index) => {
+                const item = document.createElement('div');
+                item.className = 'tool-item';
+                item.setAttribute('data-id', tool.id);
+                
+                let domain = '';
+                try {
+                    if (tool.link) {
+                        const url = new URL(tool.link);
+                        domain = url.hostname;
+                    }
+                } catch (e) {}
+                
+                item.innerHTML = `
+                    <div class="tool-info">
+                        <div class="tool-name">${escapeHtml(tool.name)}</div>
+                        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                            <span class="tool-type">${escapeHtml(tool.type)}</span>
+                            ${domain ? `<span style="font-size:0.6rem; color:var(--text-secondary);">${escapeHtml(domain)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="tool-actions">
+                        <button class="tool-share-btn" data-link="${escapeHtml(tool.link)}" data-name="${escapeHtml(tool.name)}" title="Share">🔗</button>
+                        ${showDelete ? `<button class="tool-delete-btn" data-id="${tool.id}" title="Delete">🗑️</button>` : ''}
+                    </div>
+                `;
+
+                item.addEventListener('click', (e) => {
+                    if (e.target.closest('.tool-share-btn') || e.target.closest('.tool-delete-btn')) return;
+                    if (tool.link) window.open(tool.link, '_blank');
+                    else showAlert('No link available!', 'error');
+                });
+
+                const shareBtn = item.querySelector('.tool-share-btn');
+                if (shareBtn) {
+                    shareBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const link = shareBtn.getAttribute('data-link');
+                        const name = shareBtn.getAttribute('data-name');
+                        if (navigator.share) {
+                            navigator.share({ title: name, text: `🔧 ${name} - Check out this tool!`, url: link });
+                        } else {
+                            navigator.clipboard.writeText(link).then(() => showAlert('✅ Link copied!', 'success'));
+                        }
+                    });
+                }
+
+                const deleteBtn = item.querySelector('.tool-delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = deleteBtn.getAttribute('data-id');
+                        if (confirm('Delete this tool?')) {
+                            const success = await deleteTool(id);
+                            if (success) {
+                                showAlert('✅ Tool deleted!', 'success');
+                                await refreshAll();
+                            }
+                        }
+                    });
+                }
+
+                container.appendChild(item);
+
+                // Show tools ad every 5 tools (only in main list, not in my tools)
+                if (!showDelete && (index + 1) % 5 === 0 && index < tools.length - 1) {
+                    const adDiv = document.createElement('div');
+                    adDiv.className = 'tools-ad-card';
+                    adDiv.id = `ad-${Date.now()}-${index}`;
+                    adDiv.innerHTML = `<div class="loading-spinner" style="padding:0.5rem;">⏳ Loading ad...</div>`;
+                    container.appendChild(adDiv);
+                }
+            });
+        }
+
+        // ============================================================
+        // LOAD TOOLS ADS (Separate from home ads)
+        // ============================================================
+        async function loadToolsAds(container) {
+            try {
+                const country = currentUser?.country || 'Bangladesh';
+                const ads = await fetchToolsAds(country);
+                const adDivs = container.querySelectorAll('.tools-ad-card');
+                
+                adDivs.forEach((adDiv, index) => {
+                    if (ads && ads.length > 0) {
+                        const ad = ads[index % ads.length];
+                        if (ad && ad.link) {
+                            const imgHtml = ad.image_url ? 
+                                `<img src="${escapeHtml(ad.image_url)}" alt="${escapeHtml(ad.caption)}" loading="lazy" onerror="this.style.display='none'">` : 
+                                '<span class="ad-emoji">📢</span>';
+                            adDiv.innerHTML = `
+                                <a href="${escapeHtml(ad.link)}" target="_blank" rel="noopener noreferrer">
+                                    ${imgHtml}
+                                    <span class="ad-caption">${escapeHtml(ad.caption)}</span>
+                                </a>
+                            `;
+                        } else {
+                            adDiv.innerHTML = `<a href="#"><span class="ad-emoji">📢</span><span class="ad-caption">Your ad here</span></a>`;
+                        }
+                    } else {
+                        adDiv.innerHTML = `<a href="#"><span class="ad-emoji">📢</span><span class="ad-caption">Your ad here</span></a>`;
+                    }
+                });
+            } catch (err) {
+                container.querySelectorAll('.tools-ad-card').forEach(adDiv => {
+                    adDiv.innerHTML = `<a href="#"><span class="ad-emoji">📢</span><span class="ad-caption">Your ad here</span></a>`;
+                });
+            }
+        }
+
+        // ============================================================
+        // PAGINATION
+        // ============================================================
+        function loadMoreTools() {
+            if (isLoading || !hasMoreTools) return;
+            const start = currentPage * TOOLS_PER_PAGE;
+            const end = start + TOOLS_PER_PAGE;
+            const nextBatch = filteredTools.slice(start, end);
+            if (nextBatch.length === 0) {
+                hasMoreTools = false;
+                seeMoreBtn.textContent = 'No more tools';
+                seeMoreBtn.disabled = true;
+                return;
+            }
+            renderTools(nextBatch, toolsListEl, false, true);
+            currentPage++;
+            if (end >= filteredTools.length) {
+                hasMoreTools = false;
+                seeMoreBtn.textContent = 'No more tools';
+                seeMoreBtn.disabled = true;
+            } else {
+                seeMoreBtn.textContent = `See More ↓ (${filteredTools.length - end} remaining)`;
+                seeMoreBtn.disabled = false;
+            }
+        }
+
+        // ============================================================
+        // REFRESH & FILTER
+        // ============================================================
+        async function refreshAll() {
+            if (isLoading) return;
+            isLoading = true;
+            try {
+                if (!currentUser) {
+                    toolsListEl.innerHTML = `<div class="no-tools">🔒 Please login</div>`;
+                    return;
+                }
+                allTools = await fetchTools();
+                myTools = await fetchMyTools(currentUser.id);
+                applyFilters();
+            } catch (err) {
+                toolsListEl.innerHTML = `<div class="no-tools">❌ Failed to load tools</div>`;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function applyFilters() {
+            currentPage = 0;
+            hasMoreTools = true;
+            seeMoreBtn.textContent = 'See More ↓';
+            seeMoreBtn.disabled = false;
+            
+            filteredTools = allTools;
+            if (searchQuery.trim()) {
+                const q = searchQuery.trim().toLowerCase();
+                filteredTools = filteredTools.filter(t => t.name.toLowerCase().includes(q));
+            }
+            if (currentFilter !== 'all') {
+                filteredTools = filteredTools.filter(t => t.type === currentFilter);
+            }
+
+            if (showingMyTools) {
+                myToolsSection.style.display = 'block';
+                let filteredMyTools = myTools;
+                if (searchQuery.trim()) {
+                    const q = searchQuery.trim().toLowerCase();
+                    filteredMyTools = filteredMyTools.filter(t => t.name.toLowerCase().includes(q));
+                }
+                if (currentFilter !== 'all') {
+                    filteredMyTools = filteredMyTools.filter(t => t.type === currentFilter);
+                }
+                renderTools(filteredMyTools, myToolsListEl, true);
+            } else {
+                myToolsSection.style.display = 'none';
+            }
+
+            const firstBatch = filteredTools.slice(0, TOOLS_PER_PAGE);
+            renderTools(firstBatch, toolsListEl, false, false);
+            currentPage = 1;
+            
+            if (filteredTools.length <= TOOLS_PER_PAGE) {
+                hasMoreTools = false;
+                seeMoreBtn.textContent = 'No more tools';
+                seeMoreBtn.disabled = true;
+            } else {
+                hasMoreTools = true;
+                seeMoreBtn.textContent = `See More ↓ (${filteredTools.length - TOOLS_PER_PAGE} remaining)`;
+                seeMoreBtn.disabled = false;
+            }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            applyFilters();
+        });
+
+        filterBar.addEventListener('click', (e) => {
+            const chip = e.target.closest('.filter-chip');
+            if (!chip) return;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.getAttribute('data-type');
+            applyFilters();
+        });
+
+        myToolsToggleBtn.addEventListener('click', () => {
+            showingMyTools = !showingMyTools;
+            myToolsToggleBtn.classList.toggle('active-filter');
+            myToolsToggleBtn.textContent = showingMyTools ? '📁 All Tools' : '📁 My Tools';
+            applyFilters();
+        });
+
+        seeMoreBtn.addEventListener('click', loadMoreTools);
+
+        addToolBtn.addEventListener('click', () => {
+            addModal.classList.add('open');
+            toolNameInput.value = '';
+            toolLinkInput.value = '';
+            toolTypeSelect.value = 'Cyber Security';
+            toolNameInput.focus();
+        });
+
+        closeAddModalBtn.addEventListener('click', () => addModal.classList.remove('open'));
+        addModal.addEventListener('click', (e) => { if (e.target === addModal) addModal.classList.remove('open'); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && addModal.classList.contains('open')) addModal.classList.remove('open'); });
+
+        publishBtn.addEventListener('click', async () => {
+            const name = toolNameInput.value.trim();
+            const type = toolTypeSelect.value;
+            const link = toolLinkInput.value.trim();
+            if (!name) { showAlert('Please enter tool name!', 'error'); toolNameInput.focus(); return; }
+            if (name.length < 2) { showAlert('Name must be at least 2 characters!', 'error'); toolNameInput.focus(); return; }
+            if (!link) { showAlert('Please enter tool link!', 'error'); toolLinkInput.focus(); return; }
+            if (!isValidUrl(link)) { showAlert('Please enter a valid link (http/https)', 'error'); toolLinkInput.focus(); return; }
+
+            publishBtn.disabled = true;
+            publishBtn.textContent = '⏳ Publishing...';
+            const success = await publishTool(name, type, link);
+            if (success) {
+                showAlert('✅ Tool published!', 'success');
+                addModal.classList.remove('open');
+                await refreshAll();
+            }
+            publishBtn.disabled = false;
+            publishBtn.textContent = '📤 Publish';
+        });
+
+        // Logout
+        document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('userId');
+            window.location.href = 'index.html';
+        });
+
+        // User dropdown
+        document.getElementById('userMenuBtn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('userDropdown').classList.toggle('show');
+        });
+        document.addEventListener('click', () => {
+            document.getElementById('userDropdown')?.classList.remove('show');
+        });
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔧 Tools page loading...');
+            
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const supabase = window.getSupabase();
+            if (!supabase) {
+                showAlert('Supabase connection failed!', 'error');
+                toolsListEl.innerHTML = `<div class="no-tools">❌ Supabase not connected</div>`;
+                return;
+            }
+
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error || !user) {
+                    showAlert('User not found!', 'error');
+                    localStorage.removeItem('userId');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = user;
+                console.log('✅ User loaded:', currentUser.username);
+                await refreshAll();
+                console.log('✅ Tools loaded successfully');
+                
+            } catch (err) {
+                console.error('Page load error:', err);
+                showAlert('Failed to load page!', 'error');
+                toolsListEl.innerHTML = `<div class="no-tools">❌ Load failed</div>`;
+            }
+        });
+
+        // ============================================================
+        // GLOBAL EXPORTS
+        // ============================================================
+        window.refreshAll = refreshAll;
+        window.applyFilters = applyFilters;
+        window.renderTools = renderTools;
+        window.loadMoreTools = loadMoreTools;
+        window.showAlert = showAlert;
+        window.fetchToolsAds = fetchToolsAds;
+        window.loadToolsAds = loadToolsAds;
+
+        console.log('🔧 Tools script loaded successfully');
+    </script>
 </body>
 </html>

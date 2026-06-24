@@ -10,9 +10,9 @@
         body { background: #1a1a2e; color: #eee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; height: 100vh; overflow: hidden; }
         .navbar { background: #16213e; padding: 12px 16px; position: fixed; top: 0; width: 100%; z-index: 1000; }
         .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .nav-brand { font-size: 1.2rem; font-weight: bold; }
-        .nav-icons { display: flex; gap: 15px; align-items: center; }
-        .nav-icon { font-size: 1.3rem; text-decoration: none; color: #aaa; }
+        .nav-brand { font-size: 1.1rem; font-weight: bold; }
+        .nav-icons { display: flex; gap: 12px; align-items: center; }
+        .nav-icon { font-size: 1.2rem; text-decoration: none; color: #aaa; }
         .nav-icon.active { color: #eee; }
         .user-menu { position: relative; }
         .user-menu-btn { background: #0f3460; border: none; font-size: 1.2rem; padding: 6px 12px; border-radius: 50%; cursor: pointer; color: white; }
@@ -22,7 +22,10 @@
         .dropdown-menu a:hover { background: #0f3460; }
         .chat-list-container { margin-top: 60px; max-width: 700px; margin: 60px auto 0; padding: 0 16px; height: calc(100vh - 60px); overflow-y: auto; }
         .chat-list-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #2a2a4a; position: sticky; top: 0; background: #1a1a2e; z-index: 10; }
+        .header-buttons { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .create-room-btn { background: #0f3460; border: none; color: white; padding: 8px 16px; border-radius: 25px; cursor: pointer; font-size: 0.8rem; }
+        .secret-chat-btn { background: #9c27b0; border: none; color: white; padding: 8px 16px; border-radius: 25px; cursor: pointer; font-size: 0.8rem; }
+        .secret-chat-btn:hover { background: #7b1fa2; }
         .chat-list-top-actions { display: flex; justify-content: flex-end; padding: 8px 0; gap: 10px; }
         .settings-btn { background: #0f3460; border: none; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
         .settings-btn:hover { background: #1a4a7a; }
@@ -61,6 +64,7 @@
         .room-badge { background: #4caf50; font-size: 0.6rem; padding: 2px 6px; border-radius: 10px; }
         .custom-badge { background: #9c27b0; font-size: 0.6rem; padding: 2px 6px; border-radius: 10px; }
         .blocked-badge { background: #e94560; font-size: 0.6rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px; }
+        .dm-badge { background: #2196f3; font-size: 0.6rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px; }
         .fullscreen-chat { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; z-index: 2000; display: flex; flex-direction: column; }
         .fullscreen-header { padding: 16px; background: #16213e; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #2a2a4a; flex-shrink: 0; }
         .back-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: white; }
@@ -102,6 +106,10 @@
         .custom-alert.info { background: #0f3460; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @media (max-width: 768px) { .message-bubble { max-width: 85%; } .chat-side-menu { width: 280px; } }
+        .chat-section-title { font-size: 0.8rem; color: #aaa; padding: 12px 0 8px; border-bottom: 1px solid #2a2a4a; margin-bottom: 12px; }
+        .scroll-down-btn { position: absolute; bottom: 80px; right: 20px; background: #0f3460; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 50; }
+        .scroll-down-btn:hover { background: #1a4a7a; }
+        .scroll-down-btn.show { display: flex; }
     </style>
 </head>
 <body>
@@ -127,7 +135,10 @@
     <div id="chatListView" class="chat-list-container">
         <div class="chat-list-header">
             <h2>💬 মেসেজ</h2>
-            <button class="create-room-btn" id="createRoomBtn">+ কাস্টম রুম</button>
+            <div class="header-buttons">
+                <button class="secret-chat-btn" id="secretChatBtn">🔒 সিক্রেট চ্যাট</button>
+                <button class="create-room-btn" id="createRoomBtn">+ কাস্টম রুম</button>
+            </div>
         </div>
         <div class="chat-list-top-actions">
             <button class="settings-btn" id="settingsBtn">⚙️ ব্লক লিস্ট</button>
@@ -160,9 +171,10 @@
         </div>
         <div class="fullscreen-chat-area">
             <div id="fullscreenMessages" class="chat-messages"></div>
+            <button class="scroll-down-btn" id="scrollDownBtn" title="নিচে যান">↓</button>
             <div class="chat-input-wrapper">
                 <div class="chat-input-area">
-                    <textarea id="messageInput" rows="1" placeholder="মেসেজ লিখুন... (Enter পাঠান, Shift+Enter = নতুন লাইন)"></textarea>
+                    <textarea id="messageInput" rows="1" placeholder="মেসেজ লিখুন... (Shift+Enter = নতুন লাইন, Enter = পাঠান)"></textarea>
                     <button id="sendMsgFullBtn">➤</button>
                 </div>
             </div>
@@ -245,7 +257,7 @@
     <script src="js/config.js"></script>
     <script>
     // ============================================================
-    // সম্পূর্ণ চ্যাট সিস্টেম - ফিক্সড (কোন এরর নাই)
+    // সম্পূর্ণ চ্যাট সিস্টেম - মোবাইল ব্যাক বাটন + এন্টার ফিক্স
     // ============================================================
     
     var currentUser = null;
@@ -265,6 +277,9 @@
     var blockedByUsers = new Set();
     var roomBans = {};
     var isRenderingRooms = false;
+    var isAutoScroll = true;
+    var lastScrollHeight = 0;
+    var isFullscreenOpen = false;
     
     function showAlert(msg, type) {
         var existing = document.querySelector('.custom-alert');
@@ -297,12 +312,24 @@
     
     function scrollToBottom() {
         var container = document.getElementById('fullscreenMessages');
-        if (container && !isScrolling && !isOpeningChat) {
-            isScrolling = true;
-            setTimeout(function() {
-                container.scrollTop = container.scrollHeight;
-                setTimeout(function() { isScrolling = false; }, 100);
-            }, 100);
+        if (container) {
+            isAutoScroll = true;
+            container.scrollTop = container.scrollHeight;
+            document.getElementById('scrollDownBtn')?.classList.remove('show');
+        }
+    }
+    
+    function checkScrollPosition() {
+        var container = document.getElementById('fullscreenMessages');
+        var btn = document.getElementById('scrollDownBtn');
+        if (!container || !btn) return;
+        var isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+        if (!isAtBottom && container.scrollHeight > container.clientHeight) {
+            btn.classList.add('show');
+            isAutoScroll = false;
+        } else {
+            btn.classList.remove('show');
+            isAutoScroll = true;
         }
     }
     
@@ -319,6 +346,22 @@
         if (menu) menu.classList.remove('open');
         if (overlay) overlay.classList.remove('show');
     }
+    
+    // ------------------------------------------------------------
+    // মোবাইল ব্যাক বাটন হ্যান্ডলিং
+    // ------------------------------------------------------------
+    window.addEventListener('popstate', function(event) {
+        if (isFullscreenOpen) {
+            closeFullscreenChat();
+        }
+    });
+    
+    // ------------------------------------------------------------
+    // সিক্রেট চ্যাট
+    // ------------------------------------------------------------
+    document.getElementById('secretChatBtn')?.addEventListener('click', function() {
+        window.location.href = 'secret.html';
+    });
     
     // ------------------------------------------------------------
     // ব্লক লিস্ট
@@ -864,10 +907,11 @@
     });
     
     // ------------------------------------------------------------
-    // ডাইরেক্ট মেসেজ
+    // ডাইরেক্ট মেসেজ (DM)
     // ------------------------------------------------------------
     async function startDirectMessage(userId, username) {
         var supabase = window.getSupabase();
+        
         var blockByOtherResult = await supabase.from('blocks').select('id').eq('user_id', userId).eq('blocked_user_id', currentUser.id);
         if (blockByOtherResult.data && blockByOtherResult.data.length > 0) {
             showAlert(username + ' আপনাকে ব্লক করেছেন!', 'error');
@@ -878,27 +922,43 @@
             showAlert('আপনি ' + username + ' কে ব্লক করেছেন! আনব্লক করে মেসেজ পাঠান।', 'error');
             return;
         }
+        
         var existingConvId = null;
         var myMembershipsResult = await supabase.from('conversation_members').select('conversation_id').eq('user_id', currentUser.id);
         if (myMembershipsResult.data) {
             for (var i = 0; i < myMembershipsResult.data.length; i++) {
                 var mem = myMembershipsResult.data[i];
-                var otherMemberResult = await supabase.from('conversation_members').select('user_id').eq('conversation_id', mem.conversation_id).eq('user_id', userId);
-                if (otherMemberResult.data && otherMemberResult.data.length > 0) {
-                    existingConvId = mem.conversation_id;
-                    break;
+                var convCheck = await supabase.from('conversations').select('type').eq('id', mem.conversation_id).single();
+                if (convCheck.data && convCheck.data.type === 'dm') {
+                    var otherMemberResult = await supabase.from('conversation_members').select('user_id').eq('conversation_id', mem.conversation_id).eq('user_id', userId);
+                    if (otherMemberResult.data && otherMemberResult.data.length > 0) {
+                        existingConvId = mem.conversation_id;
+                        break;
+                    }
                 }
             }
         }
+        
         var convId = existingConvId;
         if (!convId) {
-            var newConvResult = await supabase.from('conversations').insert({ type: 'dm' }).select().single();
+            var newConvResult = await supabase.from('conversations').insert({ 
+                type: 'dm',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }).select().single();
+            
+            if (newConvResult.error) {
+                showAlert('DM তৈরি করতে সমস্যা!', 'error');
+                return;
+            }
             convId = newConvResult.data.id;
+            
             await supabase.from('conversation_members').insert([
                 { conversation_id: convId, user_id: currentUser.id, role: 'member' },
                 { conversation_id: convId, user_id: userId, role: 'member' }
             ]);
         }
+        
         await loadChatList();
         openPrivateChat(convId, username);
         document.getElementById('chatSearchResults').style.display = 'none';
@@ -907,6 +967,13 @@
     
     async function openPrivateChat(chatId, userName) {
         var supabase = window.getSupabase();
+        
+        var convCheck = await supabase.from('conversations').select('type').eq('id', chatId).single();
+        if (convCheck.data && convCheck.data.type !== 'dm') {
+            showAlert('এই চ্যাটটি DM নয়!', 'error');
+            return;
+        }
+        
         var membersResult = await supabase.from('conversation_members').select('user_id').eq('conversation_id', chatId);
         var otherUser = null;
         if (membersResult.data) {
@@ -971,7 +1038,7 @@
     function toggleBlockFromMenu() { toggleBlock(); closeSideMenu(); }
     
     // ------------------------------------------------------------
-    // চ্যাট ডিলিট
+    // চ্যাট ডিলিট (শুধু DM)
     // ------------------------------------------------------------
     async function deleteCurrentChat() {
         if (!currentChat) return;
@@ -1100,95 +1167,173 @@
     async function loadChatList() {
         var supabase = window.getSupabase();
         await loadBlockedUsers();
+        
         var roomMembershipsResult = await supabase.from('conversation_members').select('conversation_id').eq('user_id', currentUser.id);
         if (roomMembershipsResult.data) {
             for (var i = 0; i < roomMembershipsResult.data.length; i++) {
                 var mem = roomMembershipsResult.data[i];
                 var convResult = await supabase.from('conversations').select('type').eq('id', mem.conversation_id).single();
-                if (convResult.data && convResult.data.type === 'room') joinedRoomIds.add(mem.conversation_id);
+                if (convResult.data && convResult.data.type === 'room') {
+                    joinedRoomIds.add(mem.conversation_id);
+                }
             }
         }
-        var dmMembershipsResult = await supabase.from('conversation_members').select('conversation_id, role').eq('user_id', currentUser.id);
-        if (!dmMembershipsResult.data) { allChats = []; renderChatList(); renderRoomsList(); return; }
-        var conversationIds = [];
-        for (var j = 0; j < dmMembershipsResult.data.length; j++) {
-            conversationIds.push(dmMembershipsResult.data[j].conversation_id);
-        }
-        var convResult = await supabase.from('conversations').select('*').in('id', conversationIds).eq('type', 'dm').order('updated_at', { ascending: false });
+        
+        var membershipsResult = await supabase.from('conversation_members').select('conversation_id, role').eq('user_id', currentUser.id);
         var newAllChats = [];
-        if (convResult.data) {
-            for (var k = 0; k < convResult.data.length; k++) {
-                var conv = convResult.data[k];
-                var displayName = 'ইউজার';
-                var membersResult = await supabase.from('conversation_members').select('user_id').eq('conversation_id', conv.id);
-                var otherUser = null;
-                if (membersResult.data) {
-                    for (var l = 0; l < membersResult.data.length; l++) {
-                        if (membersResult.data[l].user_id !== currentUser.id) { otherUser = membersResult.data[l]; break; }
+        if (membershipsResult.data) {
+            var allIds = [];
+            for (var j = 0; j < membershipsResult.data.length; j++) {
+                allIds.push(membershipsResult.data[j].conversation_id);
+            }
+            if (allIds.length > 0) {
+                var convResult = await supabase.from('conversations').select('*').in('id', allIds).order('updated_at', { ascending: false });
+                if (convResult.data) {
+                    for (var k = 0; k < convResult.data.length; k++) {
+                        var conv = convResult.data[k];
+                        var displayName = 'ইউজার';
+                        var avatar = '👤';
+                        var isBlockedFlag = false;
+                        
+                        if (conv.type === 'dm') {
+                            var membersResult = await supabase.from('conversation_members').select('user_id').eq('conversation_id', conv.id);
+                            var otherUser = null;
+                            if (membersResult.data) {
+                                for (var l = 0; l < membersResult.data.length; l++) {
+                                    if (membersResult.data[l].user_id !== currentUser.id) {
+                                        otherUser = membersResult.data[l];
+                                        break;
+                                    }
+                                }
+                            }
+                            if (otherUser) {
+                                var userResult = await supabase.from('users').select('username').eq('id', otherUser.user_id).single();
+                                displayName = userResult.data ? userResult.data.username : 'ইউজার';
+                            }
+                            avatar = '👤';
+                            isBlockedFlag = blockedUsers.has(otherUser ? otherUser.user_id : null) || blockedByUsers.has(otherUser ? otherUser.user_id : null);
+                        } else {
+                            displayName = conv.name;
+                            avatar = conv.type === 'room' ? (conv.name?.includes('গ্লোবাল') ? '🌍' : (conv.broadcast_mode ? '📢' : '🌍')) : '👤';
+                            if (!joinedRoomIds.has(conv.id) && conv.type === 'room') {
+                                continue;
+                            }
+                        }
+                        
+                        var lastMsgResult = await supabase.from('messages').select('content, created_at').eq('conversation_id', conv.id).order('created_at', { ascending: false }).limit(1);
+                        var lastMessageText = 'কোন মেসেজ নেই';
+                        if (lastMsgResult.data && lastMsgResult.data[0] && lastMsgResult.data[0].content) {
+                            lastMessageText = lastMsgResult.data[0].content.substring(0, 30);
+                        }
+                        
+                        var role = null;
+                        for (var m = 0; m < membershipsResult.data.length; m++) {
+                            if (membershipsResult.data[m].conversation_id === conv.id) {
+                                role = membershipsResult.data[m].role;
+                                break;
+                            }
+                        }
+                        
+                        var chatType = conv.type === 'dm' ? 'dm' : 'room';
+                        newAllChats.push({
+                            id: conv.id,
+                            type: chatType,
+                            name: displayName,
+                            avatar: avatar,
+                            lastMessage: lastMessageText,
+                            updatedAt: conv.updated_at,
+                            role: role,
+                            isBlocked: isBlockedFlag,
+                            isCustom: conv.type === 'room' ? (conv.room_code && !['bangladesh', 'india', 'usa', 'uk', 'canada', 'australia', 'pakistan', 'saudi', 'global'].includes(conv.room_code)) : false,
+                            isGlobal: conv.type === 'room' && (conv.name?.includes('গ্লোবাল') || conv.room_code === 'global'),
+                            broadcastMode: conv.broadcast_mode
+                        });
                     }
                 }
-                if (otherUser) {
-                    var userResult = await supabase.from('users').select('username').eq('id', otherUser.user_id).single();
-                    displayName = userResult.data ? userResult.data.username : 'ইউজার';
-                }
-                var isThisBlocked = blockedUsers.has(otherUser ? otherUser.user_id : null) || blockedByUsers.has(otherUser ? otherUser.user_id : null);
-                var lastMsgResult = await supabase.from('messages').select('content, created_at').eq('conversation_id', conv.id).order('created_at', { ascending: false }).limit(1);
-                var lastMessageText = 'কোন মেসেজ নেই';
-                if (lastMsgResult.data && lastMsgResult.data[0] && lastMsgResult.data[0].content) {
-                    lastMessageText = lastMsgResult.data[0].content.substring(0, 30);
-                }
-                var role = null;
-                for (var m = 0; m < dmMembershipsResult.data.length; m++) {
-                    if (dmMembershipsResult.data[m].conversation_id === conv.id) { role = dmMembershipsResult.data[m].role; break; }
-                }
-                newAllChats.push({ id: conv.id, type: conv.type, name: displayName, avatar: '👤', lastMessage: lastMessageText, updatedAt: conv.updated_at, role: role, isBlocked: isThisBlocked });
             }
         }
+        
         var allRooms = await getAllRooms();
         var joinedArray = Array.from(joinedRoomIds);
         for (var n = 0; n < joinedArray.length; n++) {
             var roomId = joinedArray[n];
-            var room = null;
-            for (var o = 0; o < allRooms.length; o++) {
-                if (allRooms[o].id === roomId) { room = allRooms[o]; break; }
-            }
-            if (room && !newAllChats.find(function(c) { return c.id === roomId; })) {
-                var lastMsgResult = await supabase.from('messages').select('content, created_at').eq('conversation_id', roomId).order('created_at', { ascending: false }).limit(1);
-                var lastMessageText = 'কোন মেসেজ নেই';
-                if (lastMsgResult.data && lastMsgResult.data[0] && lastMsgResult.data[0].content) {
-                    lastMessageText = lastMsgResult.data[0].content.substring(0, 30);
+            if (!newAllChats.find(function(c) { return c.id === roomId; })) {
+                var room = null;
+                for (var o = 0; o < allRooms.length; o++) {
+                    if (allRooms[o].id === roomId) {
+                        room = allRooms[o];
+                        break;
+                    }
                 }
-                newAllChats.push({ id: roomId, type: 'room', name: room.name, avatar: room.isCustom ? '🔧' : '🌍', lastMessage: lastMessageText, updatedAt: new Date().toISOString(), role: 'member', isCustom: room.isCustom });
+                if (room) {
+                    var lastMsgResult = await supabase.from('messages').select('content, created_at').eq('conversation_id', roomId).order('created_at', { ascending: false }).limit(1);
+                    var lastMessageText = 'কোন মেসেজ নেই';
+                    if (lastMsgResult.data && lastMsgResult.data[0] && lastMsgResult.data[0].content) {
+                        lastMessageText = lastMsgResult.data[0].content.substring(0, 30);
+                    }
+                    newAllChats.push({
+                        id: roomId,
+                        type: 'room',
+                        name: room.name,
+                        avatar: room.isCustom ? '🔧' : (room.isGlobal ? '🌍' : '🌍'),
+                        lastMessage: lastMessageText,
+                        updatedAt: new Date().toISOString(),
+                        role: 'member',
+                        isBlocked: false,
+                        isCustom: room.isCustom,
+                        isGlobal: room.isGlobal,
+                        broadcastMode: room.broadcastMode
+                    });
+                }
             }
         }
+        
         allChats = newAllChats;
         renderChatList();
         renderRoomsList();
     }
     
     // ------------------------------------------------------------
-    // রেন্ডার চ্যাট লিস্ট (ফিক্সড)
+    // রেন্ডার চ্যাট লিস্ট
     // ------------------------------------------------------------
     function renderChatList() {
         var container = document.getElementById('chatsList');
         if (!container) return;
+        container.innerHTML = '';
+        
         if (allChats.length === 0) {
             container.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">💬 কোন চ্যাট নেই</div>';
             return;
         }
-        container.innerHTML = '';
-        for (var i = 0; i < allChats.length; i++) {
-            var chat = allChats[i];
+        
+        var dmChats = allChats.filter(function(c) { return c.type === 'dm'; });
+        var roomChats = allChats.filter(function(c) { return c.type === 'room'; });
+        var sortedChats = dmChats.concat(roomChats);
+        
+        for (var i = 0; i < sortedChats.length; i++) {
+            var chat = sortedChats[i];
             var chatDiv = document.createElement('div');
             chatDiv.className = 'chat-item';
             chatDiv.setAttribute('data-chat-id', chat.id);
+            
             var badgeHtml = '';
-            if (chat.type === 'room') {
-                badgeHtml = chat.isCustom ? '<span class="custom-badge">কাস্টম</span>' : '<span class="room-badge">রুম</span>';
+            if (chat.type === 'dm') {
+                badgeHtml = '<span class="dm-badge">DM</span>';
+            } else if (chat.type === 'room') {
+                if (chat.isGlobal) {
+                    badgeHtml = '<span class="room-badge">গ্লোবাল</span>';
+                } else if (chat.isCustom) {
+                    badgeHtml = '<span class="custom-badge">কাস্টম</span>';
+                } else {
+                    badgeHtml = '<span class="room-badge">রুম</span>';
+                }
+                if (chat.broadcastMode) badgeHtml += ' <span class="broadcast-badge">📢</span>';
             }
+            
             var blockedHtml = chat.isBlocked ? '<span class="blocked-badge">ব্লক</span>' : '';
+            
             chatDiv.innerHTML = '<div class="chat-avatar">' + chat.avatar + '</div><div class="chat-info"><div class="chat-name">' + escapeHtml(chat.name) + badgeHtml + blockedHtml + '</div><div class="chat-last-msg">' + escapeHtml(chat.lastMessage) + '</div></div><div class="chat-right"><div class="chat-time">' + formatTime(chat.updatedAt) + '</div></div>';
-            // ক্লিক ইভেন্ট - সঠিক চ্যাট ওপেন করবে
+            
             (function(chatData) {
                 chatDiv.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1199,6 +1344,7 @@
                     }
                 });
             })(chat);
+            
             container.appendChild(chatDiv);
         }
     }
@@ -1213,9 +1359,14 @@
         var memberResult = await supabase.from('conversation_members').select('role').eq('conversation_id', chat.id).eq('user_id', currentUser.id).single();
         chat.role = memberResult.data ? memberResult.data.role : 'member';
         currentChat = chat;
+        isFullscreenOpen = true;
         document.getElementById('chatListView').style.display = 'none';
         document.getElementById('fullscreenChat').style.display = 'flex';
         document.getElementById('chatTitle').innerHTML = chat.avatar + ' ' + escapeHtml(chat.name);
+        
+        // মোবাইল ব্যাক বাটনের জন্য হিস্টোরি যোগ
+        history.pushState({ chatOpen: true }, '');
+        
         if (chat.type === 'room') {
             var maxMem = roomMaxMembers[chat.id];
             var memberCount = await getRoomMemberCount(chat.id);
@@ -1264,7 +1415,9 @@
             if ((isBlocked && msg.sender_id !== currentUser.id) || (isBlockedByOther && msg.sender_id !== currentUser.id)) continue;
             appendMessageToContainer(msg, container);
         }
-        scrollToBottom();
+        if (isAutoScroll) {
+            setTimeout(function() { scrollToBottom(); }, 100);
+        }
     }
     
     function appendMessageToContainer(msg, container) {
@@ -1283,7 +1436,7 @@
     }
     
     // ------------------------------------------------------------
-    // মেসেজ সেন্ড
+    // মেসেজ সেন্ড (এন্টার ফিক্স সহ)
     // ------------------------------------------------------------
     async function sendMessage() {
         var input = document.getElementById('messageInput');
@@ -1313,9 +1466,37 @@
             input.value = '';
             input.style.height = 'auto';
             await supabase.from('conversations').update({ updated_at: new Date() }).eq('id', currentChat.id);
-            input.focus();
-            scrollToBottom();
+            // মেসেজ পাঠানোর পর ফোকাস রাখি (কিবোর্ড বন্ধ হবে না)
+            setTimeout(function() {
+                input.focus();
+                scrollToBottom();
+            }, 100);
         }
+    }
+    
+    // ------------------------------------------------------------
+    // এন্টার ইভেন্ট হ্যান্ডলিং (মোবাইলের জন্য ফিক্স)
+    // ------------------------------------------------------------
+    var msgInput = document.getElementById('messageInput');
+    if (msgInput) {
+        msgInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+        
+        msgInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                // Shift চেপে থাকলে নতুন লাইন, নাহলে সেন্ড
+                if (e.shiftKey) {
+                    // নতুন লাইন - কিছু করব না
+                    return;
+                } else {
+                    // মেসেজ সেন্ড
+                    e.preventDefault();
+                    sendMessage();
+                }
+            }
+        });
     }
     
     // ------------------------------------------------------------
@@ -1414,30 +1595,46 @@
                 if (container && currentChat && currentChat.id === convId && !document.getElementById('msg-' + payload.new.id)) {
                     if ((isBlocked && payload.new.sender_id !== currentUser.id) || (isBlockedByOther && payload.new.sender_id !== currentUser.id)) return;
                     appendMessageToContainer(payload.new, container);
-                    scrollToBottom();
+                    if (isAutoScroll) {
+                        setTimeout(function() { scrollToBottom(); }, 100);
+                    }
                 }
                 loadChatList();
             }).subscribe();
     }
     
     function closeFullscreenChat() {
+        isFullscreenOpen = false;
         if (activeSubscription) { window.getSupabase().removeChannel(activeSubscription); activeSubscription = null; }
         closeSideMenu();
         document.getElementById('fullscreenChat').style.display = 'none';
         document.getElementById('chatListView').style.display = 'block';
         currentChat = null;
         loadChatList();
+        // ইতিহাস থেকে পপ স্টেট রিমুভ
+        if (window.history.state && window.history.state.chatOpen) {
+            history.back();
+        }
     }
+    
+    // ------------------------------------------------------------
+    // স্ক্রল ইভেন্ট
+    // ------------------------------------------------------------
+    function setupScrollListener() {
+        var container = document.getElementById('fullscreenMessages');
+        if (!container) return;
+        container.addEventListener('scroll', function() {
+            checkScrollPosition();
+        });
+    }
+    
+    document.getElementById('scrollDownBtn')?.addEventListener('click', function() {
+        scrollToBottom();
+    });
     
     // ------------------------------------------------------------
     // ইভেন্ট লিসেনার
     // ------------------------------------------------------------
-    var msgInput = document.getElementById('messageInput');
-    if (msgInput) {
-        msgInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
-        msgInput.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-    }
-    
     document.getElementById('sendMsgFullBtn')?.addEventListener('click', sendMessage);
     document.getElementById('closeChatBtn')?.addEventListener('click', closeFullscreenChat);
     document.getElementById('menuToggleBtn')?.addEventListener('click', openSideMenu);
@@ -1502,6 +1699,7 @@
         loadJoinedRoomsFromLocal();
         loadCustomRoomsFromLocal();
         await loadChatList();
+        setupScrollListener();
     });
     
     // গ্লোবাল ফাংশন এক্সপোজ
@@ -1519,6 +1717,7 @@
     window.closeSideMenu = closeSideMenu;
     window.showBlockList = showBlockList;
     window.unblockUser = unblockUser;
+    window.closeFullscreenChat = closeFullscreenChat;
     </script>
 </body>
 </html>
