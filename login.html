@@ -8,14 +8,16 @@
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     
-    <!-- Firebase JS (Compat - আপনার কনফিগারেশনের সাথে মিলে) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <!-- Firebase JS (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     
     <link rel="stylesheet" href="css/style.css">
     
     <style>
-        /* ===== Main Auth Container ===== */
+        /* ============================================
+           Login Page Styles
+           ============================================ */
         .auth-container {
             display: flex;
             justify-content: center;
@@ -24,6 +26,7 @@
             padding: 1rem;
             background: var(--bg-primary);
         }
+        
         .auth-card {
             background-color: var(--bg-secondary);
             padding: 2.5rem;
@@ -33,17 +36,24 @@
             text-align: center;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
+        
+        .auth-card .logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
         .auth-card h2 {
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
         }
+        
         .auth-card .subtitle {
             color: var(--text-secondary);
             margin-bottom: 2rem;
             font-size: 0.95rem;
         }
         
-        /* ===== Google Login Button ===== */
+        /* Google Button */
         .google-btn {
             background: #fff;
             color: #444;
@@ -60,20 +70,28 @@
             transition: 0.3s;
             font-weight: 500;
         }
+        
         .google-btn:hover {
             background: #f1f1f1;
             transform: scale(1.02);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
+        
         .google-btn:active {
             transform: scale(0.98);
         }
+        
         .google-btn svg {
             width: 24px;
             height: 24px;
         }
         
-        /* ===== Registration Step ===== */
+        .google-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Registration Step */
         .step {
             background: var(--bg-primary);
             padding: 1.5rem;
@@ -81,19 +99,22 @@
             margin-top: 1.5rem;
             text-align: left;
         }
+        
         .step h3 {
             text-align: center;
             margin-bottom: 1.2rem;
             font-size: 1.2rem;
         }
+        
         .hidden {
             display: none !important;
         }
         
-        /* ===== Form Elements ===== */
+        /* Form Elements */
         .form-group {
             margin-bottom: 1rem;
         }
+        
         .form-group input,
         .form-group select {
             width: 100%;
@@ -103,31 +124,36 @@
             color: var(--text-primary);
             border-radius: 8px;
             font-size: 0.95rem;
+            box-sizing: border-box;
         }
+        
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: var(--accent);
         }
         
-        /* ===== Username Availability ===== */
+        /* Username Availability */
         .username-availability {
             font-size: 0.9rem;
             margin-top: 0.4rem;
         }
+        
         .username-available {
             color: #4caf50;
         }
+        
         .username-unavailable {
             color: #e94560;
         }
+        
         .username-hint {
             color: var(--text-secondary);
             font-size: 0.75rem;
             margin-top: 0.2rem;
         }
         
-        /* ===== Google User Info ===== */
+        /* Google User Info */
         .google-user-info {
             display: flex;
             align-items: center;
@@ -137,28 +163,32 @@
             border-radius: 8px;
             margin-bottom: 1.2rem;
         }
+        
         .google-user-info img {
             width: 50px;
             height: 50px;
             border-radius: 50%;
             object-fit: cover;
         }
+        
         .google-user-info .user-name {
             font-weight: 600;
             font-size: 1rem;
         }
+        
         .google-user-info .user-email {
             color: var(--text-secondary);
             font-size: 0.8rem;
         }
         
-        /* ===== Captcha ===== */
+        /* Captcha */
         .captcha-wrapper {
             background: var(--bg-secondary);
             border-radius: 8px;
             padding: 1rem;
             border: 1px solid var(--border);
         }
+        
         .captcha-display {
             background: #0a0a1a;
             padding: 0.8rem;
@@ -176,14 +206,17 @@
             align-items: center;
             flex-wrap: wrap;
         }
+        
         .captcha-display span {
             display: inline-block;
             margin: 0 2px;
         }
+        
         .captcha-input-group {
             display: flex;
             gap: 0.8rem;
         }
+        
         .captcha-input-group input {
             flex: 1;
             padding: 0.7rem;
@@ -195,10 +228,12 @@
             border-radius: 8px;
             font-size: 0.95rem;
         }
+        
         .captcha-input-group input:focus {
             outline: none;
             border-color: var(--accent);
         }
+        
         .btn-refresh {
             background-color: var(--accent);
             color: white;
@@ -210,11 +245,12 @@
             font-size: 0.9rem;
             transition: 0.3s;
         }
+        
         .btn-refresh:hover {
             background: var(--accent-hover);
         }
         
-        /* ===== Buttons ===== */
+        /* Primary Button */
         .btn-primary {
             background-color: var(--accent);
             color: white;
@@ -227,14 +263,18 @@
             transition: 0.3s;
             font-weight: 500;
         }
+        
         .btn-primary:hover:not(:disabled) {
             background-color: var(--accent-hover);
             transform: scale(1.02);
         }
+        
         .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
+        
+        /* Secondary Button */
         .btn-secondary {
             background: transparent;
             color: var(--text-primary);
@@ -247,11 +287,12 @@
             transition: 0.3s;
             margin-top: 0.5rem;
         }
+        
         .btn-secondary:hover {
             background: var(--bg-secondary);
         }
         
-        /* ===== Loading Spinner ===== */
+        /* Loading Spinner */
         .spinner {
             display: inline-block;
             width: 20px;
@@ -261,17 +302,28 @@
             border-top-color: #fff;
             animation: spin 0.8s ease-in-out infinite;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        /* ===== Responsive ===== */
+        /* Footer */
+        .auth-footer {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Responsive */
         @media (max-width: 480px) {
             .auth-card {
                 padding: 1.5rem;
             }
             .auth-card h2 {
                 font-size: 1.4rem;
+            }
+            .auth-card .logo {
+                font-size: 2.5rem;
             }
             .google-btn {
                 font-size: 0.95rem;
@@ -293,7 +345,7 @@
         <div class="auth-card">
             
             <!-- ===== LOGO / HEADER ===== -->
-            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔐</div>
+            <div class="logo">🔐</div>
             <h2>স্বাগতম</h2>
             <p class="subtitle">লগইন করতে আপনার গুগল একাউন্ট ব্যবহার করুন</p>
             
@@ -362,13 +414,15 @@
             </div>
             
             <!-- ===== FOOTER ===== -->
-            <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+            <div class="auth-footer">
                 🔒 নিরাপদ লগইন • গুগল দ্বারা সুরক্ষিত
-            </p>
+            </div>
         </div>
     </div>
 
-    <!-- ===== SCRIPTS ===== -->
+    <!-- ============================================================
+    SCRIPTS
+    ============================================================ -->
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
     
@@ -516,15 +570,23 @@
                 // Firebase signInWithGoogle function from firebase-config.js
                 const user = await window.signInWithGoogle();
                 googleUser = user;
-                console.log('Google User:', user);
+                console.log('✅ Google User:', user);
                 
                 // Check if user exists in Supabase
                 const supabase = window.getSupabase();
+                if (!supabase) {
+                    throw new Error('Supabase not initialized');
+                }
+                
                 const { data: existingUser, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('email', user.email)
                     .maybeSingle();
+
+                if (error) {
+                    console.error('Supabase query error:', error);
+                }
 
                 if (existingUser) {
                     // Account exists - direct login
@@ -547,26 +609,42 @@
                     updateCaptcha();
                     
                     // Reset button
-                    googleSignInBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
-                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-                    </svg> <span>Google দিয়ে লগইন করুন</span>`;
-                    googleSignInBtn.disabled = false;
+                    resetGoogleButton();
                 }
             } catch (error) {
-                console.error('Google Sign-In Error:', error);
-                alert('গুগল লগইন ব্যর্থ!');
-                googleSignInBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
+                console.error('❌ Google Sign-In Error:', error);
+                
+                // User friendly error message
+                let errorMessage = 'গুগল লগইন ব্যর্থ!';
+                if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'পপ-আপ ব্লক করা হয়েছে! ব্রাউজারের পপ-আপ সেটিংস চেক করুন।';
+                } else if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'আপনি পপ-আপ বন্ধ করে দিয়েছেন। আবার চেষ্টা করুন।';
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    errorMessage = 'এই ডোমেইন অনুমোদিত নয়। Firebase Console এ Authorized Domains এ socialock.github.io যোগ করুন।';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage = 'নেটওয়ার্ক সংযোগ সমস্যা! ইন্টারনেট চেক করুন।';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(errorMessage);
+                resetGoogleButton();
+            }
+        });
+
+        function resetGoogleButton() {
+            googleSignInBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                     <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
                     <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
                     <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
                     <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-                </svg> <span>Google দিয়ে লগইন করুন</span>`;
-                googleSignInBtn.disabled = false;
-            }
-        });
+                </svg>
+                <span>Google দিয়ে লগইন করুন</span>
+            `;
+            googleSignInBtn.disabled = false;
+        }
 
         // ============================================================
         // COMPLETE REGISTRATION (Supabase)
@@ -594,11 +672,25 @@
 
             try {
                 const supabase = window.getSupabase();
+                if (!supabase) {
+                    throw new Error('Supabase সংযোগ নেই!');
+                }
                 
+                // IMPORTANT: Firebase UID is string, not UUID
+                // So we insert it as string (TEXT type)
+                const userId = googleUser.uid; // This is a string like "abc123def456"
+                
+                console.log('📝 Inserting user:', {
+                    id: userId,
+                    username: username,
+                    email: googleUser.email,
+                    country: country
+                });
+
                 const { data: newUser, error: insertError } = await supabase
                     .from('users')
                     .insert({
-                        id: googleUser.uid,
+                        id: userId,  // TEXT type (Firebase UID)
                         username: username,
                         email: googleUser.email,
                         country: country,
@@ -609,18 +701,31 @@
                     .single();
 
                 if (insertError) {
-                    console.error('User creation error:', insertError);
-                    alert('একাউন্ট তৈরি করতে সমস্যা!');
+                    console.error('❌ User creation error:', insertError);
+                    
+                    // User friendly error message
+                    let errorMsg = 'একাউন্ট তৈরি করতে সমস্যা!';
+                    if (insertError.code === '23505') {
+                        errorMsg = 'এই ইউজারনেম বা ইমেইল ইতিমধ্যে ব্যবহার করা হয়েছে!';
+                    } else if (insertError.code === '42501') {
+                        errorMsg = 'ডাটাবেজে লেখার অনুমতি নেই! Supabase RLS Policy চেক করুন।';
+                    } else if (insertError.message) {
+                        errorMsg = insertError.message;
+                    }
+                    
+                    alert(errorMsg);
                     completeRegBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
                     completeRegBtn.disabled = false;
                     return;
                 }
 
+                console.log('✅ User created successfully:', newUser);
                 localStorage.setItem('userId', newUser.id);
                 window.location.href = 'home.html';
+                
             } catch (err) {
-                console.error('Registration error:', err);
-                alert('একাউন্ট তৈরি ব্যর্থ!');
+                console.error('❌ Registration error:', err);
+                alert('একাউন্ট তৈরি ব্যর্থ: ' + err.message);
                 completeRegBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
                 completeRegBtn.disabled = false;
             }
@@ -651,7 +756,7 @@
         // ============================================================
         window.onAuthStateChanged(async (user) => {
             if (user) {
-                console.log('Already signed in:', user);
+                console.log('👤 Already signed in:', user.email);
                 const supabase = window.getSupabase();
                 const { data: existingUser } = await supabase
                     .from('users')
