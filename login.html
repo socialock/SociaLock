@@ -2,36 +2,679 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>লগইন</title>
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Supabase JS CDN - এটা যোগ করা জরুরি -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>গুগল লগইন - সোশ্যাল মিডিয়া</title>
+    
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    
+    <!-- Firebase JS (Compat - আপনার কনফিগারেশনের সাথে মিলে) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* ===== Main Auth Container ===== */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            background: var(--bg-primary);
+        }
+        .auth-card {
+            background-color: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .auth-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .auth-card .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        
+        /* ===== Google Login Button ===== */
+        .google-btn {
+            background: #fff;
+            color: #444;
+            border: 1px solid #ddd;
+            padding: 0.9rem;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            width: 100%;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .google-btn:hover {
+            background: #f1f1f1;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .google-btn:active {
+            transform: scale(0.98);
+        }
+        .google-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* ===== Registration Step ===== */
+        .step {
+            background: var(--bg-primary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .step h3 {
+            text-align: center;
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+        }
+        .hidden {
+            display: none !important;
+        }
+        
+        /* ===== Form Elements ===== */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* ===== Username Availability ===== */
+        .username-availability {
+            font-size: 0.9rem;
+            margin-top: 0.4rem;
+        }
+        .username-available {
+            color: #4caf50;
+        }
+        .username-unavailable {
+            color: #e94560;
+        }
+        .username-hint {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-top: 0.2rem;
+        }
+        
+        /* ===== Google User Info ===== */
+        .google-user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+        }
+        .google-user-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .google-user-info .user-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .google-user-info .user-email {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        /* ===== Captcha ===== */
+        .captcha-wrapper {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+        }
+        .captcha-display {
+            background: #0a0a1a;
+            padding: 0.8rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            font-family: monospace;
+            border: 2px dashed var(--accent);
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .captcha-display span {
+            display: inline-block;
+            margin: 0 2px;
+        }
+        .captcha-input-group {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .captcha-input-group input {
+            flex: 1;
+            padding: 0.7rem;
+            text-align: center;
+            letter-spacing: 2px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        .captcha-input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .btn-refresh {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-refresh:hover {
+            background: var(--accent-hover);
+        }
+        
+        /* ===== Buttons ===== */
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: scale(1.02);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 0.7rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 0.5rem;
+        }
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+        }
+        
+        /* ===== Loading Spinner ===== */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ===== Responsive ===== */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 1.5rem;
+            }
+            .auth-card h2 {
+                font-size: 1.4rem;
+            }
+            .google-btn {
+                font-size: 0.95rem;
+                padding: 0.8rem;
+            }
+            .step {
+                padding: 1rem;
+            }
+            .captcha-display {
+                font-size: 1.2rem;
+                min-height: 50px;
+            }
+        }
+    </style>
 </head>
+
 <body class="dark-theme">
     <div class="auth-container">
         <div class="auth-card">
-            <h2>🔐 লগইন করুন</h2>
             
-            <!-- কানেকশন স্ট্যাটাস -->
-            <div id="connectionStatus" style="margin-bottom: 15px; padding: 8px; border-radius: 5px; text-align: center; font-size: 14px;"></div>
+            <!-- ===== LOGO / HEADER ===== -->
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔐</div>
+            <h2>স্বাগতম</h2>
+            <p class="subtitle">লগইন করতে আপনার গুগল একাউন্ট ব্যবহার করুন</p>
             
-            <form id="loginForm">
+            <!-- ===== GOOGLE LOGIN BUTTON ===== -->
+            <button id="googleSignInBtn" class="google-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                </svg>
+                <span>Google দিয়ে লগইন করুন</span>
+            </button>
+            
+            <!-- ===== REGISTRATION STEP (Hidden by default) ===== -->
+            <div id="registrationStep" class="step hidden">
+                <h3>✏️ প্রোফাইল তৈরি করুন</h3>
+                
+                <div id="googleUserInfo" class="google-user-info"></div>
+                
                 <div class="form-group">
-                    <input type="text" id="loginIdentifier" placeholder="ইউজারনেম বা ইমেইল" required>
+                    <input type="text" id="newUsername" placeholder="ইউজারনেম (শুধু A-z এবং ০-৯, সর্বোচ্চ ১০ অক্ষর)" maxlength="10" pattern="[A-Za-z0-9]+" autocomplete="off">
+                    <div id="usernameStatus" class="username-availability"></div>
+                    <div class="username-hint">💡 শুধু ইংরেজি অক্ষর ও সংখ্যা (A-z, 0-9)</div>
                 </div>
+
                 <div class="form-group">
-                    <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড" required>
+                    <select id="newCountry">
+                        <option value="">🌍 দেশ নির্বাচন করুন</option>
+                        <option value="বাংলাদেশ">বাংলাদেশ</option>
+                        <option value="ভারত">ভারত</option>
+                        <option value="পাকিস্তান">পাকিস্তান</option>
+                        <option value="আমেরিকা">আমেরিকা</option>
+                        <option value="যুক্তরাজ্য">যুক্তরাজ্য</option>
+                        <option value="কানাডা">কানাডা</option>
+                        <option value="অস্ট্রেলিয়া">অস্ট্রেলিয়া</option>
+                        <option value="জার্মানি">জার্মানি</option>
+                        <option value="ফ্রান্স">ফ্রান্স</option>
+                        <option value="ইতালি">ইতালি</option>
+                        <option value="স্পেন">স্পেন</option>
+                        <option value="তুরস্ক">তুরস্ক</option>
+                        <option value="সংযুক্ত আরব আমিরাত">সংযুক্ত আরব আমিরাত</option>
+                        <option value="সৌদি আরব">সৌদি আরব</option>
+                        <option value="মালয়েশিয়া">মালয়েশিয়া</option>
+                        <option value="সিঙ্গাপুর">সিঙ্গাপুর</option>
+                        <option value="ইন্দোনেশিয়া">ইন্দোনেশিয়া</option>
+                        <option value="দক্ষিণ কোরিয়া">দক্ষিণ কোরিয়া</option>
+                        <option value="জাপান">জাপান</option>
+                        <option value="ব্রাজিল">ব্রাজিল</option>
+                        <option value="মেক্সিকো">মেক্সিকো</option>
+                    </select>
                 </div>
-                <button type="submit" id="loginBtn" class="btn-primary">লগইন</button>
-            </form>
-            <p style="margin-top: 1rem; text-align: center;">
-                অ্যাকাউন্ট নেই? <a href="register.html">খুলুন</a>
+
+                <div class="form-group">
+                    <div class="captcha-wrapper">
+                        <div class="captcha-display" id="captchaDisplay"></div>
+                        <div class="captcha-input-group">
+                            <input type="text" id="captchaInput" placeholder="ক্যাপচা কোড লিখুন" autocomplete="off">
+                            <button type="button" id="refreshCaptcha" class="btn-refresh">⟳</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="completeRegistrationBtn" class="btn-primary" disabled>✅ একাউন্ট তৈরি করুন</button>
+                <button id="cancelRegistrationBtn" class="btn-secondary">↩️ বাতিল করুন</button>
+            </div>
+            
+            <!-- ===== FOOTER ===== -->
+            <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                🔒 নিরাপদ লগইন • গুগল দ্বারা সুরক্ষিত
             </p>
         </div>
     </div>
-    
+
+    <!-- ===== SCRIPTS ===== -->
     <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/firebase-config.js"></script>
+    
+    <script>
+        // ============================================================
+        // GOOGLE LOGIN ONLY - Complete System
+        // ============================================================
+        
+        // ============================================================
+        // DOM REFERENCES
+        // ============================================================
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const registrationStep = document.getElementById('registrationStep');
+        const googleUserInfo = document.getElementById('googleUserInfo');
+        const newUsername = document.getElementById('newUsername');
+        const usernameStatus = document.getElementById('usernameStatus');
+        const newCountry = document.getElementById('newCountry');
+        const captchaInput = document.getElementById('captchaInput');
+        const captchaDisplay = document.getElementById('captchaDisplay');
+        const refreshCaptcha = document.getElementById('refreshCaptcha');
+        const completeRegBtn = document.getElementById('completeRegistrationBtn');
+        const cancelRegBtn = document.getElementById('cancelRegistrationBtn');
+
+        let currentCaptcha = '';
+        let googleUser = null;
+        let isUsernameAvailable = false;
+
+        // ============================================================
+        // CAPTCHA FUNCTIONS
+        // ============================================================
+        function generateCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+            let captcha = '';
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return captcha;
+        }
+
+        function updateCaptcha() {
+            currentCaptcha = generateCaptcha();
+            captchaDisplay.innerHTML = currentCaptcha.split('').map(char => 
+                `<span style="transform:rotate(${Math.random() * 30 - 15}deg); 
+                font-size:24px; font-weight:bold; 
+                color:hsl(${Math.random() * 360}, 80%, 55%); 
+                text-shadow:1px 1px 2px rgba(0,0,0,0.3);
+                font-family:monospace;">${char}</span>`
+            ).join('');
+        }
+
+        refreshCaptcha.addEventListener('click', () => {
+            updateCaptcha();
+            captchaInput.value = '';
+        });
+
+        // ============================================================
+        // USERNAME AVAILABILITY CHECK (Supabase)
+        // ============================================================
+        async function checkUsernameAvailability(username) {
+            if (!username || username.length < 2) {
+                usernameStatus.innerHTML = '';
+                isUsernameAvailable = false;
+                completeRegBtn.disabled = true;
+                return;
+            }
+
+            const validPattern = /^[A-Za-z0-9]+$/;
+            if (!validPattern.test(username)) {
+                usernameStatus.innerHTML = '❌ শুধু ইংরেজি অক্ষর ও সংখ্যা ব্যবহার করুন';
+                usernameStatus.className = 'username-availability username-unavailable';
+                isUsernameAvailable = false;
+                completeRegBtn.disabled = true;
+                return;
+            }
+
+            try {
+                const supabase = window.getSupabase();
+                if (!supabase) {
+                    usernameStatus.innerHTML = '⚠️ সংযোগ সমস্যা';
+                    return;
+                }
+
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('username')
+                    .eq('username', username)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('Username check error:', error);
+                    usernameStatus.innerHTML = '⚠️ চেক করতে সমস্যা';
+                    return;
+                }
+
+                if (data) {
+                    usernameStatus.innerHTML = '❌ এই ইউজারনেম নেওয়া হয়েছে!';
+                    usernameStatus.className = 'username-availability username-unavailable';
+                    isUsernameAvailable = false;
+                    completeRegBtn.disabled = true;
+                } else {
+                    usernameStatus.innerHTML = '✅ ইউজারনেম available!';
+                    usernameStatus.className = 'username-availability username-available';
+                    isUsernameAvailable = true;
+                    checkFormValidity();
+                }
+            } catch (err) {
+                console.error('Username check exception:', err);
+                usernameStatus.innerHTML = '⚠️ চেক করতে সমস্যা';
+            }
+        }
+
+        newUsername.addEventListener('input', () => {
+            const val = newUsername.value.trim();
+            newUsername.value = val.replace(/[^A-Za-z0-9]/g, '');
+            checkUsernameAvailability(newUsername.value);
+        });
+
+        // ============================================================
+        // FORM VALIDATION
+        // ============================================================
+        function checkFormValidity() {
+            const country = newCountry.value;
+            const captcha = captchaInput.value.trim();
+            const isCaptchaValid = captcha.toUpperCase() === currentCaptcha.toUpperCase();
+            
+            if (isUsernameAvailable && country && isCaptchaValid) {
+                completeRegBtn.disabled = false;
+            } else {
+                completeRegBtn.disabled = true;
+            }
+        }
+
+        newCountry.addEventListener('change', checkFormValidity);
+        captchaInput.addEventListener('input', checkFormValidity);
+
+        // ============================================================
+        // GOOGLE SIGN-IN (Firebase)
+        // ============================================================
+        googleSignInBtn.addEventListener('click', async () => {
+            // Show loading state
+            googleSignInBtn.innerHTML = '<span class="spinner"></span> লগইন হচ্ছে...';
+            googleSignInBtn.disabled = true;
+
+            try {
+                // Firebase signInWithGoogle function from firebase-config.js
+                const user = await window.signInWithGoogle();
+                googleUser = user;
+                console.log('Google User:', user);
+                
+                // Check if user exists in Supabase
+                const supabase = window.getSupabase();
+                const { data: existingUser, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('email', user.email)
+                    .maybeSingle();
+
+                if (existingUser) {
+                    // Account exists - direct login
+                    localStorage.setItem('userId', existingUser.id);
+                    window.location.href = 'home.html';
+                } else {
+                    // New user - show registration step
+                    document.querySelector('.auth-card h2').textContent = '📝 একাউন্ট তৈরি করুন';
+                    document.querySelector('.auth-card .subtitle').textContent = 'আপনার প্রোফাইল তৈরি করতে নিচের তথ্য দিন';
+                    googleSignInBtn.classList.add('hidden');
+                    
+                    registrationStep.classList.remove('hidden');
+                    googleUserInfo.innerHTML = `
+                        <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User')}" alt="Profile">
+                        <div>
+                            <div class="user-name">${user.displayName || 'নাম নেই'}</div>
+                            <div class="user-email">${user.email}</div>
+                        </div>
+                    `;
+                    updateCaptcha();
+                    
+                    // Reset button
+                    googleSignInBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
+                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    </svg> <span>Google দিয়ে লগইন করুন</span>`;
+                    googleSignInBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Google Sign-In Error:', error);
+                alert('গুগল লগইন ব্যর্থ!');
+                googleSignInBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                </svg> <span>Google দিয়ে লগইন করুন</span>`;
+                googleSignInBtn.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // COMPLETE REGISTRATION (Supabase)
+        // ============================================================
+        completeRegBtn.addEventListener('click', async () => {
+            const username = newUsername.value.trim();
+            const country = newCountry.value;
+            const captcha = captchaInput.value.trim();
+
+            if (!isUsernameAvailable || !country || !captcha) {
+                alert('সব তথ্য সঠিকভাবে পূরণ করুন!');
+                return;
+            }
+
+            if (captcha.toUpperCase() !== currentCaptcha.toUpperCase()) {
+                alert('❌ ক্যাপচা ভুল!');
+                updateCaptcha();
+                captchaInput.value = '';
+                return;
+            }
+
+            // Show loading
+            completeRegBtn.innerHTML = '<span class="spinner"></span> একাউন্ট তৈরি হচ্ছে...';
+            completeRegBtn.disabled = true;
+
+            try {
+                const supabase = window.getSupabase();
+                
+                const { data: newUser, error: insertError } = await supabase
+                    .from('users')
+                    .insert({
+                        id: googleUser.uid,
+                        username: username,
+                        email: googleUser.email,
+                        country: country,
+                        role: 'user',
+                        created_at: new Date().toISOString()
+                    })
+                    .select()
+                    .single();
+
+                if (insertError) {
+                    console.error('User creation error:', insertError);
+                    alert('একাউন্ট তৈরি করতে সমস্যা!');
+                    completeRegBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
+                    completeRegBtn.disabled = false;
+                    return;
+                }
+
+                localStorage.setItem('userId', newUser.id);
+                window.location.href = 'home.html';
+            } catch (err) {
+                console.error('Registration error:', err);
+                alert('একাউন্ট তৈরি ব্যর্থ!');
+                completeRegBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
+                completeRegBtn.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // CANCEL REGISTRATION
+        // ============================================================
+        cancelRegBtn.addEventListener('click', () => {
+            window.signOutUser();
+            
+            // Reset UI
+            document.querySelector('.auth-card h2').textContent = '🔐 স্বাগতম';
+            document.querySelector('.auth-card .subtitle').textContent = 'লগইন করতে আপনার গুগল একাউন্ট ব্যবহার করুন';
+            googleSignInBtn.classList.remove('hidden');
+            registrationStep.classList.add('hidden');
+            
+            newUsername.value = '';
+            usernameStatus.innerHTML = '';
+            newCountry.value = '';
+            captchaInput.value = '';
+            completeRegBtn.disabled = true;
+            googleUser = null;
+        });
+
+        // ============================================================
+        // AUTO-LOGIN CHECK (Already logged in?)
+        // ============================================================
+        window.onAuthStateChanged(async (user) => {
+            if (user) {
+                console.log('Already signed in:', user);
+                const supabase = window.getSupabase();
+                const { data: existingUser } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('email', user.email)
+                    .maybeSingle();
+                
+                if (existingUser) {
+                    localStorage.setItem('userId', existingUser.id);
+                    // Redirect to home after a moment
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 500);
+                }
+            }
+        });
+
+        // ============================================================
+        // INITIALIZE
+        // ============================================================
+        updateCaptcha();
+        console.log('🚀 Google Login Only - Ready!');
+        console.log('📱 Firebase Project:', firebaseConfig.projectId);
+    </script>
 </body>
 </html>
