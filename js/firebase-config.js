@@ -4,7 +4,7 @@
 // ============================================================
 
 // ============================================================
-// 1. YOUR FIREBASE CONFIG (socialock-c91dd)
+// 1. FIREBASE CONFIG (Your Firebase Project)
 // ============================================================
 const firebaseConfig = {
     apiKey: "AIzaSyB7NgsszBItILY5KPzAhL4Z8h34aBl9L1g",
@@ -17,19 +17,18 @@ const firebaseConfig = {
 };
 
 // ============================================================
-// 2. FIREBASE INITIALIZE (Modular SDK - CDN Version)
+// 2. FIREBASE INITIALIZE (Compat)
 // ============================================================
-// Firebase CDN (compat) ব্যবহার করছি, তাই এইভাবে initialize করতে হবে
 firebase.initializeApp(firebaseConfig);
 
-// ============================================================
-// 3. AUTH REFERENCES
-// ============================================================
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
+provider.addScope('profile');
+provider.addScope('email');
+provider.setCustomParameters({ prompt: 'select_account' });
 
 // ============================================================
-// 4. GOOGLE SIGN-IN FUNCTION
+// 3. GOOGLE SIGN-IN FUNCTION
 // ============================================================
 async function signInWithGoogle() {
     try {
@@ -39,12 +38,14 @@ async function signInWithGoogle() {
         return user;
     } catch (error) {
         console.error('❌ Google Sign-In Error:', error);
+        console.error('Error Code:', error.code);
+        console.error('Error Message:', error.message);
         throw error;
     }
 }
 
 // ============================================================
-// 5. SIGN-OUT FUNCTION
+// 4. SIGN-OUT FUNCTION
 // ============================================================
 async function signOutUser() {
     try {
@@ -56,7 +57,7 @@ async function signOutUser() {
 }
 
 // ============================================================
-// 6. AUTH STATE LISTENER
+// 5. AUTH STATE LISTENER
 // ============================================================
 function onAuthStateChanged(callback) {
     auth.onAuthStateChanged((user) => {
@@ -70,7 +71,7 @@ function onAuthStateChanged(callback) {
 }
 
 // ============================================================
-// 7. EXPORT FUNCTIONS (Global)
+// 6. GLOBAL EXPORTS
 // ============================================================
 window.signInWithGoogle = signInWithGoogle;
 window.signOutUser = signOutUser;
