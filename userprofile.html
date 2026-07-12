@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Profile</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+        }
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            display: flex;
+            flex-direction: column;
+            padding-top: 0;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0 8px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 16px;
+        }
+        .back-header .back-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .back-header .back-btn:hover {
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+        .back-header .back-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e4e6eb;
+        }
+
+        .profile-header {
+            margin-bottom: 16px;
+        }
+
+        .profile-avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 32px;
+            border: 3px solid #3a3b3c;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .profile-name-row {
+            flex: 1;
+        }
+
+        .profile-username {
+            font-size: 22px;
+            font-weight: 700;
+            color: #e4e6eb;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .profile-username .verified-badge {
+            color: #1877f2;
+            font-size: 18px;
+        }
+
+        .profile-bio {
+            color: #b0b3b8;
+            font-size: 14px;
+            margin-top: 4px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        .profile-bio .bio-edit-btn {
+            background: none;
+            border: none;
+            color: #1877f2;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 6px;
+        }
+        .profile-bio .bio-edit-btn:hover {
+            text-decoration: underline;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+            font-size: 13px;
+            color: #b0b3b8;
+            flex-wrap: wrap;
+        }
+        .profile-meta .country {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        .profile-stats span {
+            cursor: pointer;
+            color: #b0b3b8;
+        }
+        .profile-stats span:hover {
+            color: #e4e6eb;
+        }
+        .profile-stats .count {
+            font-weight: 700;
+            color: #e4e6eb;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            position: relative;
+            align-items: center;
+        }
+        .profile-actions .btn {
+            padding: 7px 18px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+        .btn-primary {
+            background: #1877f2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #166fe5;
+        }
+        .btn-primary.following {
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+        .btn-primary.following:hover {
+            background: #e94560;
+        }
+        .btn-danger {
+            background: #e94560;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .btn-more {
+            background: #3a3b3c;
+            color: #e4e6eb;
+            padding: 7px 12px;
+            border-radius: 50%;
+            font-size: 16px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            min-height: 36px;
+        }
+        .btn-more:hover {
+            background: #4a4b4c;
+        }
+
+        .more-dropdown {
+            display: none;
+            position: absolute;
+            right: 50%;
+            transform: translateX(50%);
+            top: 100%;
+            background: #242526;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            z-index: 100;
+            border: 1px solid #3a3b3c;
+            padding: 6px 0;
+            margin-top: 6px;
+        }
+        .more-dropdown.show {
+            display: block;
+        }
+        .more-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            color: #e4e6eb;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .more-dropdown .dropdown-item:hover {
+            background: #3a3b3c;
+        }
+        .more-dropdown .dropdown-item .icon {
+            font-size: 15px;
+            color: #b0b3b8;
+            width: 20px;
+            text-align: center;
+        }
+        .more-dropdown .dropdown-item.danger {
+            color: #e94560;
+        }
+        .more-dropdown .dropdown-item.danger .icon {
+            color: #e94560;
+        }
+
+        .profile-posts-title {
+            font-weight: 600;
+            font-size: 17px;
+            margin-bottom: 12px;
+            color: #e4e6eb;
+            border-top: 1px solid #3a3b3c;
+            padding-top: 16px;
+        }
+
+        .post-card {
+            background: #242526;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #3a3b3c;
+            transition: 0.2s;
+        }
+        .post-card:hover {
+            border-color: #4a4b4c;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .post-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .post-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .post-user-info {
+            flex: 1;
+        }
+        .post-username {
+            font-weight: 600;
+            font-size: 14px;
+            color: #e4e6eb;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .post-username:hover {
+            text-decoration: underline;
+        }
+        .post-username .verified-badge {
+            color: #1877f2;
+            font-size: 13px;
+        }
+        .post-time {
+            font-size: 11px;
+            color: #b0b3b8;
+        }
+
+        .post-more-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 50%;
+            transition: 0.2s;
+            position: relative;
+        }
+        .post-more-btn:hover {
+            background: #3a3b3c;
+        }
+
+        .post-more-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 28px;
+            background: #242526;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            min-width: 140px;
+            z-index: 100;
+            border: 1px solid #3a3b3c;
+            padding: 6px 0;
+        }
+        .post-more-menu.show {
+            display: block;
+        }
+        .post-more-menu .menu-item {
+            display: block;
+            padding: 8px 14px;
+            color: #e4e6eb;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+            font-size: 13px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .post-more-menu .menu-item:hover {
+            background: #3a3b3c;
+        }
+        .post-more-menu .menu-item.danger {
+            color: #e94560;
+        }
+
+        .post-content {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            color: #e4e6eb;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            cursor: pointer;
+        }
+        .post-content a {
+            color: #1877f2;
+            text-decoration: none;
+        }
+        .post-content a:hover {
+            text-decoration: underline;
+        }
+
+        .post-stats {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-top: 1px solid #3a3b3c;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 6px;
+        }
+        .post-stats span {
+            font-size: 13px;
+            color: #b0b3b8;
+            cursor: pointer;
+        }
+        .post-stats span:hover {
+            color: #1877f2;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 6px;
+            padding: 4px 0;
+        }
+        .post-action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #b0b3b8;
+            transition: 0.2s;
+        }
+        .post-action-btn:hover {
+            background: #3a3b3c;
+        }
+        .post-action-btn.liked {
+            color: #e94560;
+        }
+        .post-action-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .no-posts {
+            text-align: center;
+            padding: 30px;
+            color: #b0b3b8;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 30px;
+            color: #b0b3b8;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: #242526;
+            padding: 1.5rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #3a3b3c;
+        }
+        .modal-box h3 {
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #e4e6eb;
+            font-size: 18px;
+        }
+        .modal-box .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: #b0b3b8;
+            margin-bottom: 6px;
+        }
+        .modal-box textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: #3a3b3c;
+            border: 1px solid #3a3b3c;
+            color: #e4e6eb;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+            max-height: 150px;
+            font-family: inherit;
+        }
+        .modal-box textarea:focus {
+            border-color: #1877f2;
+        }
+        .modal-box textarea:disabled {
+            opacity: 0.5;
+        }
+        .modal-box .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .modal-box .btn-row button {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary-modal {
+            background: #1877f2;
+            color: white;
+        }
+        .btn-primary-modal:hover {
+            background: #166fe5;
+        }
+        .btn-primary-modal:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-danger-modal {
+            background: #e94560;
+            color: white;
+        }
+        .btn-danger-modal:hover {
+            background: #ff4757;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success {
+            background: #4caf50;
+        }
+        .custom-alert.error {
+            background: #e94560;
+        }
+        .custom-alert.info {
+            background: #1877f2;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0 12px;
+            }
+            .profile-avatar {
+                width: 64px;
+                height: 64px;
+                font-size: 26px;
+                border-width: 2px;
+            }
+            .profile-username {
+                font-size: 18px;
+            }
+            .profile-username .verified-badge {
+                font-size: 15px;
+            }
+            .profile-avatar-row {
+                gap: 12px;
+            }
+            .profile-stats {
+                gap: 12px;
+                font-size: 13px;
+            }
+            .profile-actions .btn {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+            .btn-more {
+                padding: 6px 10px;
+                font-size: 14px;
+                min-width: 32px;
+                min-height: 32px;
+            }
+            .post-card {
+                padding: 12px;
+            }
+            .post-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            .post-username {
+                font-size: 13px;
+            }
+            .post-content {
+                font-size: 13px;
+            }
+            .post-action-btn {
+                font-size: 12px;
+                padding: 5px;
+            }
+            .post-action-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+            .back-header .back-btn {
+                font-size: 20px;
+            }
+            .back-header .back-title {
+                font-size: 16px;
+            }
+            .profile-bio {
+                font-size: 13px;
+            }
+            .profile-meta {
+                font-size: 12px;
+                gap: 8px;
+            }
+            .modal-box {
+                padding: 1rem;
+                max-width: 320px;
+            }
+            .modal-box textarea {
+                font-size: 13px;
+                min-height: 60px;
+            }
+            .more-dropdown {
+                min-width: 180px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+            .more-dropdown .dropdown-item {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+            .post-more-menu {
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .more-dropdown {
+                min-width: 160px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+        }
+    </style>
+</head>
+
+<body class="dark-theme">
+    <div class="main-wrapper">
+        <div class="main-container" id="mainContainer">
+            <div class="back-header">
+                <button class="back-btn" onclick="window.location.href='home.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span class="back-title" id="pageTitle">Profile</span>
+            </div>
+
+            <div id="profileContainer">
+                <div class="loading-spinner">⏳ Loading profile...</div>
+            </div>
+
+            <div class="profile-posts-title">📝 Posts</div>
+            <div id="postsContainer">
+                <div class="loading-spinner">⏳ Loading posts...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EDIT BIO MODAL ===== -->
+    <div class="modal-overlay" id="editBioModal">
+        <div class="modal-box">
+            <h3>✏️ Edit Bio</h3>
+            <div class="char-count"><span id="bioCharCount">0</span>/100</div>
+            <textarea id="bioTextarea" placeholder="Write something about yourself..." maxlength="100"></textarea>
+            <div class="btn-row">
+                <button class="btn-primary-modal" id="saveBioBtn">Save</button>
+                <button class="btn-danger-modal" id="closeBioModal">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // SUPABASE CONFIG
+        // ============================================================
+        const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co';
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
+
+        let supabaseClient = null;
+
+        function getSupabase() {
+            if (!supabaseClient) {
+                try {
+                    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log("✅ Supabase connected");
+                    }
+                } catch (e) {
+                    console.error("❌ Supabase error:", e);
+                }
+            }
+            return supabaseClient;
+        }
+
+        function showAlert(message, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            alert.innerHTML = message +
+                '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        // GLOBAL VARIABLES
+        // ============================================================
+        let currentUser = null;
+        let profileUser = null;
+        let isOwnProfile = false;
+        let isFollowing = false;
+        let blockedUsers = [];
+
+        const profileContainer = document.getElementById('profileContainer');
+        const postsContainer = document.getElementById('postsContainer');
+        const editBioModal = document.getElementById('editBioModal');
+        const bioTextarea = document.getElementById('bioTextarea');
+        const bioCharCount = document.getElementById('bioCharCount');
+        const saveBioBtn = document.getElementById('saveBioBtn');
+
+        // ============================================================
+        // BIO CHARACTER COUNT
+        // ============================================================
+        bioTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            bioCharCount.textContent = count;
+            saveBioBtn.disabled = count === 0 || count > 100;
+        });
+
+        // ============================================================
+        // GET BLOCKED USERS
+        // ============================================================
+        async function getBlockedUsers() {
+            if (!currentUser) return [];
+            const supabase = getSupabase();
+
+            try {
+                const { data, error } = await supabase
+                    .from('blocks')
+                    .select('blocked_user_id')
+                    .eq('user_id', currentUser.id);
+
+                if (error) {
+                    console.error('Error fetching blocked users:', error);
+                    return [];
+                }
+                blockedUsers = data ? data.map(b => b.blocked_user_id) : [];
+                return blockedUsers;
+            } catch (err) {
+                console.error('Exception:', err);
+                return [];
+            }
+        }
+
+        function isUserBlocked(userId) {
+            return blockedUsers.includes(userId);
+        }
+
+        // ============================================================
+        // CHECK FOLLOW STATUS
+        // ============================================================
+        async function checkFollowStatus() {
+            if (!currentUser || !profileUser || isOwnProfile) return;
+
+            const supabase = getSupabase();
+            const { data, error } = await supabase
+                .from('follows')
+                .select('id')
+                .eq('follower_id', currentUser.id)
+                .eq('following_id', profileUser.id);
+
+            if (error) {
+                console.error('Follow check error:', error);
+                return;
+            }
+
+            isFollowing = data && data.length > 0;
+            updateFollowButton();
+        }
+
+        // ============================================================
+        // FOLLOW / UNFOLLOW
+        // ============================================================
+        async function toggleFollow() {
+            if (!currentUser || !profileUser || isOwnProfile) return;
+
+            const supabase = getSupabase();
+
+            if (isFollowing) {
+                const { error } = await supabase
+                    .from('follows')
+                    .delete()
+                    .eq('follower_id', currentUser.id)
+                    .eq('following_id', profileUser.id);
+
+                if (error) {
+                    showAlert('Failed to unfollow!', 'error');
+                    return;
+                }
+
+                isFollowing = false;
+                showAlert(`Unfollowed ${profileUser.username}`, 'info');
+
+            } else {
+                const { error } = await supabase
+                    .from('follows')
+                    .insert({
+                        follower_id: currentUser.id,
+                        following_id: profileUser.id,
+                        created_at: new Date().toISOString()
+                    });
+
+                if (error) {
+                    showAlert('Failed to follow!', 'error');
+                    return;
+                }
+
+                isFollowing = true;
+                showAlert(`Following ${profileUser.username}`, 'success');
+            }
+
+            updateFollowButton();
+            updateProfileStats();
+        }
+
+        function updateFollowButton() {
+            const btn = document.getElementById('followBtn');
+            if (!btn) return;
+
+            if (isFollowing) {
+                btn.textContent = '✓ Following';
+                btn.classList.add('following');
+            } else {
+                btn.textContent = '+ Follow';
+                btn.classList.remove('following');
+            }
+        }
+
+        // ============================================================
+        // UPDATE PROFILE STATS - Following & Followers clickable (shudhu nijer profile)
+        // ============================================================
+        async function updateProfileStats() {
+            if (!profileUser) return;
+
+            const supabase = getSupabase();
+
+            const { count: followers } = await supabase
+                .from('follows')
+                .select('*', { count: 'exact', head: true })
+                .eq('following_id', profileUser.id);
+
+            const { count: following } = await supabase
+                .from('follows')
+                .select('*', { count: 'exact', head: true })
+                .eq('follower_id', profileUser.id);
+
+            const statsEl = document.getElementById('profileStats');
+            if (statsEl) {
+                if (isOwnProfile) {
+                    // নিজের প্রোফাইলে - Following & Followers ক্লিকযোগ্য
+                    statsEl.innerHTML = `
+                        <span onclick="window.location.href='following.html'">
+                            <span class="count">${followers || 0}</span> Followers
+                        </span>
+                        <span onclick="window.location.href='following.html'">
+                            <span class="count">${following || 0}</span> Following
+                        </span>
+                    `;
+                } else {
+                    // অন্যের প্রোফাইলে - শুধু দেখাবে
+                    statsEl.innerHTML = `
+                        <span style="cursor:default;">
+                            <span class="count">${followers || 0}</span> Followers
+                        </span>
+                        <span style="cursor:default;">
+                            <span class="count">${following || 0}</span> Following
+                        </span>
+                    `;
+                }
+            }
+        }
+
+        // ============================================================
+        // SHARE PROFILE LINK
+        // ============================================================
+        function shareProfileLink() {
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: `${profileUser.username}'s Profile`,
+                    text: `Check out ${profileUser.username}'s profile on SociaLock!`,
+                    url: url
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showAlert('✅ Profile link copied!', 'success');
+                }).catch(() => {
+                    prompt('Copy this link:', url);
+                });
+            }
+        }
+
+        // ============================================================
+        // LOAD PROFILE
+        // ============================================================
+        async function loadProfile(profileUserId) {
+            const supabase = getSupabase();
+
+            const { data: user, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', profileUserId)
+                .single();
+
+            if (error || !user) {
+                profileContainer.innerHTML = '<div style="text-align:center;padding:40px;color:#e94560;">❌ User not found</div>';
+                return;
+            }
+
+            profileUser = user;
+            isOwnProfile = profileUserId === currentUser.id;
+
+            document.getElementById('pageTitle').textContent = isOwnProfile ? 'My Profile' : profileUser.username;
+
+            await getBlockedUsers();
+
+            if (!isOwnProfile && isUserBlocked(profileUserId)) {
+                profileContainer.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:#e94560;">
+                        <div style="font-size:48px;margin-bottom:16px;">🚫</div>
+                        <h3>You have blocked this user</h3>
+                        <p style="color:#b0b3b8;margin-top:8px;">Unblock them to see their profile.</p>
+                    </div>
+                `;
+                postsContainer.innerHTML = '';
+                return;
+            }
+
+            await checkFollowStatus();
+            renderProfile();
+            await loadUserPosts(profileUserId);
+        }
+
+        // ============================================================
+        // RENDER PROFILE
+        // ============================================================
+        function renderProfile() {
+            const user = profileUser;
+            const isVerified = user.is_verified || false;
+
+            const verifiedBadge = isVerified ?
+                `<span class="verified-badge"><i class="fas fa-check-circle"></i></span>` : '';
+
+            const isBlockedByOther = !isOwnProfile && isUserBlocked(currentUser.id);
+
+            const showCountry = isOwnProfile && user.country;
+            const showEmail = isOwnProfile && user.email;
+
+            profileContainer.innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-avatar-row">
+                        <div class="profile-avatar">
+                            ${user.avatar_url ? `<img src="${escapeHtml(user.avatar_url)}" alt="Avatar">` : user.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="profile-name-row">
+                            <div class="profile-username">
+                                ${escapeHtml(user.username)} ${verifiedBadge}
+                            </div>
+                            <div class="profile-bio" id="profileBio">
+                                ${user.bio ? escapeHtml(user.bio) : '<span style="color:#b0b3b8;">No bio yet</span>'}
+                                ${isOwnProfile ? `<button class="bio-edit-btn" onclick="openBioModal()">✏️ Edit</button>` : ''}
+                            </div>
+                            <div class="profile-meta">
+                                ${showCountry ? `<span class="country"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(user.country)}</span>` : ''}
+                                ${showEmail ? `<span><i class="fas fa-envelope"></i> ${escapeHtml(user.email)}</span>` : ''}
+                            </div>
+                            <div class="profile-stats" id="profileStats">
+                                <span>📊 Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        ${!isOwnProfile && !isBlockedByOther ? `
+                            <button class="btn btn-primary" id="followBtn" onclick="toggleFollow()">+ Follow</button>
+                            <button class="btn btn-danger" onclick="toggleBlockUser()">🚫 Block</button>
+                        ` : ''}
+                        ${!isOwnProfile && isBlockedByOther ? `
+                            <div style="color:#e94560;font-size:13px;padding:6px;width:100%;text-align:center;">🚫 You have been blocked by this user</div>
+                        ` : ''}
+                        <div style="position:relative;display:inline-block;">
+                            <button class="btn btn-more" onclick="toggleMoreDropdown()">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <div class="more-dropdown" id="moreDropdown">
+                                <button class="dropdown-item" onclick="shareProfileLink()">
+                                    <span class="icon"><i class="fas fa-link"></i></span> Copy Profile Link
+                                </button>
+                                ${!isOwnProfile ? `
+                                <button class="dropdown-item" onclick="reportUser()">
+                                    <span class="icon"><i class="fas fa-flag"></i></span> Report User
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            updateProfileStats();
+            updateFollowButton();
+        }
+
+        // ============================================================
+        // TOGGLE MORE DROPDOWN
+        // ============================================================
+        function toggleMoreDropdown() {
+            const dropdown = document.getElementById('moreDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('moreDropdown');
+            if (dropdown && !e.target.closest('.profile-actions')) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // ============================================================
+        // REPORT USER
+        // ============================================================
+        function reportUser() {
+            const reason = prompt(`Report ${profileUser.username}? Enter reason:`, 'Spam or abuse');
+            if (reason && reason.trim()) {
+                showAlert(`✅ Report sent against ${profileUser.username}`, 'success');
+            }
+        }
+
+        // ============================================================
+        // TOGGLE BLOCK USER
+        // ============================================================
+        async function toggleBlockUser() {
+            if (!currentUser || !profileUser) return;
+
+            const supabase = getSupabase();
+
+            const { data: existing } = await supabase
+                .from('blocks')
+                .select('id')
+                .eq('user_id', currentUser.id)
+                .eq('blocked_user_id', profileUser.id);
+
+            if (existing && existing.length > 0) {
+                if (!confirm(`Unblock ${profileUser.username}?`)) return;
+
+                const { error } = await supabase
+                    .from('blocks')
+                    .delete()
+                    .eq('user_id', currentUser.id)
+                    .eq('blocked_user_id', profileUser.id);
+
+                if (error) {
+                    showAlert('Failed to unblock!', 'error');
+                    return;
+                }
+
+                showAlert(`✅ ${profileUser.username} unblocked!`, 'success');
+                location.reload();
+
+            } else {
+                if (!confirm(`Block ${profileUser.username}? They won't be able to interact with you.`)) return;
+
+                const { error } = await supabase
+                    .from('blocks')
+                    .insert({
+                        user_id: currentUser.id,
+                        blocked_user_id: profileUser.id,
+                        created_at: new Date().toISOString()
+                    });
+
+                if (error) {
+                    showAlert('Failed to block!', 'error');
+                    return;
+                }
+
+                showAlert(`✅ ${profileUser.username} blocked!`, 'success');
+                location.reload();
+            }
+        }
+
+        // ============================================================
+        // EDIT BIO
+        // ============================================================
+        function openBioModal() {
+            const currentBio = profileUser.bio || '';
+            bioTextarea.value = currentBio;
+            bioCharCount.textContent = currentBio.length;
+            saveBioBtn.disabled = currentBio.length === 0 || currentBio.length > 100;
+            editBioModal.classList.add('open');
+            setTimeout(() => bioTextarea.focus(), 100);
+        }
+
+        document.getElementById('closeBioModal').addEventListener('click', function() {
+            editBioModal.classList.remove('open');
+        });
+
+        document.getElementById('saveBioBtn').addEventListener('click', async function() {
+            const bio = bioTextarea.value.trim();
+
+            if (!bio) {
+                showAlert('Bio cannot be empty!', 'error');
+                return;
+            }
+
+            if (bio.length > 100) {
+                showAlert('Bio must be 100 characters or less!', 'error');
+                return;
+            }
+
+            saveBioBtn.disabled = true;
+            saveBioBtn.textContent = '⏳ Saving...';
+
+            const supabase = getSupabase();
+
+            try {
+                console.log('🔍 Updating bio for user:', currentUser.id);
+                console.log('📝 New bio:', bio);
+
+                const { data, error } = await supabase
+                    .from('users')
+                    .update({ bio: bio })
+                    .eq('id', currentUser.id)
+                    .select();
+
+                console.log('📊 Update response:', { data, error });
+
+                if (error) {
+                    console.error('❌ Update error:', error);
+                    showAlert('Failed to update bio: ' + error.message, 'error');
+                    saveBioBtn.disabled = false;
+                    saveBioBtn.textContent = 'Save';
+                    return;
+                }
+
+                profileUser.bio = bio;
+
+                const bioEl = document.querySelector('#profileBio');
+                if (bioEl) {
+                    bioEl.innerHTML = escapeHtml(bio) +
+                        `<button class="bio-edit-btn" onclick="openBioModal()">✏️ Edit</button>`;
+                }
+
+                editBioModal.classList.remove('open');
+                showAlert('✅ Bio updated!', 'success');
+                console.log('✅ Bio updated successfully!');
+
+            } catch (err) {
+                console.error('❌ Exception:', err);
+                showAlert('Something went wrong!', 'error');
+            }
+
+            saveBioBtn.disabled = false;
+            saveBioBtn.textContent = 'Save';
+        });
+
+        // ============================================================
+        // LOAD USER POSTS
+        // ============================================================
+        async function loadUserPosts(userId) {
+            const supabase = getSupabase();
+
+            const { data: posts, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                postsContainer.innerHTML = '<div class="no-posts">❌ Failed to load posts</div>';
+                return;
+            }
+
+            if (!posts || posts.length === 0) {
+                postsContainer.innerHTML = '<div class="no-posts">📝 No posts yet</div>';
+                return;
+            }
+
+            postsContainer.innerHTML = '';
+            for (const post of posts) {
+                const postElement = await createPostElement(post);
+                postsContainer.appendChild(postElement);
+            }
+        }
+
+        // ============================================================
+        // CREATE POST ELEMENT
+        // ============================================================
+        async function createPostElement(post) {
+            const supabase = getSupabase();
+
+            let userLiked = false;
+            if (currentUser) {
+                const { data: likeData } = await supabase
+                    .from('likes')
+                    .select('id')
+                    .eq('post_id', post.id)
+                    .eq('user_id', currentUser.id)
+                    .maybeSingle();
+                userLiked = !!likeData;
+            }
+
+            const { count: commentCount } = await supabase
+                .from('comments')
+                .select('*', { count: 'exact', head: true })
+                .eq('post_id', post.id);
+
+            const timeAgo = getTimeAgo(post.created_at);
+            const isOwner = currentUser && post.user_id === currentUser.id;
+            const isVerified = profileUser?.is_verified || false;
+
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post-card';
+            postDiv.id = `post-${post.id}`;
+
+            let content = post.content || '';
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            content = content.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <div class="post-left">
+                        <div class="post-avatar" onclick="window.location.href='userprofile.html?userId=${post.user_id}'">
+                            ${(post.username || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        <div class="post-user-info">
+                            <div class="post-username" onclick="window.location.href='userprofile.html?userId=${post.user_id}'">
+                                ${escapeHtml(post.username || 'User')}
+                                ${isVerified ? `<span class="verified-badge"><i class="fas fa-check-circle"></i></span>` : ''}
+                            </div>
+                            <div class="post-time">${timeAgo}</div>
+                        </div>
+                    </div>
+                    ${isOwner ? `
+                    <div style="position:relative;">
+                        <button class="post-more-btn" onclick="togglePostMenu('${post.id}')">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="post-more-menu" id="postMenu-${post.id}">
+                            <button class="menu-item danger" onclick="deletePost('${post.id}')">🗑️ Delete</button>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="post-content" onclick="window.location.href='post.html?postId=${post.id}'">${content}</div>
+                <div class="post-stats">
+                    <span>❤️ <span id="likeCount-${post.id}">${post.likes_count || 0}</span></span>
+                    <span onclick="window.location.href='post.html?postId=${post.id}'">💬 ${commentCount || 0} comments</span>
+                </div>
+                <div class="post-actions">
+                    <button class="post-action-btn ${userLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        <span>Like</span>
+                    </button>
+                    <button class="post-action-btn" onclick="window.location.href='post.html?postId=${post.id}'">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
+                        <span>Comment</span>
+                    </button>
+                </div>
+            `;
+
+            return postDiv;
+        }
+
+        // ============================================================
+        // TOGGLE POST MENU
+        // ============================================================
+        function togglePostMenu(postId) {
+            const menu = document.getElementById(`postMenu-${postId}`);
+            if (menu) {
+                menu.classList.toggle('show');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.post-more-menu').forEach(menu => {
+                if (!menu.contains(e.target) && !e.target.closest('.post-more-btn')) {
+                    menu.classList.remove('show');
+                }
+            });
+        });
+
+        // ============================================================
+        // TOGGLE LIKE
+        // ============================================================
+        window.toggleLike = async function(postId) {
+            if (!currentUser) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            const supabase = getSupabase();
+            const btn = document.querySelector(`.post-action-btn[onclick*="toggleLike('${postId}')"]`);
+            if (!btn) return;
+
+            const isLiked = btn.classList.contains('liked');
+            const likeCountSpan = document.getElementById(`likeCount-${postId}`);
+            if (!likeCountSpan) return;
+
+            let currentCount = parseInt(likeCountSpan.textContent) || 0;
+
+            try {
+                if (isLiked) {
+                    const { error } = await supabase
+                        .from('likes')
+                        .delete()
+                        .eq('post_id', postId)
+                        .eq('user_id', currentUser.id);
+
+                    if (error) {
+                        showAlert('Failed to unlike!', 'error');
+                        return;
+                    }
+
+                    btn.classList.remove('liked');
+                    const newCount = Math.max(0, currentCount - 1);
+                    likeCountSpan.textContent = newCount;
+                    await supabase.from('posts').update({ likes_count: newCount }).eq('id', postId);
+
+                } else {
+                    const { error } = await supabase
+                        .from('likes')
+                        .insert({
+                            post_id: postId,
+                            user_id: currentUser.id,
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (error) {
+                        if (error.code === '23505') {
+                            btn.classList.add('liked');
+                            showAlert('You already liked this post!', 'info');
+                            return;
+                        }
+                        showAlert('Failed to like!', 'error');
+                        return;
+                    }
+
+                    btn.classList.add('liked');
+                    const newCount = currentCount + 1;
+                    likeCountSpan.textContent = newCount;
+                    await supabase.from('posts').update({ likes_count: newCount }).eq('id', postId);
+                }
+            } catch (err) {
+                console.error('Toggle like error:', err);
+                showAlert('Something went wrong!', 'error');
+            }
+        };
+
+        // ============================================================
+        // DELETE POST
+        // ============================================================
+        window.deletePost = async function(postId) {
+            if (!confirm('Are you sure you want to delete this post?')) return;
+
+            const supabase = getSupabase();
+
+            await supabase.from('comments').delete().eq('post_id', postId);
+            await supabase.from('likes').delete().eq('post_id', postId);
+
+            const { error } = await supabase
+                .from('posts')
+                .delete()
+                .eq('id', postId)
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                showAlert('Failed to delete post!', 'error');
+                return;
+            }
+
+            const postEl = document.getElementById(`post-${postId}`);
+            if (postEl) postEl.remove();
+
+            showAlert('✅ Post deleted!', 'success');
+        };
+
+        // ============================================================
+        // TIME FORMAT
+        // ============================================================
+        function getTimeAgo(date) {
+            if (!date) return 'Just now';
+            try {
+                const now = new Date();
+                const past = new Date(date);
+                const diffInSeconds = Math.floor((now - past) / 1000);
+
+                if (diffInSeconds < 5) return 'Just now';
+                if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+                const minutes = Math.floor(diffInSeconds / 60);
+                if (minutes < 60) return `${minutes}m ago`;
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `${hours}h ago`;
+                const days = Math.floor(hours / 24);
+                if (days < 7) return `${days}d ago`;
+                const weeks = Math.floor(days / 7);
+                if (weeks < 4) return `${weeks}w ago`;
+                const months = Math.floor(days / 30);
+                if (months < 12) return `${months}mo ago`;
+                const years = Math.floor(days / 365);
+                return `${years}y ago`;
+            } catch (e) {
+                return 'Just now';
+            }
+        }
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const supabase = getSupabase();
+            if (!supabase) {
+                showAlert('Supabase connection failed!', 'error');
+                return;
+            }
+
+            const { data: user, error: userError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (userError || !user) {
+                localStorage.removeItem('userId');
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = user;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const profileUserId = urlParams.get('userId') || userId;
+
+            await loadProfile(profileUserId);
+        });
+
+        console.log('🚀 Profile page loaded with Following click navigation!');
+    </script>
+</body>
+</html>

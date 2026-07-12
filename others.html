@@ -2,35 +2,674 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মেসেজ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>পোস্ট - সোশ্যাল মিডিয়া</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1c1e21; }
+        
+        .dark-theme { background: #18191a; color: #e4e6eb; }
+        .dark-theme .post-card { background: #242526; }
+        .dark-theme .comment-item { background: #3a3b3c; }
+        .dark-theme .comment-input { border-color: #3a3b3c; }
+        .dark-theme .comment-input input { background: #3a3b3c; color: #e4e6eb; border: 1px solid #3a3b3c; }
+        .dark-theme .post-stats { border-color: #3a3b3c; }
+        .dark-theme .post-action-btn:hover { background: #3a3b3c; }
+        .dark-theme .navbar { background: #242526; border-bottom: 1px solid #3a3b3c; }
+        .dark-theme .nav-icon { color: #b0b3b8; }
+        .dark-theme .nav-icon:hover { background: #3a3b3c; }
+        .dark-theme .user-menu-btn:hover { background: #3a3b3c; }
+        .dark-theme .post-time { color: #b0b3b8; }
+        .dark-theme .post-stats span { color: #b0b3b8; }
+        .dark-theme .comment-time { color: #b0b3b8; }
+        .dark-theme .comment-username { color: #e4e6eb; }
+        .dark-theme .comment-text { color: #e4e6eb; }
+        .dark-theme .no-comments { color: #b0b3b8; }
+        .dark-theme .loading-spinner { color: #b0b3b8; }
+        .dark-theme .comment-action-btn { color: #b0b3b8; }
+        .dark-theme .comment-action-btn:hover { color: #e94560; }
+        
+        .navbar { background: #ffffff; padding: 8px 16px; position: fixed; top: 0; width: 100%; z-index: 1000; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { font-size: 1.5rem; font-weight: bold; color: #1877f2; cursor: pointer; }
+        .nav-icons { display: flex; gap: 12px; align-items: center; }
+        .nav-icon { font-size: 1.5rem; text-decoration: none; color: #606770; padding: 8px; border-radius: 50%; transition: 0.3s; }
+        .nav-icon:hover { background: #f0f2f5; }
+        .nav-icon.active { color: #1877f2; }
+        
+        .user-menu { position: relative; }
+        .user-menu-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 8px; border-radius: 50%; }
+        .user-menu-btn:hover { background: #f0f2f5; }
+        .dropdown-menu { display: none; position: absolute; right: 0; top: 100%; background: white; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.2); min-width: 200px; z-index: 1001; }
+        .dropdown-menu.show { display: block; }
+        .dropdown-menu a { display: block; padding: 12px 16px; color: #1c1e21; text-decoration: none; transition: 0.2s; }
+        .dropdown-menu a:hover { background: #f0f2f5; }
+        .dropdown-menu .danger { color: #e94560; }
+        
+        .main-container { max-width: 680px; margin: 70px auto 20px; padding: 0 16px; }
+        
+        /* ===== পোস্ট কার্ড (ফেসবুক স্টাইল) ===== */
+        .post-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        
+        .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .post-avatar { width: 40px; height: 40px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; flex-shrink: 0; cursor: pointer; }
+        .post-user-info { flex: 1; }
+        .post-username { font-weight: 600; font-size: 15px; cursor: pointer; }
+        .post-username:hover { text-decoration: underline; }
+        .post-time { font-size: 12px; color: #606770; }
+        .post-time span { margin: 0 4px; }
+        
+        .post-content { font-size: 15px; line-height: 1.6; margin-bottom: 12px; word-wrap: break-word; white-space: pre-wrap; }
+        .post-content a { color: #1877f2; text-decoration: none; }
+        .post-content a:hover { text-decoration: underline; }
+        
+        .post-stats { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 1px solid #e4e6eb; border-bottom: 1px solid #e4e6eb; margin-bottom: 8px; }
+        .post-stats span { font-size: 14px; color: #606770; cursor: pointer; }
+        .post-stats span:hover { color: #1877f2; }
+        
+        .post-actions { display: flex; gap: 8px; padding: 4px 0; margin-bottom: 12px; }
+        .post-action-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px; border: none; background: none; border-radius: 8px; cursor: pointer; font-size: 14px; color: #606770; transition: 0.2s; }
+        .post-action-btn:hover { background: #f0f2f5; }
+        .post-action-btn.liked { color: #e94560; }
+        .post-action-btn svg { width: 20px; height: 20px; }
+        
+        /* ===== কমেন্ট সেকশন (ফেসবুক স্টাইল) ===== */
+        .comments-section { padding-top: 8px; }
+        .comments-title { font-weight: 600; font-size: 16px; margin-bottom: 12px; color: #606770; }
+        .dark-theme .comments-title { color: #b0b3b8; }
+        
+        .comment-item { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid #e4e6eb; }
+        .dark-theme .comment-item { border-color: #3a3b3c; }
+        .comment-item:last-child { border-bottom: none; }
+        
+        .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; flex-shrink: 0; cursor: pointer; }
+        .comment-body { flex: 1; min-width: 0; }
+        .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; }
+        .comment-username { font-weight: 600; font-size: 13px; cursor: pointer; }
+        .comment-username:hover { text-decoration: underline; }
+        .comment-time { font-size: 11px; color: #606770; }
+        .comment-text { font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .comment-actions { margin-top: 4px; display: flex; gap: 12px; }
+        .comment-action-btn { background: none; border: none; font-size: 12px; color: #606770; cursor: pointer; padding: 2px 4px; transition: 0.2s; }
+        .comment-action-btn:hover { color: #e94560; }
+        
+        /* ===== কমেন্ট ইনপুট (ফেসবুক স্টাইল) ===== */
+        .comment-input { display: flex; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e4e6eb; align-items: center; }
+        .dark-theme .comment-input { border-color: #3a3b3c; }
+        .comment-input-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; flex-shrink: 0; }
+        .comment-input input { flex: 1; padding: 8px 12px; border-radius: 20px; border: 1px solid #e4e6eb; background: #f0f2f5; font-size: 14px; outline: none; transition: 0.3s; }
+        .comment-input input:focus { border-color: #1877f2; background: white; }
+        .comment-input button { padding: 8px 16px; border: none; background: #1877f2; color: white; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        .comment-input button:hover { background: #166fe5; }
+        .comment-input button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* ===== লোড মোর ===== */
+        .view-more-comments { color: #606770; font-size: 14px; cursor: pointer; padding: 12px 0; display: block; text-align: center; transition: 0.2s; }
+        .dark-theme .view-more-comments { color: #b0b3b8; }
+        .view-more-comments:hover { color: #1877f2; }
+        
+        .no-comments { text-align: center; padding: 20px; color: #606770; font-size: 14px; }
+        .dark-theme .no-comments { color: #b0b3b8; }
+        .loading-spinner { text-align: center; padding: 20px; color: #606770; }
+        .dark-theme .loading-spinner { color: #b0b3b8; }
+        
+        /* ===== মোবাইল রেসপনসিভ ===== */
+        @media (max-width: 480px) {
+            .main-container { margin: 65px auto 16px; padding: 0 8px; }
+            .post-card { padding: 12px; }
+            .post-avatar { width: 36px; height: 36px; font-size: 16px; }
+            .post-username { font-size: 14px; }
+            .post-content { font-size: 14px; }
+            .comment-avatar { width: 28px; height: 28px; font-size: 12px; }
+            .comment-text { font-size: 13px; }
+            .comment-input input { font-size: 13px; padding: 6px 12px; }
+            .comment-input button { font-size: 13px; padding: 6px 14px; }
+        }
+    </style>
 </head>
 <body class="dark-theme">
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">সোশ্যাল মিডিয়া</div>
+            <div class="nav-brand" onclick="window.location.href='home.html'">📱</div>
             <div class="nav-icons">
                 <a href="home.html" class="nav-icon">🏠</a>
-                <a href="messages.html" class="nav-icon active">💬</a>
-                <a href="tools.html" class="nav-icon">🔧</a>
+                <a href="messages.html" class="nav-icon">💬</a>
                 <a href="notifications.html" class="nav-icon">🔔</a>
                 <a href="others.html" class="nav-icon">⚙️</a>
             </div>
             <div class="user-menu">
-                <button id="userMenuBtn" class="user-menu-btn">👤</button>
+                <button class="user-menu-btn" id="userMenuBtn">👤</button>
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="#" id="profileBtn">👤 প্রোফাইল</a>
+                    <a href="#" id="logoutBtn" class="danger">🚪 লগআউট</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="coming-soon">
-        <div class="coming-soon-content">
-            <h2>🚀 শীঘ্রই আসছে!</h2>
-            <p>We are working hard. This feature coming soon.</p>
+    <div class="main-container">
+        <!-- পোস্ট কার্ড -->
+        <div class="post-card" id="postContainer">
+            <div id="postContent">
+                <div class="loading-spinner">⏳ পোস্ট লোড হচ্ছে...</div>
+            </div>
+        </div>
+
+        <!-- কমেন্ট সেকশন (পোস্টের নিচেই) -->
+        <div class="post-card" id="commentsSection">
+            <div class="comments-title" id="commentsTitle">💬 কমেন্ট</div>
+            <div id="commentsContainer">
+                <div class="loading-spinner">⏳ কমেন্ট লোড হচ্ছে...</div>
+            </div>
+            <div class="comment-input">
+                <div class="comment-input-avatar" id="commentAvatar">U</div>
+                <input type="text" id="commentInput" placeholder="কমেন্ট লিখুন..." maxlength="200">
+                <button id="commentBtn">পোস্ট</button>
+            </div>
         </div>
     </div>
 
     <script src="js/config.js"></script>
-    <script src="js/common.js"></script>
+    <script>
+        // ============================================================
+        // POST DETAILS - ফেসবুক স্টাইল
+        // ============================================================
+        
+        let currentUser = null;
+        let currentPost = null;
+        let allComments = [];
+        let commentPage = 0;
+        const COMMENTS_PER_PAGE = 10;
+        let isLoadingComments = false;
+        let hasMoreComments = true;
+
+        // ============================================================
+        // পেজ লোড
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const supabase = window.getSupabase();
+            if (!supabase) {
+                showAlert('Supabase সংযোগ নেই!', 'error');
+                return;
+            }
+
+            // ইউজার তথ্য লোড
+            const { data: user, error: userError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (userError || !user) {
+                localStorage.removeItem('userId');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = user;
+            
+            // কমেন্ট আভাতার
+            const avatar = document.getElementById('commentAvatar');
+            if (avatar) {
+                avatar.textContent = user.username.charAt(0).toUpperCase();
+            }
+
+            // URL থেকে postId নেওয়া
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('postId');
+
+            if (!postId) {
+                showAlert('পোস্ট আইডি পাওয়া যায়নি!', 'error');
+                window.location.href = 'home.html';
+                return;
+            }
+
+            // ড্রপডাউন মেনু
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', () => {
+                userDropdown.classList.remove('show');
+            });
+
+            document.getElementById('profileBtn').addEventListener('click', () => {
+                window.location.href = `userprofile.html?userId=${currentUser.id}`;
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('userId');
+                window.location.href = 'index.html';
+            });
+
+            // পোস্ট এবং কমেন্ট লোড
+            await loadPost(postId);
+            await loadComments(postId);
+
+            // কমেন্ট ইনপুট ইভেন্ট
+            const commentInput = document.getElementById('commentInput');
+            const commentBtn = document.getElementById('commentBtn');
+
+            commentInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    addComment(postId);
+                }
+            });
+
+            commentBtn.addEventListener('click', function() {
+                addComment(postId);
+            });
+
+            // স্ক্রল লোড
+            const commentsContainer = document.getElementById('commentsContainer');
+            commentsContainer.addEventListener('scroll', function() {
+                if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
+                    if (!isLoadingComments && hasMoreComments) {
+                        loadMoreComments(postId);
+                    }
+                }
+            });
+        });
+
+        // ============================================================
+        // পোস্ট লোড
+        // ============================================================
+        async function loadPost(postId) {
+            const supabase = window.getSupabase();
+            const container = document.getElementById('postContent');
+
+            const { data: post, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('id', postId)
+                .single();
+
+            if (error || !post) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:20px;color:#e94560;">
+                        ❌ পোস্ট পাওয়া যায়নি
+                    </div>
+                `;
+                return;
+            }
+
+            currentPost = post;
+
+            // লাইক চেক
+            let userLiked = false;
+            if (currentUser) {
+                const { data: likeData } = await supabase
+                    .from('likes')
+                    .select('id')
+                    .eq('post_id', postId)
+                    .eq('user_id', currentUser.id)
+                    .maybeSingle();
+                userLiked = !!likeData;
+            }
+
+            const timeAgo = getTimeAgo(post.created_at);
+            let content = post.content || '';
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            content = content.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
+            container.innerHTML = `
+                <div class="post-header">
+                    <div class="post-avatar" onclick="window.location.href='userprofile.html?userId=${post.user_id}'">
+                        ${(post.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="post-user-info">
+                        <div class="post-username" onclick="window.location.href='userprofile.html?userId=${post.user_id}'">
+                            ${escapeHtml(post.username || 'ইউজার')}
+                        </div>
+                        <div class="post-time">
+                            ${timeAgo} <span>·</span> 🌍
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content">${content}</div>
+                <div class="post-stats">
+                    <span>❤️ <span id="likeCount">${post.likes_count || 0}</span></span>
+                    <span>💬 <span id="commentCount">${post.comments_count || 0}</span></span>
+                </div>
+                <div class="post-actions">
+                    <button class="post-action-btn ${userLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        <span>লাইক</span>
+                    </button>
+                    <button class="post-action-btn" onclick="document.getElementById('commentInput').focus()">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
+                        <span>কমেন্ট</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // কমেন্ট লোড (স্ক্রল লোড সহ)
+        // ============================================================
+        async function loadComments(postId) {
+            const supabase = window.getSupabase();
+            const container = document.getElementById('commentsContainer');
+
+            const { data: comments, error } = await supabase
+                .from('comments')
+                .select('*')
+                .eq('post_id', postId)
+                .order('created_at', { ascending: false })
+                .limit(COMMENTS_PER_PAGE);
+
+            if (error) {
+                container.innerHTML = '<div class="no-comments">❌ কমেন্ট লোড করতে সমস্যা!</div>';
+                return;
+            }
+
+            allComments = comments || [];
+            commentPage = 1;
+            hasMoreComments = allComments.length === COMMENTS_PER_PAGE;
+
+            if (allComments.length === 0) {
+                container.innerHTML = '<div class="no-comments">💬 কোন কমেন্ট নেই। প্রথম কমেন্টটি করুন!</div>';
+                return;
+            }
+
+            container.innerHTML = allComments.map(comment => createCommentHTML(comment)).join('');
+
+            if (hasMoreComments) {
+                const moreBtn = document.createElement('div');
+                moreBtn.className = 'view-more-comments';
+                moreBtn.textContent = 'আরও কমেন্ট দেখুন';
+                moreBtn.onclick = () => loadMoreComments(postId);
+                container.appendChild(moreBtn);
+            }
+        }
+
+        async function loadMoreComments(postId) {
+            if (isLoadingComments || !hasMoreComments) return;
+            isLoadingComments = true;
+
+            const supabase = window.getSupabase();
+            const start = commentPage * COMMENTS_PER_PAGE;
+
+            const { data: comments, error } = await supabase
+                .from('comments')
+                .select('*')
+                .eq('post_id', postId)
+                .order('created_at', { ascending: false })
+                .range(start, start + COMMENTS_PER_PAGE - 1);
+
+            isLoadingComments = false;
+
+            if (error || !comments || comments.length === 0) {
+                hasMoreComments = false;
+                const container = document.getElementById('commentsContainer');
+                const moreBtn = container.querySelector('.view-more-comments');
+                if (moreBtn) moreBtn.remove();
+                return;
+            }
+
+            allComments = [...allComments, ...comments];
+            commentPage++;
+            hasMoreComments = comments.length === COMMENTS_PER_PAGE;
+
+            const container = document.getElementById('commentsContainer');
+            const moreBtn = container.querySelector('.view-more-comments');
+            if (moreBtn) moreBtn.remove();
+
+            comments.forEach(comment => {
+                const commentHTML = createCommentHTML(comment);
+                container.insertAdjacentHTML('beforeend', commentHTML);
+            });
+
+            if (hasMoreComments) {
+                const newMoreBtn = document.createElement('div');
+                newMoreBtn.className = 'view-more-comments';
+                newMoreBtn.textContent = 'আরও কমেন্ট দেখুন';
+                newMoreBtn.onclick = () => loadMoreComments(postId);
+                container.appendChild(newMoreBtn);
+            }
+        }
+
+        // ============================================================
+        // কমেন্ট HTML তৈরি
+        // ============================================================
+        function createCommentHTML(comment) {
+            const isOwner = currentUser && comment.user_id === currentUser.id;
+            const timeAgo = getTimeAgo(comment.created_at);
+            
+            return `
+                <div class="comment-item" id="comment-${comment.id}">
+                    <div class="comment-avatar" onclick="window.location.href='userprofile.html?userId=${comment.user_id}'">
+                        ${(comment.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="comment-body">
+                        <div class="comment-header">
+                            <span class="comment-username" onclick="window.location.href='userprofile.html?userId=${comment.user_id}'">
+                                ${escapeHtml(comment.username || 'ইউজার')}
+                            </span>
+                            <span class="comment-time">${timeAgo}</span>
+                        </div>
+                        <div class="comment-text">${escapeHtml(comment.content)}</div>
+                        <div class="comment-actions">
+                            ${isOwner ? `<button class="comment-action-btn" onclick="deleteComment('${comment.id}', '${comment.post_id}')">🗑️ ডিলিট</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // লাইক টগল
+        // ============================================================
+        async function toggleLike(postId) {
+            if (!currentUser) return;
+
+            const supabase = window.getSupabase();
+            const btn = document.querySelector('.post-action-btn[onclick*="toggleLike"]');
+            if (!btn) return;
+            
+            const isLiked = btn.classList.contains('liked');
+            const likeCountSpan = document.getElementById('likeCount');
+            if (!likeCountSpan) return;
+            
+            let currentCount = parseInt(likeCountSpan.textContent) || 0;
+
+            if (isLiked) {
+                const { error } = await supabase
+                    .from('likes')
+                    .delete()
+                    .eq('post_id', postId)
+                    .eq('user_id', currentUser.id);
+
+                if (!error) {
+                    btn.classList.remove('liked');
+                    const newCount = currentCount - 1;
+                    likeCountSpan.textContent = newCount;
+                    await supabase.from('posts').update({ likes_count: newCount }).eq('id', postId);
+                }
+            } else {
+                const { error } = await supabase
+                    .from('likes')
+                    .insert({
+                        post_id: postId,
+                        user_id: currentUser.id,
+                        created_at: new Date().toISOString()
+                    });
+
+                if (!error) {
+                    btn.classList.add('liked');
+                    const newCount = currentCount + 1;
+                    likeCountSpan.textContent = newCount;
+                    await supabase.from('posts').update({ likes_count: newCount }).eq('id', postId);
+                }
+            }
+        }
+
+        // ============================================================
+        // কমেন্ট যোগ
+        // ============================================================
+        async function addComment(postId) {
+            const input = document.getElementById('commentInput');
+            const content = input.value.trim();
+            
+            if (!content) {
+                showAlert('কমেন্ট খালি হতে পারে না!', 'error');
+                return;
+            }
+
+            if (content.length > 200) {
+                showAlert('কমেন্ট ২০০ অক্ষরের বেশি হতে পারে না!', 'error');
+                return;
+            }
+
+            const supabase = window.getSupabase();
+            const btn = document.getElementById('commentBtn');
+            btn.disabled = true;
+
+            const { data, error } = await supabase
+                .from('comments')
+                .insert({
+                    post_id: postId,
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    content: content,
+                    created_at: new Date().toISOString()
+                })
+                .select();
+
+            btn.disabled = false;
+
+            if (error) {
+                showAlert('কমেন্ট করতে সমস্যা!', 'error');
+                return;
+            }
+
+            // কমেন্ট কাউন্ট আপডেট
+            const { count } = await supabase
+                .from('comments')
+                .select('*', { count: 'exact', head: true })
+                .eq('post_id', postId);
+            
+            await supabase.from('posts').update({ comments_count: count }).eq('id', postId);
+            document.getElementById('commentCount').textContent = count;
+
+            input.value = '';
+            
+            // কমেন্ট রিলোড
+            allComments = [];
+            commentPage = 0;
+            hasMoreComments = true;
+            await loadComments(postId);
+            
+            // স্ক্রল টু বটম
+            const container = document.getElementById('commentsContainer');
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 100);
+
+            showAlert('✅ কমেন্ট করা হয়েছে!', 'success');
+        }
+
+        // ============================================================
+        // কমেন্ট ডিলিট
+        // ============================================================
+        async function deleteComment(commentId, postId) {
+            if (!confirm('আপনি কি এই কমেন্ট ডিলিট করতে চান?')) return;
+
+            const supabase = window.getSupabase();
+            
+            const { error } = await supabase
+                .from('comments')
+                .delete()
+                .eq('id', commentId)
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                showAlert('কমেন্ট ডিলিট করতে সমস্যা!', 'error');
+                return;
+            }
+
+            // কমেন্ট কাউন্ট আপডেট
+            const { count } = await supabase
+                .from('comments')
+                .select('*', { count: 'exact', head: true })
+                .eq('post_id', postId);
+            
+            await supabase.from('posts').update({ comments_count: count }).eq('id', postId);
+            document.getElementById('commentCount').textContent = count;
+
+            // কমেন্ট রিমুভ
+            const commentEl = document.getElementById(`comment-${commentId}`);
+            if (commentEl) commentEl.remove();
+
+            showAlert('✅ কমেন্ট ডিলিট হয়েছে!', 'success');
+        }
+
+        // ============================================================
+        // টাইম ফরমেট
+        // ============================================================
+        function getTimeAgo(date) {
+            if (!date) return 'এখনই';
+            try {
+                const now = new Date();
+                const past = new Date(date);
+                const diffInSeconds = Math.floor((now - past) / 1000);
+
+                if (diffInSeconds < 5) return 'এখনই';
+                if (diffInSeconds < 60) return `${diffInSeconds}সেকেন্ড আগে`;
+                const minutes = Math.floor(diffInSeconds / 60);
+                if (minutes < 60) return `${minutes}মিনিট আগে`;
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `${hours}ঘন্টা আগে`;
+                const days = Math.floor(hours / 24);
+                if (days < 7) return `${days}দিন আগে`;
+                const weeks = Math.floor(days / 7);
+                if (weeks < 4) return `${weeks}সপ্তাহ আগে`;
+                const months = Math.floor(days / 30);
+                if (months < 12) return `${months}মাস আগে`;
+                const years = Math.floor(days / 365);
+                return `${years}বছর আগে`;
+            } catch (e) {
+                return 'এখনই';
+            }
+        }
+
+        // ============================================================
+        // ইউটিলিটি
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showAlert(message, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            
+            const alert = document.createElement('div');
+            alert.className = 'custom-alert';
+            alert.style.cssText = 'position:fixed;top:70px;right:10px;left:10px;padding:12px;border-radius:8px;color:white;z-index:10000;max-width:400px;margin:0 auto;animation:slideIn 0.3s ease;background:' + 
+                (type === 'success' ? '#4caf50' : type === 'error' ? '#e94560' : '#0f3460');
+            alert.innerHTML = message + '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        console.log('🚀 Post page loaded!');
+    </script>
 </body>
 </html>

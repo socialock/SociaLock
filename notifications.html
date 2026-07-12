@@ -1,36 +1,831 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মেসেজ</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Notifications</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+        }
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            display: flex;
+            flex-direction: column;
+            padding-top: 0;
+        }
+
+        .navbar-bottom {
+            background: #242526;
+            padding: 4px 8px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            border-bottom: 1px solid #3a3b3c;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-bottom-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+
+        .nav-icon-bottom {
+            font-size: 1.7rem;
+            text-decoration: none;
+            color: #b0b3b8;
+            padding: 4px 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .nav-icon-bottom:hover {
+            background: #3a3b3c;
+        }
+        .nav-icon-bottom.active {
+            color: #1877f2;
+        }
+        .nav-icon-bottom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: #1877f2;
+            border-radius: 2px;
+        }
+        .nav-icon-bottom .label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #b0b3b8;
+        }
+        .nav-icon-bottom.active .label {
+            color: #1877f2;
+        }
+
+        /* ===== NOTIFICATION BADGE ===== */
+        .nav-icon-bottom {
+            position: relative;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e94560;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #242526;
+            line-height: 1;
+        }
+        .notif-badge.show {
+            display: flex;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 46px;
+        }
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 12px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 12px;
+        }
+        .notif-header h1 {
+            font-size: 1.3rem;
+            color: #e4e6eb;
+        }
+        .notif-header button {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 16px;
+            transition: 0.3s;
+        }
+        .notif-header button:hover {
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+
+        .notif-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #242526;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #3a3b3c;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .notif-item:hover {
+            background: #2a2b2c;
+            border-color: #4a4b4c;
+        }
+        .notif-item.unread {
+            border-left: 3px solid #1877f2;
+            background: #1e2a3a;
+        }
+
+        .notif-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .notif-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .notif-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: #e4e6eb;
+        }
+        .notif-text strong {
+            color: #e4e6eb;
+            font-weight: 600;
+        }
+        .notif-text .highlight {
+            color: #1877f2;
+            font-weight: 500;
+        }
+        .notif-time {
+            font-size: 0.75rem;
+            color: #b0b3b8;
+            margin-top: 2px;
+        }
+
+        .notif-icon {
+            font-size: 1.2rem;
+            color: #b0b3b8;
+            flex-shrink: 0;
+        }
+        .notif-icon.like {
+            color: #e94560;
+        }
+        .notif-icon.comment {
+            color: #4caf50;
+        }
+        .notif-icon.reply {
+            color: #f7b731;
+        }
+
+        .notif-delete-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .notif-delete-btn:hover {
+            background: #3a3b3c;
+            color: #e94560;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: #b0b3b8;
+        }
+        .no-notifs {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: #b0b3b8;
+        }
+        .no-notifs .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .no-notifs h3 {
+            font-size: 1.1rem;
+            color: #e4e6eb;
+            margin-bottom: 0.3rem;
+        }
+        .no-notifs p {
+            font-size: 0.9rem;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success {
+            background: #4caf50;
+        }
+        .custom-alert.error {
+            background: #e94560;
+        }
+        .custom-alert.info {
+            background: #1877f2;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-bottom {
+                height: 42px;
+            }
+            .nav-icon-bottom {
+                font-size: 1.3rem;
+                padding: 2px 8px;
+            }
+            .nav-icon-bottom .label {
+                font-size: 0.5rem;
+            }
+            .main-wrapper {
+                margin-top: 42px;
+            }
+            .main-container {
+                padding: 0 10px;
+            }
+            .notif-item {
+                padding: 10px 12px;
+            }
+            .notif-avatar {
+                width: 38px;
+                height: 38px;
+                font-size: 15px;
+            }
+            .notif-text {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
 </head>
+
 <body class="dark-theme">
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">সোশ্যাল মিডিয়া</div>
-            <div class="nav-icons">
-                <a href="home.html" class="nav-icon">🏠</a>
-                <a href="messages.html" class="nav-icon active">💬</a>
-                <a href="tools.html" class="nav-icon">🔧</a>
-                <a href="notifications.html" class="nav-icon">🔔</a>
-                <a href="others.html" class="nav-icon">⚙️</a>
-            </div>
-            <div class="user-menu">
-                <button id="userMenuBtn" class="user-menu-btn">👤</button>
-            </div>
+    <!-- ===== BOTTOM NAVBAR ===== -->
+    <nav class="navbar-bottom">
+        <div class="nav-bottom-container">
+            <a href="home.html" class="nav-icon-bottom" title="Home">
+                <i class="fas fa-home"></i>
+                <span class="label">Home</span>
+            </a>
+            <a href="messages.html" class="nav-icon-bottom" title="Messages">
+                <i class="fas fa-comment-dots"></i>
+                <span class="label">Messages</span>
+            </a>
+            <a href="tools.html" class="nav-icon-bottom" title="Tools">
+                <i class="fas fa-tools"></i>
+                <span class="label">Tools</span>
+            </a>
+            <a href="notifications.html" class="nav-icon-bottom active" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="label">Notifications</span>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </a>
+            <a href="#" class="nav-icon-bottom" id="profileNavBtn" title="Profile">
+                <i class="fas fa-user-circle"></i>
+                <span class="label">Profile</span>
+            </a>
         </div>
     </nav>
 
-    <div class="coming-soon">
-        <div class="coming-soon-content">
-            <h2>🚀 শীঘ্রই আসছে!</h2>
-            <p>We are working hard. This feature coming soon.</p>
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-wrapper">
+        <div class="main-container" id="mainContainer">
+            <div class="notif-header">
+                <h1>🔔 Notifications</h1>
+                <button id="markAllReadBtn">Mark all read</button>
+            </div>
+
+            <div id="notificationsContainer">
+                <div class="loading-spinner">⏳ Loading notifications...</div>
+            </div>
         </div>
     </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/common.js"></script>
+    <script>
+        // ============================================================
+        // SUPABASE CONFIG
+        // ============================================================
+        const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co';
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
+
+        let supabaseClient = null;
+
+        function getSupabase() {
+            if (!supabaseClient) {
+                try {
+                    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log("✅ Supabase connected");
+                    }
+                } catch (e) {
+                    console.error("❌ Supabase error:", e);
+                }
+            }
+            return supabaseClient;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showAlert(msg, type) {
+            type = type || 'info';
+            var existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            var alert = document.createElement('div');
+            alert.className = 'custom-alert ' + type;
+            alert.innerHTML = msg +
+                '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">X</button>';
+            document.body.appendChild(alert);
+            setTimeout(function() {
+                alert.remove();
+            }, 4000);
+        }
+
+        var currentUser = null;
+        var allNotifications = [];
+        var notifChannel = null;
+        var container = document.getElementById('notificationsContainer');
+        var badge = document.getElementById('notifBadge');
+
+        // ============================================================
+        // GET UNREAD COUNT
+        // ============================================================
+        async function getUnreadCount() {
+            var supabase = getSupabase();
+            var userId = localStorage.getItem('userId');
+            if (!supabase || !userId) return 0;
+
+            try {
+                var result = await supabase
+                    .from('notifications')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', userId)
+                    .eq('is_read', false);
+
+                if (result.error) {
+                    console.error('Count error:', result.error);
+                    return 0;
+                }
+                return result.count || 0;
+            } catch (err) {
+                console.error('Count exception:', err);
+                return 0;
+            }
+        }
+
+        // ============================================================
+        // UPDATE BADGE
+        // ============================================================
+        function updateBadge(count) {
+            var display = count > 9 ? '9+' : count;
+
+            // localStorage এ সেভ
+            localStorage.setItem('unreadCount', count);
+            localStorage.setItem('unreadDisplay', display);
+
+            // Badge আপডেট
+            if (badge) {
+                badge.textContent = display;
+                if (count > 0) {
+                    badge.classList.add('show');
+                } else {
+                    badge.classList.remove('show');
+                }
+            }
+
+            // Tab title
+            if (count > 0) {
+                document.title = '(' + display + ') Notifications';
+            } else {
+                document.title = 'Notifications';
+            }
+        }
+
+        async function refreshBadge() {
+            var count = await getUnreadCount();
+            updateBadge(count);
+            return count;
+        }
+
+        // ============================================================
+        // FETCH NOTIFICATIONS
+        // ============================================================
+        async function fetchNotifications() {
+            var supabase = getSupabase();
+            if (!supabase) return [];
+
+            var userId = localStorage.getItem('userId');
+            if (!userId) {
+                console.log('No userId in localStorage');
+                return [];
+            }
+
+            console.log('Fetching for user:', userId);
+
+            try {
+                var result = await supabase
+                    .from('notifications')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (result.error) {
+                    console.error('Fetch error:', result.error);
+                    return [];
+                }
+
+                console.log('Notifications found:', result.data ? result.data.length : 0);
+                return result.data || [];
+
+            } catch (err) {
+                console.error('Exception:', err);
+                return [];
+            }
+        }
+
+        // ============================================================
+        // MARK SINGLE AS READ
+        // ============================================================
+        async function markAsRead(notifId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            var notifElement = document.querySelector('.notif-item[data-id="' + notifId + '"]');
+            if (notifElement) {
+                notifElement.classList.remove('unread');
+            }
+
+            var notif = allNotifications.find(function(n) { return n.id === notifId; });
+            if (notif) {
+                notif.is_read = true;
+            }
+
+            var supabase = getSupabase();
+            var userId = localStorage.getItem('userId');
+            if (supabase && userId) {
+                try {
+                    await supabase
+                        .from('notifications')
+                        .update({ is_read: true })
+                        .eq('id', notifId)
+                        .eq('user_id', userId);
+                } catch (err) {
+                    console.error('Mark as read error:', err);
+                }
+            }
+
+            refreshBadge();
+        }
+
+        // ============================================================
+        // MARK ALL READ
+        // ============================================================
+        async function markAllAsRead() {
+            var supabase = getSupabase();
+            var userId = localStorage.getItem('userId');
+            if (!supabase || !userId) return;
+
+            try {
+                var result = await supabase
+                    .from('notifications')
+                    .update({ is_read: true })
+                    .eq('user_id', userId)
+                    .eq('is_read', false);
+
+                if (result.error) {
+                    showAlert('Failed to mark all as read', 'error');
+                    return;
+                }
+
+                allNotifications.forEach(function(n) {
+                    n.is_read = true;
+                });
+                renderNotifications(allNotifications);
+                refreshBadge();
+                showAlert('All notifications marked as read', 'success');
+
+            } catch (err) {
+                console.error('Mark all read error:', err);
+            }
+        }
+
+        // ============================================================
+        // DELETE NOTIFICATION
+        // ============================================================
+        async function deleteNotification(notifId, event) {
+            event.stopPropagation();
+            if (!confirm('Delete this notification?')) return;
+
+            var supabase = getSupabase();
+            var userId = localStorage.getItem('userId');
+            if (!supabase || !userId) return;
+
+            try {
+                var result = await supabase
+                    .from('notifications')
+                    .delete()
+                    .eq('id', notifId)
+                    .eq('user_id', userId);
+
+                if (result.error) {
+                    showAlert('Failed to delete notification', 'error');
+                    return;
+                }
+
+                allNotifications = allNotifications.filter(function(n) {
+                    return n.id !== notifId;
+                });
+                renderNotifications(allNotifications);
+                refreshBadge();
+
+            } catch (err) {
+                console.error('Delete error:', err);
+            }
+        }
+
+        // ============================================================
+        // RENDER NOTIFICATIONS
+        // ============================================================
+        function renderNotifications(notifications) {
+            if (!notifications || notifications.length === 0) {
+                container.innerHTML =
+                    '<div class="no-notifs"><span class="icon">🔔</span><h3>No notifications yet</h3><p>When someone likes, comments or replies to your posts, you will see it here.</p></div>';
+                return;
+            }
+
+            var html = '';
+            notifications.forEach(function(notif) {
+                var isUnread = !notif.is_read;
+                var timeAgo = getTimeAgo(notif.created_at);
+
+                var iconHtml = '';
+                var iconClass = '';
+                if (notif.type === 'like') {
+                    iconHtml = '<i class="fas fa-heart"></i>';
+                    iconClass = 'like';
+                } else if (notif.type === 'comment') {
+                    iconHtml = '<i class="fas fa-comment"></i>';
+                    iconClass = 'comment';
+                } else if (notif.type === 'reply') {
+                    iconHtml = '<i class="fas fa-reply"></i>';
+                    iconClass = 'reply';
+                } else {
+                    iconHtml = '<i class="fas fa-bell"></i>';
+                    iconClass = '';
+                }
+
+                var actorName = escapeHtml(notif.actor_username || 'User');
+                var actorInitial = (notif.actor_username || 'U').charAt(0).toUpperCase();
+
+                var message = '';
+                if (notif.type === 'like') {
+                    message = '<strong>' + actorName +
+                        '</strong> liked your post: <span class="highlight">"' + escapeHtml((notif.post_content || '').substring(
+                            0, 50)) + '"</span>';
+                } else if (notif.type === 'comment') {
+                    message = '<strong>' + actorName +
+                        '</strong> commented on your post: <span class="highlight">"' + escapeHtml((notif
+                            .comment_content || '').substring(0, 50)) + '"</span>';
+                } else if (notif.type === 'reply') {
+                    message = '<strong>' + actorName +
+                        '</strong> replied to your comment: <span class="highlight">"' + escapeHtml((notif
+                            .reply_content || '').substring(0, 50)) + '"</span>';
+                } else {
+                    message = '<strong>' + actorName + '</strong> interacted with your post';
+                }
+
+                var navUrl = notif.post_id ? 'post.html?postId=' + notif.post_id : '#';
+                var unreadClass = isUnread ? 'unread' : '';
+
+                html += '<div class="notif-item ' + unreadClass + '" data-id="' + notif.id + '" onclick="markAsRead(\'' +
+                    notif.id + '\', event); window.location.href=\'' + navUrl + '\';">';
+                html += '<div class="notif-avatar" onclick="event.stopPropagation(); window.location.href=\'userprofile.html?userId=' +
+                    notif.actor_id + '\'">' + actorInitial + '</div>';
+                html += '<div class="notif-body"><div class="notif-text">' + message + '</div><div class="notif-time">' +
+                    timeAgo + '</div></div>';
+                html += '<div class="notif-icon ' + iconClass + '">' + iconHtml + '</div>';
+                html +=
+                    '<button class="notif-delete-btn" onclick="event.stopPropagation(); deleteNotification(\'' + notif
+                    .id + '\', event)"><i class="fas fa-times"></i></button>';
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // TIME FORMAT
+        // ============================================================
+        function getTimeAgo(date) {
+            if (!date) return 'Just now';
+            try {
+                var now = new Date();
+                var past = new Date(date);
+                var diff = Math.floor((now - past) / 1000);
+                if (diff < 5) return 'Just now';
+                if (diff < 60) return diff + 's ago';
+                var m = Math.floor(diff / 60);
+                if (m < 60) return m + 'm ago';
+                var h = Math.floor(m / 60);
+                if (h < 24) return h + 'h ago';
+                var d = Math.floor(h / 24);
+                if (d < 7) return d + 'd ago';
+                if (d < 30) return Math.floor(d / 7) + 'w ago';
+                if (d < 365) return Math.floor(d / 30) + 'mo ago';
+                return Math.floor(d / 365) + 'y ago';
+            } catch (e) {
+                return 'Just now';
+            }
+        }
+
+        // ============================================================
+        // SETUP REALTIME
+        // ============================================================
+        function setupRealtime() {
+            var supabase = getSupabase();
+            var userId = localStorage.getItem('userId');
+            if (!supabase || !userId) return;
+
+            if (notifChannel) {
+                supabase.removeChannel(notifChannel);
+            }
+
+            notifChannel = supabase
+                .channel('notifications-realtime')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'notifications',
+                    filter: 'user_id=eq.' + userId
+                }, async function() {
+                    allNotifications = await fetchNotifications();
+                    renderNotifications(allNotifications);
+                    refreshBadge();
+                })
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'notifications',
+                    filter: 'user_id=eq.' + userId
+                }, async function() {
+                    allNotifications = await fetchNotifications();
+                    renderNotifications(allNotifications);
+                    refreshBadge();
+                })
+                .on('postgres_changes', {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'notifications',
+                    filter: 'user_id=eq.' + userId
+                }, async function() {
+                    allNotifications = await fetchNotifications();
+                    renderNotifications(allNotifications);
+                    refreshBadge();
+                })
+                .subscribe();
+        }
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Loading notifications...');
+
+            var userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            var supabase = getSupabase();
+            if (!supabase) {
+                showAlert('Connection failed!', 'error');
+                container.innerHTML = '<div class="no-notifs">Connection failed</div>';
+                return;
+            }
+
+            try {
+                var userResult = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (userResult.data) {
+                    currentUser = userResult.data;
+                    console.log('User:', currentUser.username);
+                }
+
+                allNotifications = await fetchNotifications();
+                renderNotifications(allNotifications);
+
+                // Badge আপডেট
+                await refreshBadge();
+
+                setupRealtime();
+
+                document.getElementById('markAllReadBtn').addEventListener('click', markAllAsRead);
+
+                document.getElementById('profileNavBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (currentUser) {
+                        window.location.href = 'userprofile.html?userId=' + currentUser.id;
+                    }
+                });
+
+                // প্রতি 30 সেকেন্ডে ব্যাজ আপডেট
+                setInterval(refreshBadge, 30000);
+
+            } catch (err) {
+                console.error('Page error:', err);
+                container.innerHTML = '<div class="no-notifs">Failed to load</div>';
+            }
+        });
+
+        console.log('🚀 Notifications page loaded with badge!');
+    </script>
 </body>
 </html>

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+        }
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            display: flex;
+            flex-direction: column;
+            padding-top: 0;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #242526;
+            padding: 10px 16px;
+            border-bottom: 1px solid #3a3b3c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            height: 56px;
+            position: relative;
+            z-index: 10;
+        }
+        .chat-header .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #b0b3b8;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .chat-header .back-btn:hover {
+            color: #e4e6eb;
+        }
+        .chat-header .chat-info {
+            flex: 1;
+            cursor: pointer;
+            min-width: 0;
+        }
+        .chat-header .chat-info:hover .chat-name {
+            text-decoration: underline;
+        }
+        .chat-header .chat-name {
+            font-weight: 700;
+            font-size: 17px;
+            color: #e4e6eb;
+        }
+        .chat-header .chat-sub {
+            font-size: 12px;
+            color: #b0b3b8;
+        }
+        .chat-header .chat-actions {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .chat-header .chat-actions button {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .chat-header .chat-actions button:hover {
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+        .chat-header .chat-actions button.danger:hover {
+            background: #e94560;
+            color: white;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-bottom: 80px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 2px;
+            max-width: 80%;
+        }
+        .message.own {
+            align-self: flex-end;
+        }
+        .message.other {
+            align-self: flex-start;
+        }
+
+        .message-bubble {
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            max-width: 100%;
+            position: relative;
+        }
+        .message.own .message-bubble {
+            background: #1877f2;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.other .message-bubble {
+            background: #3a3b3c;
+            color: #e4e6eb;
+            border-bottom-left-radius: 4px;
+        }
+        .message .sender-name {
+            font-size: 11px;
+            color: #b0b3b8;
+            margin-bottom: 2px;
+            display: block;
+            cursor: pointer;
+        }
+        .message .sender-name:hover {
+            text-decoration: underline;
+        }
+        .message.own .sender-name {
+            display: none;
+        }
+        .message-time {
+            font-size: 10px;
+            color: #b0b3b8;
+            margin-top: 2px;
+            text-align: right;
+        }
+        .message.other .message-time {
+            text-align: left;
+        }
+
+        .typing-indicator {
+            display: none;
+            font-size: 13px;
+            color: #b0b3b8;
+            padding: 8px 0;
+            align-items: center;
+            gap: 4px;
+        }
+        .typing-indicator.show {
+            display: flex;
+        }
+        .typing-indicator .dots {
+            display: flex;
+            gap: 3px;
+        }
+        .typing-indicator .dot {
+            width: 8px;
+            height: 8px;
+            background: #b0b3b8;
+            border-radius: 50%;
+            animation: typingDot 1.2s infinite;
+        }
+        .typing-indicator .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typingDot {
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.3;
+            }
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        .no-messages {
+            text-align: center;
+            color: #b0b3b8;
+            padding: 40px;
+        }
+
+        .chat-input-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #242526;
+            padding: 10px 16px;
+            border-top: 1px solid #3a3b3c;
+            z-index: 999;
+        }
+        .chat-input {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: none;
+            background: #3a3b3c;
+            color: #e4e6eb;
+            font-size: 15px;
+            outline: none;
+            min-height: 42px;
+        }
+        .chat-input input::placeholder {
+            color: #b0b3b8;
+        }
+        .chat-input input:focus {
+            border: 1px solid #1877f2;
+        }
+        .chat-input input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .chat-input button {
+            padding: 8px 20px;
+            border: none;
+            background: #1877f2;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s;
+            min-height: 42px;
+        }
+        .chat-input button:hover {
+            background: #166fe5;
+        }
+        .chat-input button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        .sidebar {
+            position: fixed;
+            right: -320px;
+            top: 0;
+            width: 320px;
+            height: 100%;
+            background: #242526;
+            z-index: 2001;
+            transition: right 0.3s ease;
+            box-shadow: -2px 0 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #3a3b3c;
+        }
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #3a3b3c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            min-height: 64px;
+        }
+        .sidebar-header h3 {
+            color: #e4e6eb;
+            font-size: 18px;
+        }
+        .sidebar-header .close-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .sidebar-header .close-btn:hover {
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+
+        .sidebar-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .sidebar-body .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #e4e6eb;
+            text-decoration: none;
+            font-size: 15px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar-body .menu-item:hover {
+            background: #3a3b3c;
+        }
+        .sidebar-body .menu-item .icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+            color: #b0b3b8;
+        }
+        .sidebar-body .menu-item.danger {
+            color: #e94560;
+        }
+        .sidebar-body .menu-item.danger .icon {
+            color: #e94560;
+        }
+        .sidebar-body .menu-item.danger:hover {
+            background: #3a1a1a;
+        }
+        .sidebar-body .menu-divider {
+            height: 1px;
+            background: #3a3b3c;
+            margin: 6px 14px;
+        }
+        .sidebar-body .user-info-item {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #3a3b3c;
+        }
+        .sidebar-body .user-info-item .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .sidebar-body .user-info-item .name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #e4e6eb;
+        }
+        .sidebar-body .user-info-item .status {
+            font-size: 12px;
+            color: #b0b3b8;
+        }
+        .sidebar-body .block-status {
+            padding: 8px 20px;
+            font-size: 13px;
+            color: #e94560;
+            background: #3a1a1a;
+            margin: 4px 14px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success {
+            background: #4caf50;
+        }
+        .custom-alert.error {
+            background: #e94560;
+        }
+        .custom-alert.info {
+            background: #1877f2;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .message {
+                max-width: 90%;
+            }
+            .message-bubble {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+            .chat-header .chat-name {
+                font-size: 15px;
+            }
+            .chat-input input {
+                font-size: 14px;
+                padding: 8px 14px;
+                min-height: 38px;
+            }
+            .chat-input button {
+                font-size: 13px;
+                padding: 6px 16px;
+                min-height: 38px;
+            }
+            .messages-container {
+                padding: 12px;
+                padding-bottom: 70px;
+            }
+            .sidebar {
+                width: 280px;
+                right: -280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-header">
+        <button class="back-btn" onclick="window.location.href='messages.html'">←</button>
+        <div class="chat-info" id="chatInfo">
+            <div class="chat-name" id="chatName">Chat</div>
+            <div class="chat-sub" id="chatSub">Loading...</div>
+        </div>
+        <div class="chat-actions">
+            <button id="sidebarToggleBtn" title="More options">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <button onclick="window.location.href='messages.html'" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="messages-container" id="messagesContainer">
+        <div class="no-messages">⏳ Loading messages...</div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+        <span id="typingName">Someone</span> is typing
+        <span class="dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </span>
+    </div>
+
+    <div class="chat-input-wrapper">
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type a message..." maxlength="500" />
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Chat Options</h3>
+            <button class="close-btn" id="sidebarCloseBtn">✕</button>
+        </div>
+        <div class="sidebar-body" id="sidebarBody">
+            <div class="user-info-item" id="sidebarUserInfo">
+                <div class="avatar" id="sidebarAvatar">U</div>
+                <div>
+                    <div class="name" id="sidebarName">User</div>
+                    <div class="status" id="sidebarStatus">Online</div>
+                </div>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <div id="blockStatusContainer"></div>
+
+            <button class="menu-item" id="sidebarProfileBtn">
+                <span class="icon"><i class="fas fa-user"></i></span> View Profile
+            </button>
+
+            <button class="menu-item danger" id="sidebarDeleteChatBtn">
+                <span class="icon"><i class="fas fa-trash"></i></span> Delete Chat
+            </button>
+
+            <button class="menu-item danger" id="sidebarBlockBtn">
+                <span class="icon"><i class="fas fa-ban"></i></span> <span id="blockBtnText">Block User</span>
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <button class="menu-item" id="sidebarReportBtn">
+                <span class="icon"><i class="fas fa-flag"></i></span> Report
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // SUPABASE CONFIG
+        // ============================================================
+        const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co';
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
+
+        let supabaseClient = null;
+
+        function getSupabase() {
+            if (!supabaseClient) {
+                try {
+                    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log("✅ Supabase connected");
+                    }
+                } catch (e) {
+                    console.error("❌ Supabase error:", e);
+                }
+            }
+            return supabaseClient;
+        }
+
+        function showAlert(message, type) {
+            type = type || 'info';
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = 'custom-alert ' + type;
+            alert.innerHTML = message +
+                '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        // GLOBAL VARIABLES
+        // ============================================================
+        let currentUser = null;
+        let chatId = null;
+        let chatName = '';
+        let otherUserId = null;
+        let otherUser = null;
+        let isBlocked = false;
+        let isBlockedByOther = false;
+        let typingTimeout = null;
+
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        sidebarToggleBtn.addEventListener('click', openSidebar);
+        sidebarCloseBtn.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // ============================================================
+        // CHECK BLOCK STATUS
+        // ============================================================
+        async function checkBlockStatus() {
+            if (!currentUser || !otherUserId) {
+                console.log('⚠️ Cannot check block: currentUser or otherUserId missing');
+                return;
+            }
+
+            const supabase = getSupabase();
+            console.log('🔍 Checking block status for:', currentUser.id, otherUserId);
+
+            try {
+                const { data: block1, error: err1 } = await supabase
+                    .from('blocks')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .eq('blocked_user_id', otherUserId);
+
+                console.log('📊 Block check (I blocked them):', block1, err1);
+
+                const { data: block2, error: err2 } = await supabase
+                    .from('blocks')
+                    .select('id')
+                    .eq('user_id', otherUserId)
+                    .eq('blocked_user_id', currentUser.id);
+
+                console.log('📊 Block check (They blocked me):', block2, err2);
+
+                isBlocked = block1 && block1.length > 0;
+                isBlockedByOther = block2 && block2.length > 0;
+
+                console.log('✅ Block status - isBlocked:', isBlocked, 'isBlockedByOther:', isBlockedByOther);
+
+                updateSidebar();
+                updateInputState();
+
+            } catch (err) {
+                console.error('❌ Check block error:', err);
+            }
+        }
+
+        function updateSidebar() {
+            if (!otherUser) return;
+
+            document.getElementById('sidebarAvatar').textContent = otherUser.username.charAt(0).toUpperCase();
+            document.getElementById('sidebarName').textContent = otherUser.username;
+            document.getElementById('sidebarStatus').textContent = otherUser.is_online ? '🟢 Online' : '⚪ Offline';
+
+            const statusContainer = document.getElementById('blockStatusContainer');
+            if (isBlockedByOther) {
+                statusContainer.innerHTML =
+                    `<div class="block-status">🚫 You have been blocked by ${escapeHtml(otherUser.username)}</div>`;
+            } else if (isBlocked) {
+                statusContainer.innerHTML =
+                    `<div class="block-status">🚫 You have blocked ${escapeHtml(otherUser.username)}</div>`;
+            } else {
+                statusContainer.innerHTML = '';
+            }
+
+            document.getElementById('blockBtnText').textContent = isBlocked ? 'Unblock User' : 'Block User';
+        }
+
+        function updateInputState() {
+            if (isBlocked || isBlockedByOther) {
+                messageInput.disabled = true;
+                messageInput.placeholder = isBlockedByOther ?
+                    `You are blocked by ${otherUser?.username || 'this user'}` :
+                    `You blocked ${otherUser?.username || 'this user'}`;
+                sendBtn.disabled = true;
+            } else {
+                messageInput.disabled = false;
+                messageInput.placeholder = 'Type a message...';
+                sendBtn.disabled = false;
+            }
+        }
+
+        // ============================================================
+        // TOGGLE BLOCK - ডিবাগ ভার্সন
+        // ============================================================
+        async function toggleBlockUser() {
+            console.log('🔍🔍🔍 Toggle Block clicked!');
+            console.log('🔍 Current User:', currentUser);
+            console.log('🔍 Other User ID:', otherUserId);
+            console.log('🔍 Other User:', otherUser);
+            console.log('🔍 Is Blocked:', isBlocked);
+
+            if (!currentUser || !otherUserId) {
+                showAlert('User not found!', 'error');
+                console.error('❌ currentUser or otherUserId is null!');
+                return;
+            }
+
+            const supabase = getSupabase();
+            if (!supabase) {
+                showAlert('Connection error!', 'error');
+                return;
+            }
+
+            if (isBlocked) {
+                // ===== UNBLOCK =====
+                if (!confirm(`Unblock ${otherUser?.username || 'this user'}?`)) return;
+
+                console.log('🔄 Unblocking user...');
+
+                try {
+                    const { data, error } = await supabase
+                        .from('blocks')
+                        .delete()
+                        .eq('user_id', currentUser.id)
+                        .eq('blocked_user_id', otherUserId)
+                        .select();
+
+                    console.log('📊 Unblock response:', { data, error });
+
+                    if (error) {
+                        console.error('❌ Unblock error:', error);
+                        showAlert('Failed to unblock user: ' + error.message, 'error');
+                        return;
+                    }
+
+                    isBlocked = false;
+                    showAlert(`✅ ${otherUser?.username || 'User'} unblocked!`, 'success');
+
+                } catch (err) {
+                    console.error('❌ Unblock exception:', err);
+                    showAlert('Something went wrong!', 'error');
+                }
+
+            } else {
+                // ===== BLOCK =====
+                if (!confirm(`Block ${otherUser?.username || 'this user'}? They won't be able to message you.`)) return;
+
+                console.log('🔄 Blocking user...');
+                console.log('📝 Data to insert:', {
+                    user_id: currentUser.id,
+                    blocked_user_id: otherUserId,
+                    created_at: new Date().toISOString()
+                });
+
+                try {
+                    const { data, error } = await supabase
+                        .from('blocks')
+                        .insert({
+                            user_id: currentUser.id,
+                            blocked_user_id: otherUserId,
+                            created_at: new Date().toISOString()
+                        })
+                        .select();
+
+                    console.log('📊 Block response:', { data, error });
+
+                    if (error) {
+                        console.error('❌ Block error:', error);
+                        console.error('❌ Error code:', error.code);
+                        console.error('❌ Error message:', error.message);
+                        console.error('❌ Error details:', error.details);
+
+                        if (error.code === '23505') {
+                            showAlert('You already blocked this user!', 'info');
+                            isBlocked = true;
+                        } else if (error.code === '42501') {
+                            showAlert('Permission denied! Please check RLS policy.', 'error');
+                        } else {
+                            showAlert('Failed to block user: ' + error.message, 'error');
+                        }
+                        return;
+                    }
+
+                    isBlocked = true;
+                    showAlert(`✅ ${otherUser?.username || 'User'} blocked!`, 'success');
+
+                    // ব্লক করার পর মেসেজ ডিলিট
+                    await deleteAllMessages();
+
+                } catch (err) {
+                    console.error('❌ Block exception:', err);
+                    showAlert('Something went wrong!', 'error');
+                }
+            }
+
+            // স্টেট আপডেট
+            await checkBlockStatus();
+            updateSidebar();
+            updateInputState();
+            closeSidebar();
+        }
+
+        // ============================================================
+        // DELETE CHAT
+        // ============================================================
+        async function deleteChat() {
+            if (!chatId || !currentUser) return;
+
+            if (!confirm('Delete all messages in this chat? This cannot be undone!')) return;
+
+            const supabase = getSupabase();
+
+            try {
+                const { error: msgError } = await supabase
+                    .from('messages')
+                    .delete()
+                    .eq('conversation_id', chatId);
+
+                if (msgError) {
+                    showAlert('Failed to delete messages!', 'error');
+                    return;
+                }
+
+                await supabase
+                    .from('conversations')
+                    .update({ updated_at: new Date().toISOString() })
+                    .eq('id', chatId);
+
+                messagesContainer.innerHTML = `<div class="no-messages">💬 Chat deleted. Start fresh!</div>`;
+                showAlert('✅ Chat deleted successfully!', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'messages.html';
+                }, 1500);
+
+            } catch (err) {
+                console.error('Delete chat error:', err);
+                showAlert('Failed to delete chat!', 'error');
+            }
+        }
+
+        async function deleteAllMessages() {
+            if (!chatId) return;
+            const supabase = getSupabase();
+
+            const { error } = await supabase
+                .from('messages')
+                .delete()
+                .eq('conversation_id', chatId);
+
+            if (!error) {
+                messagesContainer.innerHTML = `<div class="no-messages">💬 Messages deleted due to block.</div>`;
+                await supabase
+                    .from('conversations')
+                    .update({ updated_at: new Date().toISOString() })
+                    .eq('id', chatId);
+            }
+        }
+
+        function reportUser() {
+            if (!otherUser) return;
+            const reason = prompt(`Report ${otherUser.username}? Please enter reason:`, 'Spam or abuse');
+            if (reason && reason.trim()) {
+                showAlert(`✅ Report sent against ${otherUser.username}`, 'success');
+            }
+            closeSidebar();
+        }
+
+        // ============================================================
+        // LOAD MESSAGES
+        // ============================================================
+        async function loadMessages() {
+            const supabase = getSupabase();
+
+            const { data: messages, error } = await supabase
+                .from('messages')
+                .select('*')
+                .eq('conversation_id', chatId)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                messagesContainer.innerHTML = `<div class="no-messages">❌ Failed to load messages</div>`;
+                return;
+            }
+
+            if (!messages || messages.length === 0) {
+                messagesContainer.innerHTML = `<div class="no-messages">💬 No messages yet. Say hello!</div>`;
+                return;
+            }
+
+            messagesContainer.innerHTML = '';
+            messages.forEach(msg => appendMessage(msg));
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function appendMessage(msg) {
+            const isOwn = msg.sender_id === currentUser.id;
+
+            const div = document.createElement('div');
+            div.className = `message ${isOwn ? 'own' : 'other'}`;
+
+            let senderName = '';
+            if (!isOwn) {
+                senderName =
+                    `<span class="sender-name" onclick="window.location.href='userprofile.html?userId=${msg.sender_id}'">${escapeHtml(msg.sender_username || 'User')}</span>`;
+            }
+
+            const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            div.innerHTML = `
+                ${senderName}
+                <div class="message-bubble">
+                    <div>${escapeHtml(msg.content)}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+
+            const noMsg = messagesContainer.querySelector('.no-messages');
+            if (noMsg) noMsg.remove();
+
+            messagesContainer.appendChild(div);
+        }
+
+        // ============================================================
+        // SEND MESSAGE - ব্লক চেক সহ
+        // ============================================================
+        async function sendMessage() {
+            if (isBlocked) {
+                showAlert(`You have blocked ${otherUser?.username || 'this user'}!`, 'error');
+                return;
+            }
+
+            if (isBlockedByOther) {
+                showAlert(`You are blocked by ${otherUser?.username || 'this user'}!`, 'error');
+                return;
+            }
+
+            const content = messageInput.value.trim();
+            if (!content) return;
+
+            const supabase = getSupabase();
+            sendBtn.disabled = true;
+
+            // ডাটাবেস লেভেলে ব্লক চেক
+            const { data: blockCheck, error: blockError } = await supabase
+                .from('blocks')
+                .select('id')
+                .or(`user_id.eq.${currentUser.id},blocked_user_id.eq.${currentUser.id}`)
+                .or(`user_id.eq.${otherUserId},blocked_user_id.eq.${otherUserId}`);
+
+            if (blockError) {
+                console.error('Block check error:', blockError);
+            }
+
+            if (blockCheck && blockCheck.length > 0) {
+                await checkBlockStatus();
+                updateInputState();
+                showAlert('You are blocked or have blocked this user!', 'error');
+                sendBtn.disabled = false;
+                return;
+            }
+
+            const { error } = await supabase
+                .from('messages')
+                .insert({
+                    conversation_id: chatId,
+                    sender_id: currentUser.id,
+                    sender_username: currentUser.username,
+                    content: content,
+                    created_at: new Date().toISOString()
+                });
+
+            sendBtn.disabled = false;
+
+            if (error) {
+                showAlert('Failed to send message!', 'error');
+                return;
+            }
+
+            await supabase
+                .from('conversations')
+                .update({ updated_at: new Date().toISOString() })
+                .eq('id', chatId);
+
+            messageInput.value = '';
+            messageInput.focus();
+        }
+
+        // ============================================================
+        // TYPING
+        // ============================================================
+        function sendTyping() {
+            if (!window.typingChannel) return;
+
+            window.typingChannel.send({
+                type: 'broadcast',
+                event: 'typing',
+                payload: {
+                    chatId: chatId,
+                    userId: currentUser.id,
+                    username: currentUser.username
+                }
+            });
+        }
+
+        function showTyping(username) {
+            const indicator = document.getElementById('typingIndicator');
+            document.getElementById('typingName').textContent = username;
+            indicator.classList.add('show');
+
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // ============================================================
+        // REALTIME
+        // ============================================================
+        function setupRealtime() {
+            const supabase = getSupabase();
+
+            const msgChannel = supabase.channel('messages-' + chatId);
+            msgChannel.on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'messages',
+                filter: `conversation_id=eq.${chatId}`
+            }, (payload) => {
+                appendMessage(payload.new);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }).subscribe();
+
+            const typingChannel = supabase.channel('typing-' + chatId);
+            typingChannel.on('broadcast', { event: 'typing' }, ({ payload }) => {
+                if (payload.userId === currentUser.id) return;
+                if (payload.chatId === chatId) {
+                    showTyping(payload.username);
+                }
+            }).subscribe();
+
+            window.typingChannel = typingChannel;
+            window.msgChannel = msgChannel;
+        }
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Full message page loading...');
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const supabase = getSupabase();
+            if (!supabase) {
+                showAlert('Supabase connection failed!', 'error');
+                return;
+            }
+
+            const { data: user, error: userError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (userError || !user) {
+                localStorage.removeItem('userId');
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = user;
+            console.log('✅ Current user loaded:', currentUser.username);
+
+            const params = new URLSearchParams(window.location.search);
+            chatId = params.get('chatId');
+            chatName = params.get('name') || 'Chat';
+            const isDm = params.get('isDm') === 'true';
+
+            document.getElementById('chatName').textContent = chatName;
+
+            if (isDm && chatId) {
+                console.log('🔍 Fetching other user...');
+                const { data: members } = await supabase
+                    .from('conversation_members')
+                    .select('user_id')
+                    .eq('conversation_id', chatId)
+                    .neq('user_id', currentUser.id);
+
+                console.log('📊 Members:', members);
+
+                if (members && members.length > 0) {
+                    otherUserId = members[0].user_id;
+                    console.log('🔍 Other user ID:', otherUserId);
+
+                    const { data: otherUserData } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', otherUserId)
+                        .single();
+
+                    if (otherUserData) {
+                        otherUser = otherUserData;
+                        chatName = otherUserData.username;
+                        document.getElementById('chatName').textContent = chatName;
+                        console.log('✅ Other user loaded:', otherUser.username);
+
+                        await checkBlockStatus();
+
+                        document.getElementById('chatInfo').addEventListener('click', function() {
+                            window.location.href = `userprofile.html?userId=${otherUserId}`;
+                        });
+                    }
+                }
+                document.getElementById('chatSub').textContent = '🔒 Direct Message';
+            }
+
+            await loadMessages();
+            setupRealtime();
+
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+                if (e.key !== 'Enter' && e.key !== 'Shift') {
+                    sendTyping();
+                }
+            });
+
+            sendBtn.addEventListener('click', sendMessage);
+
+            document.getElementById('sidebarProfileBtn').addEventListener('click', function() {
+                if (otherUserId) {
+                    window.location.href = `userprofile.html?userId=${otherUserId}`;
+                }
+                closeSidebar();
+            });
+
+            document.getElementById('sidebarDeleteChatBtn').addEventListener('click', deleteChat);
+            document.getElementById('sidebarBlockBtn').addEventListener('click', toggleBlockUser);
+            document.getElementById('sidebarReportBtn').addEventListener('click', reportUser);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            updateInputState();
+
+            console.log('🚀 Full message page loaded with debug!');
+            console.log('📌 Open console to see debug logs.');
+        });
+    </script>
+</body>
+</html>

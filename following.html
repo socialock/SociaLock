@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Following</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+        }
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            display: flex;
+            flex-direction: column;
+            padding-top: 0;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0 8px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 16px;
+        }
+        .back-header .back-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .back-header .back-btn:hover {
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+        .back-header .back-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e4e6eb;
+        }
+
+        .following-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #242526;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #3a3b3c;
+            transition: 0.2s;
+        }
+        .following-item:hover {
+            background: #2a2b2c;
+            border-color: #4a4b4c;
+        }
+
+        .following-item .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .following-item .user-info .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .following-item .user-info .name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #e4e6eb;
+        }
+        .following-item .user-info .name .verified-badge {
+            color: #1877f2;
+            font-size: 14px;
+            margin-left: 4px;
+        }
+
+        .following-item .unfollow-btn {
+            background: #3a3b3c;
+            border: none;
+            color: #e4e6eb;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .following-item .unfollow-btn:hover {
+            background: #e94560;
+            color: white;
+        }
+
+        .no-following {
+            text-align: center;
+            padding: 40px;
+            color: #b0b3b8;
+        }
+        .no-following .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .no-following h3 {
+            font-size: 18px;
+            color: #e4e6eb;
+            margin-bottom: 4px;
+        }
+        .no-following p {
+            font-size: 14px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 30px;
+            color: #b0b3b8;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success {
+            background: #4caf50;
+        }
+        .custom-alert.error {
+            background: #e94560;
+        }
+        .custom-alert.info {
+            background: #1877f2;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0 12px;
+            }
+            .following-item {
+                padding: 10px 12px;
+            }
+            .following-item .user-info .avatar {
+                width: 38px;
+                height: 38px;
+                font-size: 15px;
+            }
+            .following-item .user-info .name {
+                font-size: 14px;
+            }
+            .following-item .unfollow-btn {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            .back-header .back-btn {
+                font-size: 20px;
+            }
+            .back-header .back-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body class="dark-theme">
+    <div class="main-wrapper">
+        <div class="main-container">
+            <div class="back-header">
+                <button class="back-btn" onclick="window.location.href='home.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span class="back-title">Following</span>
+            </div>
+
+            <div id="followingContainer">
+                <div class="loading-spinner">⏳ Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // SUPABASE CONFIG
+        // ============================================================
+        const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co';
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
+
+        let supabaseClient = null;
+
+        function getSupabase() {
+            if (!supabaseClient) {
+                try {
+                    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log("✅ Supabase connected");
+                    }
+                } catch (e) {
+                    console.error("❌ Supabase error:", e);
+                }
+            }
+            return supabaseClient;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showAlert(msg, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            alert.innerHTML = msg +
+                '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        let currentUser = null;
+
+        // ============================================================
+        // LOAD FOLLOWING
+        // ============================================================
+        async function loadFollowing() {
+            const supabase = getSupabase();
+            const container = document.getElementById('followingContainer');
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Current user
+                const { data: user, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (userError || !user) {
+                    localStorage.removeItem('userId');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                currentUser = user;
+
+                // Get following list
+                const { data: follows, error } = await supabase
+                    .from('follows')
+                    .select('following_id')
+                    .eq('follower_id', userId)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error fetching following:', error);
+                    container.innerHTML = '<div class="no-following">❌ Failed to load</div>';
+                    return;
+                }
+
+                if (!follows || follows.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-following">
+                            <span class="icon">👤</span>
+                            <h3>Not following anyone yet</h3>
+                            <p>When you follow people, they'll appear here.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const followingIds = follows.map(f => f.following_id);
+
+                // Get user details
+                const { data: users, error: userError2 } = await supabase
+                    .from('users')
+                    .select('id, username, is_verified')
+                    .in('id', followingIds);
+
+                if (userError2) {
+                    console.error('Error fetching users:', userError2);
+                    container.innerHTML = '<div class="no-following">❌ Failed to load users</div>';
+                    return;
+                }
+
+                if (!users || users.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-following">
+                            <span class="icon">👤</span>
+                            <h3>No users found</h3>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render
+                container.innerHTML = '';
+                users.forEach(user => {
+                    const isVerified = user.is_verified || false;
+                    const verifiedBadge = isVerified ?
+                        `<span class="verified-badge"><i class="fas fa-check-circle"></i></span>` : '';
+
+                    const item = document.createElement('div');
+                    item.className = 'following-item';
+                    item.innerHTML = `
+                        <div class="user-info" onclick="window.location.href='userprofile.html?userId=${user.id}'">
+                            <div class="avatar">${user.username.charAt(0).toUpperCase()}</div>
+                            <div class="name">${escapeHtml(user.username)} ${verifiedBadge}</div>
+                        </div>
+                        <button class="unfollow-btn" onclick="unfollowUser('${user.id}', '${escapeHtml(user.username)}')">Unfollow</button>
+                    `;
+                    container.appendChild(item);
+                });
+
+            } catch (err) {
+                console.error('Load following error:', err);
+                container.innerHTML = '<div class="no-following">❌ Something went wrong</div>';
+            }
+        }
+
+        // ============================================================
+        // UNFOLLOW USER
+        // ============================================================
+        async function unfollowUser(userId, username) {
+            if (!confirm(`Unfollow ${username}?`)) return;
+
+            const supabase = getSupabase();
+
+            try {
+                const { error } = await supabase
+                    .from('follows')
+                    .delete()
+                    .eq('follower_id', currentUser.id)
+                    .eq('following_id', userId);
+
+                if (error) {
+                    showAlert('Failed to unfollow!', 'error');
+                    return;
+                }
+
+                showAlert(`Unfollowed ${username}`, 'info');
+                // রিলোড লিস্ট
+                await loadFollowing();
+
+            } catch (err) {
+                console.error('Unfollow error:', err);
+                showAlert('Something went wrong!', 'error');
+            }
+        }
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFollowing();
+        });
+
+        console.log('🚀 Following page loaded!');
+    </script>
+</body>
+</html>

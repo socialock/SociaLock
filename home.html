@@ -1,50 +1,2188 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>হোম</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1c1e21;
+            overflow-x: hidden;
+            padding-top: 0;
+        }
+
+        .dark-theme {
+            background: #18191a;
+            color: #e4e6eb;
+        }
+        .dark-theme .post-card {
+            background: #242526;
+        }
+        .dark-theme .create-post {
+            background: #242526;
+        }
+        .dark-theme .ad-card {
+            background: linear-gradient(135deg, #1a1a3e, #24245e);
+        }
+        .dark-theme .post-stats {
+            border-color: #3a3b3c;
+        }
+        .dark-theme .post-action-btn:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .post-more-menu {
+            background: #242526;
+            border: 1px solid #3a3b3c;
+        }
+        .dark-theme .post-more-menu a {
+            color: #e4e6eb;
+        }
+        .dark-theme .post-more-menu a:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .post-time {
+            color: #b0b3b8;
+        }
+        .dark-theme .post-stats span {
+            color: #b0b3b8;
+        }
+        .dark-theme .no-posts {
+            color: #b0b3b8;
+        }
+        .dark-theme .loading-spinner {
+            color: #b0b3b8;
+        }
+        .dark-theme .create-post-input {
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+        .dark-theme .nav-search input {
+            background: #3a3b3c;
+            border: 1px solid #3a3b3c;
+            color: #e4e6eb;
+        }
+        .dark-theme .nav-icon {
+            color: #b0b3b8;
+        }
+        .dark-theme .nav-icon:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .user-menu-btn:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .post-more-btn:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .post-action-btn {
+            color: #b0b3b8;
+        }
+        .dark-theme .sidemenu {
+            background: #242526;
+            border-right: 1px solid #3a3b3c;
+        }
+        .dark-theme .sidemenu .menu-item:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .sidemenu .menu-item {
+            color: #e4e6eb;
+        }
+        .dark-theme .sidemenu .menu-item .icon {
+            color: #b0b3b8;
+        }
+        .dark-theme .sidemenu .menu-divider {
+            background: #3a3b3c;
+        }
+        .dark-theme .sidemenu .user-name {
+            color: #e4e6eb;
+        }
+        .dark-theme .sidemenu .user-email {
+            color: #b0b3b8;
+        }
+        .dark-theme .sidemenu-overlay {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .dark-theme .search-fullscreen {
+            background: #18191a;
+        }
+        .dark-theme .search-fullscreen input {
+            background: #2a2a2a;
+            color: #e4e6eb;
+            border: 1px solid #3a3b3c;
+        }
+        .dark-theme .search-fullscreen input::placeholder {
+            color: #888;
+        }
+        .dark-theme .search-fullscreen .close-btn {
+            color: #b0b3b8;
+        }
+        .dark-theme .search-fullscreen .close-btn:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .search-fullscreen .result-item:hover {
+            background: #3a3b3c;
+        }
+
+        /* ===== BADGE ===== */
+        .nav-icon-bottom {
+            position: relative;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e94560;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #242526;
+            line-height: 1;
+            z-index: 5;
+        }
+        .notif-badge.show {
+            display: flex;
+        }
+
+        /* ===== TOP NAVBAR ===== */
+        .navbar-top {
+            background: #ffffff;
+            padding: 6px 12px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            height: 48px;
+            display: flex;
+            align-items: center;
+        }
+        .dark-theme .navbar-top {
+            background: #242526;
+            border-bottom: 1px solid #3a3b3c;
+        }
+
+        .nav-top-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .nav-brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1877f2;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .nav-brand i {
+            font-size: 1.6rem;
+            color: #1877f2;
+            margin-right: 6px;
+        }
+        .menu-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #606770;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .menu-toggle-btn:hover {
+            background: #f0f2f5;
+        }
+        .dark-theme .menu-toggle-btn {
+            color: #b0b3b8;
+        }
+        .dark-theme .menu-toggle-btn:hover {
+            background: #3a3b3c;
+        }
+
+        .nav-search {
+            flex: 1;
+            max-width: 600px;
+            position: relative;
+            margin: 0 12px;
+        }
+        .nav-search input {
+            width: 100%;
+            padding: 10px 16px 10px 44px;
+            border-radius: 24px;
+            border: 1px solid #ddd;
+            background: #f0f2f5;
+            font-size: 16px;
+            outline: none;
+            transition: none;
+            cursor: pointer;
+            height: 44px;
+        }
+        .nav-search input:focus {
+            border-color: #1877f2;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.15);
+        }
+        .dark-theme .nav-search input:focus {
+            background: #2a2a2a;
+        }
+        .nav-search .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #606770;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .user-menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            color: #606770;
+            transition: 0.2s;
+        }
+        .user-menu-btn:hover {
+            background: #f0f2f5;
+        }
+        .dark-theme .user-menu-btn {
+            color: #b0b3b8;
+        }
+        .dark-theme .user-menu-btn:hover {
+            background: #3a3b3c;
+        }
+
+        /* ===== BOTTOM NAVBAR ===== */
+        .navbar-bottom {
+            background: #ffffff;
+            padding: 4px 8px;
+            position: fixed;
+            top: 48px;
+            width: 100%;
+            z-index: 999;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-theme .navbar-bottom {
+            background: #242526;
+            border-bottom: 1px solid #3a3b3c;
+        }
+
+        .nav-bottom-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+
+        .nav-icon-bottom {
+            font-size: 1.7rem;
+            text-decoration: none;
+            color: #606770;
+            padding: 4px 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .nav-icon-bottom:hover {
+            background: #f0f2f5;
+        }
+        .nav-icon-bottom.active {
+            color: #1877f2;
+        }
+        .nav-icon-bottom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: #1877f2;
+            border-radius: 2px;
+        }
+        .nav-icon-bottom .label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #606770;
+        }
+        .nav-icon-bottom.active .label {
+            color: #1877f2;
+        }
+        .dark-theme .nav-icon-bottom {
+            color: #b0b3b8;
+        }
+        .dark-theme .nav-icon-bottom:hover {
+            background: #3a3b3c;
+        }
+        .dark-theme .nav-icon-bottom.active {
+            color: #1877f2;
+        }
+        .dark-theme .nav-icon-bottom .label {
+            color: #b0b3b8;
+        }
+        .dark-theme .nav-icon-bottom.active .label {
+            color: #1877f2;
+        }
+
+        /* ===== SEARCH ===== */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            max-height: 350px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            margin-top: 4px;
+            border: 1px solid #e4e6eb;
+        }
+        .search-results.show {
+            display: block;
+        }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-bottom: 1px solid #e4e6eb;
+            font-size: 13px;
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        .search-result-item:hover {
+            background: #f0f2f5;
+        }
+        .search-result-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-right: 10px;
+        }
+        .search-result-info {
+            flex: 1;
+        }
+        .search-result-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1c1e21;
+        }
+        .search-empty {
+            padding: 16px;
+            text-align: center;
+            color: #606770;
+            font-size: 13px;
+        }
+
+        .search-fullscreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 9999;
+            padding: 16px 20px;
+            flex-direction: column;
+        }
+        .search-fullscreen.show {
+            display: flex;
+        }
+        .search-fullscreen .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .search-fullscreen .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: #606770;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .search-fullscreen .close-btn:hover {
+            background: #f0f2f5;
+        }
+        .search-fullscreen input {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 24px;
+            border: 1px solid #ddd;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-size: 18px;
+            outline: none;
+            transition: 0.3s;
+            height: 48px;
+        }
+        .search-fullscreen input::placeholder {
+            color: #888;
+        }
+        .search-fullscreen input:focus {
+            border-color: #1877f2;
+            background: #1a1a1a;
+        }
+        .search-fullscreen .results {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+        .search-fullscreen .result-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        .search-fullscreen .result-item:hover {
+            background: #f0f2f5;
+        }
+        .search-fullscreen .result-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+        .search-fullscreen .result-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .search-fullscreen .no-result {
+            text-align: center;
+            padding: 30px;
+            color: #606770;
+            font-size: 15px;
+        }
+
+        /* ===== SIDEMENU ===== */
+        .sidemenu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
+        }
+        .sidemenu-overlay.show {
+            display: block;
+        }
+
+        .sidemenu {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: white;
+            z-index: 2001;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .sidemenu.open {
+            left: 0;
+        }
+
+        .sidemenu-header {
+            padding: 16px;
+            border-bottom: 1px solid #e4e6eb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 48px;
+        }
+        .sidemenu-header:hover {
+            background: #f0f2f5;
+        }
+        .sidemenu-header .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .sidemenu-header .user-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1c1e21;
+        }
+        .sidemenu-header .user-email {
+            font-size: 12px;
+            color: #606770;
+        }
+
+        .sidemenu-body {
+            flex: 1;
+            padding: 6px 0;
+        }
+        .sidemenu-body .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 15px;
+            color: #1c1e21;
+            text-decoration: none;
+        }
+        .sidemenu-body .menu-item:hover {
+            background: #f0f2f5;
+        }
+        .sidemenu-body .menu-item .icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+            color: #606770;
+        }
+        .sidemenu-body .menu-divider {
+            height: 1px;
+            background: #e4e6eb;
+            margin: 6px 14px;
+        }
+        .sidemenu-body .menu-item.danger {
+            color: #e94560;
+        }
+        .sidemenu-body .menu-item.danger .icon {
+            color: #e94560;
+        }
+
+        .sidemenu-footer {
+            padding: 10px 14px;
+            border-top: 1px solid #e4e6eb;
+            font-size: 11px;
+            color: #606770;
+            text-align: center;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-container {
+            max-width: 680px;
+            margin: 94px auto 16px;
+            padding: 0 12px;
+        }
+
+        .create-post {
+            background: white;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .create-post:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        .create-post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .create-post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .create-post-input {
+            flex: 1;
+            padding: 8px 14px;
+            background: #f0f2f5;
+            border-radius: 18px;
+            border: none;
+            font-size: 14px;
+            color: #1c1e21;
+            cursor: pointer;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .post-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .post-username {
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: default;
+        }
+        .post-username .verified-badge {
+            color: #1877f2;
+            font-size: 16px;
+        }
+        .post-time {
+            font-size: 12px;
+            color: #606770;
+            cursor: default;
+        }
+        .post-more-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #606770;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 50%;
+            transition: 0.2s;
+            position: relative;
+        }
+        .post-more-btn:hover {
+            background: #f0f2f5;
+        }
+        .post-more-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 28px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+            z-index: 100;
+        }
+        .post-more-menu.show {
+            display: block;
+        }
+        .post-more-menu a {
+            display: block;
+            padding: 8px 14px;
+            color: #1c1e21;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .post-more-menu a:hover {
+            background: #f0f2f5;
+        }
+        .post-more-menu .danger {
+            color: #e94560;
+        }
+
+        .post-follow-btn {
+            background: none;
+            border: none;
+            color: #1877f2;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 16px;
+            transition: 0.2s;
+            margin-left: 6px;
+            background: rgba(24, 119, 242, 0.1);
+        }
+        .post-follow-btn:hover {
+            background: rgba(24, 119, 242, 0.2);
+        }
+        .dark-theme .post-follow-btn {
+            color: #4a9eff;
+            background: rgba(74, 158, 255, 0.1);
+        }
+        .dark-theme .post-follow-btn:hover {
+            background: rgba(74, 158, 255, 0.2);
+        }
+        .post-follow-btn.following {
+            color: #606770;
+            background: rgba(96, 103, 112, 0.15);
+        }
+        .post-follow-btn.following:hover {
+            color: #e94560;
+            background: rgba(233, 69, 96, 0.15);
+        }
+        .dark-theme .post-follow-btn.following {
+            color: #b0b3b8;
+            background: rgba(176, 179, 184, 0.1);
+        }
+        .dark-theme .post-follow-btn.following:hover {
+            color: #e94560;
+            background: rgba(233, 69, 96, 0.15);
+        }
+
+        .post-content {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            cursor: default;
+        }
+        .post-content a {
+            color: #1877f2;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .post-content a:hover {
+            text-decoration: underline;
+        }
+        .dark-theme .post-content a {
+            color: #4a9eff;
+        }
+
+        .post-stats {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-top: 1px solid #e4e6eb;
+            border-bottom: 1px solid #e4e6eb;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .post-stats span {
+            color: #606770;
+            cursor: default;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 6px;
+            padding: 4px 0;
+        }
+        .post-action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #606770;
+            transition: 0.2s;
+        }
+        .post-action-btn:hover {
+            background: #f0f2f5;
+        }
+        .post-action-btn.liked {
+            color: #e94560;
+        }
+        .post-action-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .dark-theme .post-action-btn:hover {
+            background: #3a3b3c;
+        }
+
+        .ad-card {
+            background: linear-gradient(135deg, #1a1a4e, #2a2a6e);
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .ad-card a {
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+        .ad-card img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            max-height: 180px;
+            object-fit: cover;
+        }
+        .ad-caption {
+            font-size: 14px;
+            color: white;
+            font-weight: 500;
+        }
+        .ad-sponsored {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 20px;
+            color: #606770;
+            font-size: 14px;
+        }
+        .no-posts {
+            text-align: center;
+            padding: 30px;
+            color: #606770;
+            font-size: 14px;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 100px;
+            right: 10px;
+            left: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+            font-size: 14px;
+        }
+        .custom-alert.success {
+            background: #4caf50;
+        }
+        .custom-alert.error {
+            background: #e94560;
+        }
+        .custom-alert.info {
+            background: #1877f2;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-brand {
+                font-size: 1.1rem;
+            }
+            .nav-brand i {
+                font-size: 1.3rem;
+            }
+            .nav-search {
+                max-width: 280px;
+            }
+            .nav-icon-bottom {
+                font-size: 1.5rem;
+                padding: 4px 12px;
+            }
+            .main-container {
+                padding: 0 8px;
+            }
+            .sidemenu {
+                width: 260px;
+                left: -260px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding-top: 0;
+            }
+            .navbar-top {
+                height: 42px;
+                padding: 4px 8px;
+            }
+            .navbar-bottom {
+                height: 42px;
+                top: 42px;
+            }
+            .nav-brand {
+                font-size: 0.95rem;
+            }
+            .nav-brand i {
+                font-size: 1.1rem;
+            }
+            .nav-search {
+                max-width: 180px;
+            }
+            .nav-search input {
+                font-size: 13px;
+                padding: 6px 10px 6px 34px;
+                height: 34px;
+            }
+            .nav-search .search-icon {
+                font-size: 13px;
+                left: 12px;
+            }
+            .nav-icon-bottom {
+                font-size: 1.3rem;
+                padding: 2px 8px;
+            }
+            .nav-icon-bottom .label {
+                font-size: 0.5rem;
+            }
+            .sidemenu {
+                width: 240px;
+                left: -240px;
+            }
+            .sidemenu-header {
+                margin-top: 42px;
+            }
+            .main-container {
+                margin: 92px auto 12px;
+            }
+            .post-action-btn {
+                font-size: 13px;
+                padding: 6px;
+            }
+            .post-action-btn svg {
+                width: 18px;
+                height: 18px;
+            }
+            .post-card {
+                padding: 12px;
+            }
+            .post-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .post-username {
+                font-size: 14px;
+            }
+            .create-post-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .create-post-input {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+            .search-fullscreen input {
+                font-size: 16px;
+                padding: 12px 16px;
+                height: 44px;
+            }
+            .ad-card img {
+                max-height: 120px;
+            }
+            .custom-alert {
+                top: 90px;
+            }
+            .post-follow-btn {
+                font-size: 13px;
+                padding: 3px 10px;
+            }
+            .post-more-menu {
+                min-width: 130px;
+            }
+        }
+    </style>
 </head>
+
 <body class="dark-theme">
-    <!-- নেভবার এবং অন্যান্য HTML (আগের মতোই) -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">সোশ্যাল মিডিয়া</div>
-            <div class="nav-icons">
-                <a href="home.html" class="nav-icon active">🌍</a>
-                <a href="messages.html" class="nav-icon">💬</a>
-                <a href="tools.html" class="nav-icon">🔧</a>
-                <a href="notifications.html" class="nav-icon">🔔</a>
-                <a href="others.html" class="nav-icon">⚙️</a>
-            </div>
-            <div class="user-menu">
-                <button id="userMenuBtn" class="user-menu-btn">👤</button>
-                <div id="userDropdown" class="dropdown-menu">
-                    <a href="#" id="myPostsBtn">📝 মাই পোস্ট</a>
-                    <a href="#" id="changePasswordBtn">🔒 পাসওয়ার্ড চেঞ্জ</a>
-                    <a href="#" id="deleteAccountBtn">🗑️ একাউন্ট ডিলিট</a>
-                    <a href="#" id="logoutBtn">🚪 লগআউট</a>
+    <!-- ===== TOP NAVBAR ===== -->
+    <nav class="navbar-top">
+        <div class="nav-top-container">
+            <div class="nav-left">
+                <button class="menu-toggle-btn" id="menuToggleBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="nav-brand">
+                    SociaLock
                 </div>
+            </div>
+
+            <div class="nav-search" id="navSearch">
+                <span class="search-icon"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchInput" placeholder="Search users..." autocomplete="off" readonly>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+
+            <div class="nav-right">
+                <button class="user-menu-btn" id="userMenuBtn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <div class="main-container">
-        <div class="create-post">
-            <textarea id="postContent" maxlength="300" placeholder="আপনার মনের কথা লিখুন... (সর্বোচ্চ ৩০০ অক্ষর)"></textarea>
-            <div class="post-actions">
-                <span id="charCount">0/300</span>
-                <button id="createPostBtn" class="btn-primary">📤 পোস্ট করুন</button>
+    <!-- ===== BOTTOM NAVBAR ===== -->
+    <nav class="navbar-bottom">
+        <div class="nav-bottom-container">
+            <a href="home.html" class="nav-icon-bottom active" title="Home">
+                <i class="fas fa-home"></i>
+                <span class="label">Home</span>
+            </a>
+            <a href="messages.html" class="nav-icon-bottom" title="Messages">
+                <i class="fas fa-comment-dots"></i>
+                <span class="label">Messages</span>
+            </a>
+            <a href="tools.html" class="nav-icon-bottom" title="Tools">
+                <i class="fas fa-tools"></i>
+                <span class="label">Tools</span>
+            </a>
+            <a href="notifications.html" class="nav-icon-bottom" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="label">Notifications</span>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </a>
+            <a href="#" class="nav-icon-bottom" id="profileNavBtn" title="Profile">
+                <i class="fas fa-user-circle"></i>
+                <span class="label">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===== SEARCH FULLSCREEN ===== -->
+    <div class="search-fullscreen" id="searchFullscreen">
+        <div class="header">
+            <button class="close-btn" id="searchCloseBtn"><i class="fas fa-arrow-left"></i></button>
+            <input type="text" id="searchFullscreenInput" placeholder="Search users..." autocomplete="off">
+        </div>
+        <div class="results" id="searchFullscreenResults"></div>
+    </div>
+
+    <!-- ===== SIDEMENU ===== -->
+    <div class="sidemenu-overlay" id="sidemenuOverlay"></div>
+    <div class="sidemenu" id="sidemenu">
+        <div class="sidemenu-header" id="sidemenuProfileBtn">
+            <div class="avatar" id="sideMenuAvatar">U</div>
+            <div class="user-info">
+                <div class="user-name" id="sideMenuName">User</div>
+                <div class="user-email" id="sideMenuEmail">user@email.com</div>
             </div>
         </div>
-        <div id="postsContainer" class="posts-container">
-            <div style="text-align:center;padding:2rem;">পোস্ট লোড হচ্ছে...</div>
+        <div class="sidemenu-body">
+            <a href="tools.html" class="menu-item">
+                <span class="icon"><i class="fas fa-tools"></i></span> Tools
+            </a>
+            <a href="#" class="menu-item" id="sideMenuSettings">
+                <span class="icon"><i class="fas fa-cog"></i></span> Settings
+            </a>
+            <a href="#" class="menu-item" id="sideMenuContact">
+                <span class="icon"><i class="fas fa-envelope"></i></span> Contact
+            </a>
+            <a href="#" class="menu-item" id="sideMenuHelp">
+                <span class="icon"><i class="fas fa-question-circle"></i></span> Help &amp; Support
+            </a>
+            <div class="menu-divider"></div>
+            <a href="#" class="menu-item danger" id="sideMenuLogout">
+                <span class="icon"><i class="fas fa-sign-out-alt"></i></span> Logout
+            </a>
+        </div>
+        <div class="sidemenu-footer">
+            <i class="fas fa-comment-dots"></i> SociaLock v1.0
         </div>
     </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/home.js"></script>
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-container">
+        <div class="create-post" onclick="window.location.href='createpost.html'">
+            <div class="create-post-header">
+                <div class="create-post-avatar" id="createPostAvatar">U</div>
+                <div class="create-post-input">What's on your mind?</div>
+            </div>
+        </div>
+        <div id="postsContainer"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        // SUPABASE CONFIG
+        // ============================================================
+        const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co';
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
+
+        let supabaseClient = null;
+
+        function getSupabase() {
+            if (!supabaseClient) {
+                try {
+                    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        console.log("✅ Supabase connected");
+                    }
+                } catch (e) {
+                    console.error("❌ Supabase error:", e);
+                }
+            }
+            return supabaseClient;
+        }
+
+        function showAlert(message, type) {
+            type = type || 'info';
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = 'custom-alert ' + type;
+            alert.innerHTML = message +
+                '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(function() { alert.remove(); }, 4000);
+        }
+
+        let currentUser = null;
+        let allPosts = [];
+        let allAds = [];
+        let currentPage = 0;
+        const POSTS_PER_PAGE = 30;
+        const ADS_INTERVAL = 4;
+        let isLoading = false;
+        let hasMorePosts = true;
+        let isRendering = false;
+        let isSearchOpen = false;
+        let blockedUsers = [];
+        let followingUsers = [];
+        let verifiedUsers = [];
+
+        // ============================================================
+        // GET BLOCKED USERS
+        // ============================================================
+        async function getBlockedUsers() {
+            if (!currentUser) return [];
+            const supabase = getSupabase();
+            const { data, error } = await supabase
+                .from('blocks')
+                .select('blocked_user_id')
+                .eq('user_id', currentUser.id);
+            if (error) return [];
+            blockedUsers = data.map(b => b.blocked_user_id);
+            return blockedUsers;
+        }
+
+        function isUserBlocked(userId) {
+            return blockedUsers.includes(userId);
+        }
+
+        // ============================================================
+        // GET FOLLOWING USERS
+        // ============================================================
+        async function getFollowingUsers() {
+            if (!currentUser) return [];
+            const supabase = getSupabase();
+            const { data, error } = await supabase
+                .from('follows')
+                .select('following_id')
+                .eq('follower_id', currentUser.id);
+            if (error) return [];
+            followingUsers = data.map(f => f.following_id);
+            return followingUsers;
+        }
+
+        function isFollowing(userId) {
+            return followingUsers.includes(userId);
+        }
+
+        // ============================================================
+        // GET VERIFIED USERS
+        // ============================================================
+        async function getVerifiedUsers() {
+            const supabase = getSupabase();
+            const { data, error } = await supabase
+                .from('users')
+                .select('id')
+                .eq('is_verified', true);
+            if (error) return [];
+            verifiedUsers = data.map(u => u.id);
+            return verifiedUsers;
+        }
+
+        function isVerified(userId) {
+            return verifiedUsers.includes(userId);
+        }
+
+        // ============================================================
+        // FOLLOW / UNFOLLOW
+        // ============================================================
+        async function toggleFollowFromPost(userId, event) {
+            event.stopPropagation();
+
+            if (!currentUser) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            if (userId === currentUser.id) {
+                showAlert('You cannot follow yourself!', 'info');
+                return;
+            }
+
+            const supabase = getSupabase();
+
+            if (isFollowing(userId)) {
+                const { error } = await supabase
+                    .from('follows')
+                    .delete()
+                    .eq('follower_id', currentUser.id)
+                    .eq('following_id', userId);
+
+                if (error) {
+                    showAlert('Failed to unfollow!', 'error');
+                    return;
+                }
+
+                followingUsers = followingUsers.filter(id => id !== userId);
+                showAlert('Unfollowed', 'info');
+
+            } else {
+                const { error } = await supabase
+                    .from('follows')
+                    .insert({
+                        follower_id: currentUser.id,
+                        following_id: userId,
+                        created_at: new Date().toISOString()
+                    });
+
+                if (error) {
+                    showAlert('Failed to follow!', 'error');
+                    return;
+                }
+
+                followingUsers.push(userId);
+                showAlert('Following!', 'success');
+            }
+
+            document.querySelectorAll('.post-follow-btn[data-userid="' + userId + '"]').forEach(function(btn) {
+                if (isFollowing(userId)) {
+                    btn.textContent = 'Following';
+                    btn.classList.add('following');
+                } else {
+                    btn.textContent = 'Follow';
+                    btn.classList.remove('following');
+                }
+            });
+        }
+
+        // ============================================================
+        // SHUFFLE POSTS
+        // ============================================================
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function categorizeAndMixPosts(posts) {
+            const verifiedPosts = [];
+            const followingPosts = [];
+            const normalPosts = [];
+            const interactedPosts = [];
+
+            for (const post of posts) {
+                if (isUserBlocked(post.user_id)) continue;
+
+                if (post.user_interacted) {
+                    interactedPosts.push(post);
+                    continue;
+                }
+
+                if (isVerified(post.user_id)) {
+                    verifiedPosts.push(post);
+                } else if (isFollowing(post.user_id)) {
+                    followingPosts.push(post);
+                } else {
+                    normalPosts.push(post);
+                }
+            }
+
+            const shuffledVerified = shuffleArray(verifiedPosts);
+            const shuffledFollowing = shuffleArray(followingPosts);
+            const shuffledNormal = shuffleArray(normalPosts);
+
+            const total = shuffledVerified.length + shuffledFollowing.length + shuffledNormal.length;
+            const targetVerified = Math.round(total * 0.3);
+            const targetFollowing = Math.round(total * 0.3);
+            const targetNormal = total - targetVerified - targetFollowing;
+
+            const selectedVerified = shuffledVerified.slice(0, targetVerified);
+            const selectedFollowing = shuffledFollowing.slice(0, targetFollowing);
+            const selectedNormal = shuffledNormal.slice(0, targetNormal);
+
+            let mixed = [...selectedVerified, ...selectedFollowing, ...selectedNormal];
+            mixed = shuffleArray(mixed);
+
+            return [...mixed, ...interactedPosts];
+        }
+
+        // ============================================================
+        // LOAD POSTS
+        // ============================================================
+        async function loadPosts() {
+            const supabase = getSupabase();
+            const container = document.getElementById('postsContainer');
+
+            container.innerHTML = '<div class="loading-spinner">⏳ Loading posts...</div>';
+
+            await getBlockedUsers();
+            await getFollowingUsers();
+            await getVerifiedUsers();
+
+            const { data: posts, error } = await supabase
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (error) {
+                container.innerHTML = '<div class="no-posts">❌ Failed to load posts</div>';
+                return;
+            }
+
+            if (!posts || posts.length === 0) {
+                container.innerHTML = '<div class="no-posts">📝 No posts yet. Create one!</div>';
+                return;
+            }
+
+            for (const post of posts) {
+                const { data: likeData } = await supabase
+                    .from('likes')
+                    .select('id')
+                    .eq('post_id', post.id)
+                    .eq('user_id', currentUser.id)
+                    .maybeSingle();
+
+                const { data: commentData } = await supabase
+                    .from('comments')
+                    .select('id')
+                    .eq('post_id', post.id)
+                    .eq('user_id', currentUser.id)
+                    .limit(1);
+
+                post.user_interacted = !!(likeData || (commentData && commentData.length > 0));
+            }
+
+            const categorizedPosts = categorizeAndMixPosts(posts);
+
+            allPosts = categorizedPosts;
+            currentPage = 1;
+            hasMorePosts = allPosts.length === 50;
+
+            if (allPosts.length === 0) {
+                container.innerHTML = '<div class="no-posts">📝 No posts to show.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            await displayPostsWithAds(allPosts.slice(0, POSTS_PER_PAGE));
+        }
+
+        async function loadMorePosts() {
+            if (isLoading || !hasMorePosts) return;
+            isLoading = true;
+
+            const start = currentPage * POSTS_PER_PAGE;
+            const supabase = getSupabase();
+
+            await getBlockedUsers();
+            await getFollowingUsers();
+            await getVerifiedUsers();
+
+            const { data: posts, error } = await supabase
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .range(start, start + POSTS_PER_PAGE - 1);
+
+            if (!error && posts && posts.length > 0) {
+                for (const post of posts) {
+                    const { data: likeData } = await supabase
+                        .from('likes')
+                        .select('id')
+                        .eq('post_id', post.id)
+                        .eq('user_id', currentUser.id)
+                        .maybeSingle();
+
+                    const { data: commentData } = await supabase
+                        .from('comments')
+                        .select('id')
+                        .eq('post_id', post.id)
+                        .eq('user_id', currentUser.id)
+                        .limit(1);
+
+                    post.user_interacted = !!(likeData || (commentData && commentData.length > 0));
+                }
+
+                const categorizedPosts = categorizeAndMixPosts(posts);
+                allPosts = [...allPosts, ...categorizedPosts];
+                currentPage++;
+                hasMorePosts = posts.length === POSTS_PER_PAGE;
+                await displayPostsWithAds(categorizedPosts);
+            } else {
+                hasMorePosts = false;
+            }
+
+            isLoading = false;
+        }
+
+        async function displayPostsWithAds(posts) {
+            const container = document.getElementById('postsContainer');
+            if (!container) return;
+            if (isRendering) return;
+            isRendering = true;
+
+            const existingPosts = container.querySelectorAll('.post-card').length;
+
+            for (let i = 0; i < posts.length; i++) {
+                const post = posts[i];
+                const postElement = await createPostElement(post);
+                container.appendChild(postElement);
+
+                const currentPostIndex = existingPosts + i;
+                if ((currentPostIndex + 1) % ADS_INTERVAL === 0) {
+                    const ad = getRandomAd();
+                    if (ad) {
+                        const adElement = createAdElement(ad);
+                        container.appendChild(adElement);
+                    }
+                }
+            }
+
+            isRendering = false;
+        }
+
+        // ============================================================
+        // ADS
+        // ============================================================
+        async function loadAds() {
+            const supabase = getSupabase();
+            const userCountry = currentUser?.country || 'Bangladesh';
+
+            const { data: ads, error } = await supabase
+                .from('ads')
+                .select('*')
+                .eq('target_country', userCountry);
+
+            if (error) {
+                console.error('Ads load error:', error);
+                allAds = [];
+                return;
+            }
+
+            allAds = ads || [];
+        }
+
+        function getRandomAd() {
+            if (!allAds || allAds.length === 0) return null;
+            const randomIndex = Math.floor(Math.random() * allAds.length);
+            return allAds[randomIndex];
+        }
+
+        function createAdElement(ad) {
+            const adDiv = document.createElement('div');
+            adDiv.className = 'ad-card';
+            adDiv.innerHTML = `
+                    <div class="ad-sponsored">📢 Sponsored</div>
+                    <a href="${ad.link || '#'}" target="_blank" rel="noopener noreferrer">
+                        <img src="${ad.image_url || 'https://via.placeholder.com/600x200/1877f2/ffffff?text=Ad'}" alt="${ad.caption || 'Ad'}">
+                        <div class="ad-caption">${escapeHtml(ad.caption || 'Advertisement')}</div>
+                    </a>
+                `;
+            return adDiv;
+        }
+
+        // ============================================================
+        // COPY LINK
+        // ============================================================
+        function copyPostLink(postId) {
+            const url = window.location.origin + window.location.pathname.replace('home.html', '') + 'post.html?postId=' +
+                postId;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showAlert('✅ Post link copied!', 'success');
+                }).catch(function() {
+                    prompt('Copy this link:', url);
+                });
+            } else {
+                prompt('Copy this link:', url);
+            }
+        }
+
+        // ============================================================
+        // CREATE POST ELEMENT
+        // ============================================================
+        async function createPostElement(post) {
+            const supabase = getSupabase();
+
+            let userLiked = false;
+            if (currentUser) {
+                const { data: likeData } = await supabase
+                    .from('likes')
+                    .select('id')
+                    .eq('post_id', post.id)
+                    .eq('user_id', currentUser.id)
+                    .maybeSingle();
+                userLiked = !!likeData;
+            }
+
+            const { count: commentCount } = await supabase
+                .from('comments')
+                .select('*', { count: 'exact', head: true })
+                .eq('post_id', post.id);
+
+            const timeAgo = getTimeAgo(post.created_at);
+            const isOwner = currentUser && post.user_id === currentUser.id;
+            const verified = isVerified(post.user_id);
+            const following = isFollowing(post.user_id);
+
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post-card';
+            postDiv.id = 'post-' + post.id;
+
+            let content = post.content || '';
+            content = content.replace(/(https?:\/\/[^\s]+)/g,
+                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
+            const verifiedBadge = verified ?
+                '<span class="verified-badge"><i class="fas fa-check-circle"></i></span>' : '';
+
+            const followBtnHtml = (!isOwner && currentUser) ?
+                '<button class="post-follow-btn ' + (following ? 'following' : '') + '" data-userid="' + post.user_id +
+                '" onclick="toggleFollowFromPost(\'' + post.user_id + '\', event)">' +
+                (following ? 'Following' : 'Follow') +
+                '</button>' :
+                '';
+
+            postDiv.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-user">
+                            <div class="post-avatar" onclick="window.location.href='userprofile.html?userId=${post.user_id}'">
+                                ${(post.username || 'U').charAt(0).toUpperCase()}
+                            </div>
+                            <div class="post-user-info">
+                                <div class="post-username">
+                                    <span onclick="window.location.href='userprofile.html?userId=${post.user_id}'" style="cursor:pointer;">
+                                        ${escapeHtml(post.username || 'User')}
+                                    </span>
+                                    ${verifiedBadge}
+                                    ${followBtnHtml}
+                                </div>
+                                <div class="post-time">${timeAgo}</div>
+                            </div>
+                        </div>
+                        <div style="position:relative;">
+                            <button class="post-more-btn" onclick="togglePostMenu('post-${post.id}')">•••</button>
+                            <div class="post-more-menu" id="menu-post-${post.id}">
+                                <a onclick="copyPostLink('${post.id}')">🔗 Copy Link</a>
+                                ${isOwner ? `<a class="danger" onclick="deletePost('${post.id}')">🗑️ Delete</a>` : ''}
+                                ${!isOwner ? `<a onclick="reportPost('${post.id}')">🚫 Report</a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${content}</div>
+                    <div class="post-stats">
+                        <div>
+                            <span>❤️ <span id="likeCount-${post.id}">${post.likes_count || 0}</span></span>
+                        </div>
+                        <div>
+                            <span onclick="window.location.href='post.html?postId=${post.id}'" style="cursor:pointer;">💬 ${commentCount || 0} comments</span>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn ${userLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                            <span>Like</span>
+                        </button>
+                        <button class="post-action-btn" onclick="window.location.href='post.html?postId=${post.id}'">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
+                            <span>Comment</span>
+                        </button>
+                    </div>
+                `;
+
+            return postDiv;
+        }
+
+        // ============================================================
+        // TOGGLE LIKE
+        // ============================================================
+        window.toggleLike = async function(postId) {
+            if (!currentUser) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            const supabase = getSupabase();
+            const btn = document.querySelector('.post-action-btn[onclick*="toggleLike(\'' + postId + '\')"]');
+            if (!btn) return;
+
+            const isLiked = btn.classList.contains('liked');
+            const likeCountSpan = document.getElementById('likeCount-' + postId);
+            if (!likeCountSpan) return;
+
+            let currentCount = parseInt(likeCountSpan.textContent) || 0;
+
+            try {
+                if (isLiked) {
+                    const { error } = await supabase
+                        .from('likes')
+                        .delete()
+                        .eq('post_id', postId)
+                        .eq('user_id', currentUser.id);
+
+                    if (error) {
+                        showAlert('Failed to unlike!', 'error');
+                        return;
+                    }
+
+                    btn.classList.remove('liked');
+                    const newCount = Math.max(0, currentCount - 1);
+                    likeCountSpan.textContent = newCount;
+
+                    await supabase
+                        .from('posts')
+                        .update({ likes_count: newCount })
+                        .eq('id', postId);
+
+                } else {
+                    const { error } = await supabase
+                        .from('likes')
+                        .insert({
+                            post_id: postId,
+                            user_id: currentUser.id,
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (error) {
+                        if (error.code === '23505') {
+                            btn.classList.add('liked');
+                            const { data: post } = await supabase
+                                .from('posts')
+                                .select('likes_count')
+                                .eq('id', postId)
+                                .single();
+                            if (post) {
+                                likeCountSpan.textContent = post.likes_count || 0;
+                            }
+                            showAlert('You already liked this post!', 'info');
+                            return;
+                        }
+                        showAlert('Failed to like!', 'error');
+                        return;
+                    }
+
+                    btn.classList.add('liked');
+                    const newCount = currentCount + 1;
+                    likeCountSpan.textContent = newCount;
+
+                    await supabase
+                        .from('posts')
+                        .update({ likes_count: newCount })
+                        .eq('id', postId);
+                }
+            } catch (err) {
+                console.error('Toggle like error:', err);
+                showAlert('Something went wrong!', 'error');
+            }
+        };
+
+        // ============================================================
+        // DELETE POST
+        // ============================================================
+        window.deletePost = async function(postId) {
+            if (!confirm('Are you sure you want to delete this post?')) return;
+
+            const supabase = getSupabase();
+
+            await supabase.from('comments').delete().eq('post_id', postId);
+            await supabase.from('likes').delete().eq('post_id', postId);
+
+            const { error } = await supabase
+                .from('posts')
+                .delete()
+                .eq('id', postId)
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                showAlert('Failed to delete post!', 'error');
+                return;
+            }
+
+            const postEl = document.getElementById('post-' + postId);
+            if (postEl) postEl.remove();
+
+            showAlert('✅ Post deleted!', 'success');
+        };
+
+        // ============================================================
+        // TIME FORMAT
+        // ============================================================
+        function getTimeAgo(date) {
+            if (!date) return 'Just now';
+            try {
+                const now = new Date();
+                const past = new Date(date);
+                const diffInSeconds = Math.floor((now - past) / 1000);
+
+                if (diffInSeconds < 5) return 'Just now';
+                if (diffInSeconds < 60) return diffInSeconds + 's ago';
+                const minutes = Math.floor(diffInSeconds / 60);
+                if (minutes < 60) return minutes + 'm ago';
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return hours + 'h ago';
+                const days = Math.floor(hours / 24);
+                if (days < 7) return days + 'd ago';
+                const weeks = Math.floor(days / 7);
+                if (weeks < 4) return weeks + 'w ago';
+                const months = Math.floor(days / 30);
+                if (months < 12) return months + 'mo ago';
+                const years = Math.floor(days / 365);
+                return years + 'y ago';
+            } catch (e) {
+                return 'Just now';
+            }
+        }
+
+        function togglePostMenu(postId) {
+            const menu = document.getElementById('menu-' + postId);
+            if (menu) menu.classList.toggle('show');
+        }
+
+        function reportPost(postId) {
+            showAlert('🚫 Post reported!', 'info');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.addEventListener('click', function(e) {
+            document.querySelectorAll('.post-more-menu.show').forEach(function(menu) {
+                if (!menu.contains(e.target) && !e.target.classList.contains('post-more-btn')) {
+                    menu.classList.remove('show');
+                }
+            });
+        });
+
+        // ============================================================
+        // NOTIFICATION BADGE - সরাসরি ডাটাবেজ থেকে কাউন্ট নিবে
+        // ============================================================
+        async function updateNotifBadge() {
+            const badge = document.getElementById('notifBadge');
+            if (!badge) return;
+
+            // localStorage থেকে না নিয়ে সরাসরি ডাটাবেজ থেকে কাউন্ট নেওয়া হচ্ছে
+            const supabase = getSupabase();
+            const userId = localStorage.getItem('userId');
+            if (!supabase || !userId) {
+                badge.classList.remove('show');
+                return;
+            }
+
+            try {
+                const { count, error } = await supabase
+                    .from('notifications')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', userId)
+                    .eq('is_read', false);
+
+                if (error) {
+                    console.error('Badge count error:', error);
+                    badge.classList.remove('show');
+                    return;
+                }
+
+                const unreadCount = count || 0;
+                const display = unreadCount > 9 ? '9+' : unreadCount;
+
+                if (unreadCount > 0) {
+                    badge.textContent = display;
+                    badge.classList.add('show');
+                } else {
+                    badge.classList.remove('show');
+                }
+
+                // localStorage আপডেট (অন্য পেজের জন্য)
+                localStorage.setItem('unreadNotificationCount', unreadCount);
+                localStorage.setItem('totalUnreadCount', unreadCount);
+                localStorage.setItem('totalUnreadDisplay', display);
+
+            } catch (err) {
+                console.error('Badge update error:', err);
+                badge.classList.remove('show');
+            }
+        }
+
+        // ============================================================
+        // SEARCH
+        // ============================================================
+        const searchInput = document.getElementById('searchInput');
+        const searchFullscreen = document.getElementById('searchFullscreen');
+        const searchFullscreenInput = document.getElementById('searchFullscreenInput');
+        const searchFullscreenResults = document.getElementById('searchFullscreenResults');
+        const searchCloseBtn = document.getElementById('searchCloseBtn');
+
+        if (searchInput) {
+            searchInput.addEventListener('click', function() {
+                searchFullscreen.classList.add('show');
+                isSearchOpen = true;
+                setTimeout(function() { searchFullscreenInput.focus(); }, 100);
+                document.body.style.overflow = 'hidden';
+                history.pushState({ searchOpen: true }, '');
+            });
+        }
+
+        function closeFullscreenSearch() {
+            searchFullscreen.classList.remove('show');
+            isSearchOpen = false;
+            document.body.style.overflow = '';
+            searchFullscreenInput.value = '';
+            searchFullscreenResults.innerHTML = '';
+            if (window.history.state && window.history.state.searchOpen) {
+                history.back();
+            }
+        }
+
+        if (searchCloseBtn) {
+            searchCloseBtn.addEventListener('click', closeFullscreenSearch);
+        }
+
+        window.addEventListener('popstate', function(e) {
+            if (isSearchOpen) {
+                closeFullscreenSearch();
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isSearchOpen) {
+                closeFullscreenSearch();
+            }
+        });
+
+        let searchTimeout;
+        if (searchFullscreenInput) {
+            searchFullscreenInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    searchFullscreenResults.innerHTML = '';
+                    return;
+                }
+                searchTimeout = setTimeout(function() { searchFullscreenUsers(query); }, 300);
+            });
+        }
+
+        async function searchFullscreenUsers(query) {
+            const supabase = getSupabase();
+            if (!supabase || !currentUser) {
+                searchFullscreenResults.innerHTML = '<div class="no-result">❌ Connection error</div>';
+                return;
+            }
+
+            try {
+                const { data: users, error } = await supabase
+                    .from('public_users')
+                    .select('id, username')
+                    .ilike('username', '%' + query + '%')
+                    .neq('id', currentUser.id)
+                    .limit(20);
+
+                if (error || !users || users.length === 0) {
+                    searchFullscreenResults.innerHTML = '<div class="no-result">🔍 No users found</div>';
+                    return;
+                }
+
+                const filteredUsers = users.filter(function(u) { return !isUserBlocked(u.id); });
+
+                if (filteredUsers.length === 0) {
+                    searchFullscreenResults.innerHTML = '<div class="no-result">🔍 No users found</div>';
+                    return;
+                }
+
+                searchFullscreenResults.innerHTML = filteredUsers.map(function(user) {
+                    return '<div class="result-item" onclick="window.location.href=\'userprofile.html?userId=' +
+                        user.id + '\'; closeFullscreenSearch();">' +
+                        '<div class="result-avatar">' + user.username.charAt(0).toUpperCase() + '</div>' +
+                        '<div class="result-name">' + escapeHtml(user.username) + '</div>' +
+                        '</div>';
+                }).join('');
+
+            } catch (err) {
+                console.error('Search error:', err);
+                searchFullscreenResults.innerHTML = '<div class="no-result">❌ Search failed</div>';
+            }
+        }
+
+        // ============================================================
+        // SIDEMENU
+        // ============================================================
+        const sidemenu = document.getElementById('sidemenu');
+        const sidemenuOverlay = document.getElementById('sidemenuOverlay');
+
+        function openSideMenu() {
+            sidemenu.classList.add('open');
+            sidemenuOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSideMenu() {
+            sidemenu.classList.remove('open');
+            sidemenuOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        if (menuToggleBtn) {
+            menuToggleBtn.addEventListener('click', openSideMenu);
+        }
+
+        if (sidemenuOverlay) {
+            sidemenuOverlay.addEventListener('click', closeSideMenu);
+        }
+
+        const sidemenuProfileBtn = document.getElementById('sidemenuProfileBtn');
+        if (sidemenuProfileBtn) {
+            sidemenuProfileBtn.addEventListener('click', function() {
+                closeSideMenu();
+                window.location.href = 'userprofile.html?userId=' + currentUser.id;
+            });
+        }
+
+        const profileNavBtn = document.getElementById('profileNavBtn');
+        if (profileNavBtn) {
+            profileNavBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSideMenu();
+                window.location.href = 'userprofile.html?userId=' + currentUser.id;
+            });
+        }
+
+        const sideMenuSettings = document.getElementById('sideMenuSettings');
+        if (sideMenuSettings) {
+            sideMenuSettings.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSideMenu();
+                window.location.href = 'settings.html';
+            });
+        }
+
+        const sideMenuContact = document.getElementById('sideMenuContact');
+        if (sideMenuContact) {
+            sideMenuContact.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSideMenu();
+                window.location.href = 'contact.html';
+            });
+        }
+
+        const sideMenuHelp = document.getElementById('sideMenuHelp');
+        if (sideMenuHelp) {
+            sideMenuHelp.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSideMenu();
+                window.location.href = 'help.html';
+            });
+        }
+
+        const sideMenuLogout = document.getElementById('sideMenuLogout');
+        if (sideMenuLogout) {
+            sideMenuLogout.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeSideMenu();
+                localStorage.removeItem('userId');
+                window.location.href = 'index.html';
+            });
+        }
+
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        if (userMenuBtn) {
+            userMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openSideMenu();
+            });
+        }
+
+        // ============================================================
+        // SCROLL LOAD
+        // ============================================================
+        window.addEventListener('scroll', async function() {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                if (!isLoading && hasMorePosts) {
+                    await loadMorePosts();
+                }
+            }
+        });
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const supabase = getSupabase();
+            if (!supabase) {
+                showAlert('Supabase connection failed!', 'error');
+                return;
+            }
+
+            const { data: user, error: userError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (userError || !user) {
+                localStorage.removeItem('userId');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = user;
+
+            const avatar = document.getElementById('createPostAvatar');
+            if (avatar) avatar.textContent = user.username.charAt(0).toUpperCase();
+
+            document.getElementById('sideMenuAvatar').textContent = user.username.charAt(0).toUpperCase();
+            document.getElementById('sideMenuName').textContent = user.username;
+            document.getElementById('sideMenuEmail').textContent = user.email || 'user@email.com';
+
+            // Badge আপডেট
+            await updateNotifBadge();
+
+            await loadAds();
+            await loadPosts();
+
+            // প্রতি 30 সেকেন্ডে ব্যাজ আপডেট
+            setInterval(updateNotifBadge, 30000);
+        });
+
+        console.log('🚀 Home page loaded with live badge count from database!');
+    </script>
 </body>
 </html>

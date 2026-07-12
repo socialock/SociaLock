@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>পোস্ট তৈরি করুন</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <style>
+        body { background: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .dark-theme { background: #18191a; color: #e4e6eb; }
+        
+        .create-post-container { max-width: 680px; margin: 80px auto 20px; padding: 0 16px; }
+        .create-post-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .dark-theme .create-post-card { background: #242526; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+        
+        .create-post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e4e6eb; }
+        .dark-theme .create-post-header { border-color: #3a3b3c; }
+        .create-post-avatar { width: 40px; height: 40px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; }
+        .create-post-user { font-weight: 600; font-size: 16px; }
+        
+        .create-post-textarea { width: 100%; min-height: 200px; padding: 12px; border: none; background: #f0f2f5; border-radius: 8px; font-size: 16px; resize: vertical; font-family: inherit; }
+        .dark-theme .create-post-textarea { background: #3a3b3c; color: #e4e6eb; }
+        .create-post-textarea:focus { outline: none; }
+        
+        .create-post-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e4e6eb; }
+        .dark-theme .create-post-footer { border-color: #3a3b3c; }
+        .char-count { color: #606770; font-size: 14px; }
+        .dark-theme .char-count { color: #b0b3b8; }
+        .create-post-btn { padding: 8px 24px; border: none; background: #1877f2; color: white; border-radius: 20px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .create-post-btn:hover { background: #166fe5; }
+        .create-post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .create-post-btn.cancel { background: #e4e6eb; color: #1c1e21; }
+        .dark-theme .create-post-btn.cancel { background: #3a3b3c; color: #e4e6eb; }
+        .create-post-btn.cancel:hover { background: #d1d3d6; }
+        .dark-theme .create-post-btn.cancel:hover { background: #4a4b4c; }
+        
+        .post-preview { margin-top: 16px; padding: 16px; background: #f0f2f5; border-radius: 8px; display: none; }
+        .dark-theme .post-preview { background: #3a3b3c; }
+        .post-preview.show { display: block; }
+        .post-preview-title { font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #606770; }
+        .dark-theme .post-preview-title { color: #b0b3b8; }
+        .post-preview-content { font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
+        
+        @media (max-width: 480px) {
+            .create-post-container { margin: 70px auto 16px; padding: 0 8px; }
+            .create-post-card { padding: 16px; }
+            .create-post-textarea { min-height: 150px; font-size: 15px; }
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <div class="create-post-container">
+        <div class="create-post-card">
+            <div class="create-post-header">
+                <div class="create-post-avatar" id="userAvatar">U</div>
+                <div class="create-post-user" id="userName">ইউজার</div>
+            </div>
+            <textarea class="create-post-textarea" id="postContent" placeholder="What's on your mind?" maxlength="300"></textarea>
+            <div class="post-preview" id="postPreview">
+                <div class="post-preview-title">📄 প্রিভিউ</div>
+                <div class="post-preview-content" id="previewContent"></div>
+            </div>
+            <div class="create-post-footer">
+                <span class="char-count" id="charCount">0/300</span>
+                <div style="display:flex;gap:8px;">
+                    <button class="create-post-btn cancel" onclick="window.location.href='home.html'">বাতিল</button>
+                    <button class="create-post-btn" id="postBtn" disabled>পোস্ট করুন</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const supabase = window.getSupabase();
+            const { data: user } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (!user) {
+                localStorage.removeItem('userId');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+            document.getElementById('userName').textContent = user.username;
+
+            const textarea = document.getElementById('postContent');
+            const charCount = document.getElementById('charCount');
+            const postBtn = document.getElementById('postBtn');
+            const previewContent = document.getElementById('previewContent');
+            const postPreview = document.getElementById('postPreview');
+
+            textarea.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = `${length}/300`;
+                postBtn.disabled = length === 0 || length > 300;
+
+                // প্রিভিউ
+                if (this.value.trim()) {
+                    previewContent.textContent = this.value;
+                    postPreview.classList.add('show');
+                } else {
+                    postPreview.classList.remove('show');
+                }
+            });
+
+            postBtn.addEventListener('click', async function() {
+                const content = textarea.value.trim();
+                if (!content || content.length > 300) return;
+
+                this.disabled = true;
+                this.textContent = '⏳ পোস্ট হচ্ছে...';
+
+                const { error } = await supabase
+                    .from('posts')
+                    .insert({
+                        user_id: user.id,
+                        username: user.username,
+                        content: content,
+                        likes_count: 0,
+                        comments_count: 0,
+                        created_at: new Date().toISOString()
+                    });
+
+                if (error) {
+                    showAlert('পোস্ট করতে সমস্যা!', 'error');
+                    this.disabled = false;
+                    this.textContent = 'পোস্ট করুন';
+                    return;
+                }
+
+                showAlert('✅ পোস্ট হয়েছে!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 1000);
+            });
+
+            // Ctrl+Enter পোস্ট
+            textarea.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!postBtn.disabled) postBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
