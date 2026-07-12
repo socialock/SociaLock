@@ -1,87 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Login - Social Media</title>
+    <title>লগইন - সোশ্যাল মিডিয়া</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
     
     <style>
-        :root {
-            --bg-primary: #18191a;
-            --bg-secondary: #242526;
-            --text-primary: #e4e6eb;
-            --text-secondary: #b0b3b8;
-            --accent: #1877f2;
-            --accent-hover: #166fe5;
-            --danger: #e94560;
-            --success: #4caf50;
-            --border: #3a3b3c;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh;
+        .auth-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            min-height: 100vh;
+            padding: 1rem;
+            background: var(--bg-primary);
         }
-
-        .auth-container {
+        .auth-card {
+            background-color: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 16px;
             width: 100%;
             max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
-
-        .auth-card {
-            background: var(--bg-secondary);
-            padding: 2rem;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-
-        .logo {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-card h2 {
-            text-align: center;
-            font-size: 1.8rem;
-            color: var(--text-primary);
-            margin-bottom: 0.3rem;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-        }
-
+        .auth-card .logo { font-size: 3rem; text-align: center; margin-bottom: 0.5rem; }
+        .auth-card h2 { font-size: 1.8rem; text-align: center; margin-bottom: 0.5rem; }
+        .auth-card .subtitle { color: var(--text-secondary); text-align: center; margin-bottom: 2rem; font-size: 0.95rem; }
+        
         .auth-tabs {
             display: flex;
             gap: 0.5rem;
+            margin-bottom: 1.5rem;
             background: var(--bg-primary);
             border-radius: 10px;
             padding: 0.3rem;
-            margin-bottom: 1.5rem;
         }
-
         .auth-tab {
             flex: 1;
             padding: 0.6rem;
@@ -94,37 +51,14 @@
             font-weight: 500;
             transition: 0.3s;
         }
-
-        .auth-tab.active {
-            background: var(--accent);
-            color: white;
-        }
-
-        .auth-tab:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.3rem;
-        }
-
-        .form-group input,
-        .form-group select {
+        .auth-tab.active { background: var(--accent); color: white; }
+        .auth-tab:hover:not(.active) { background: rgba(255,255,255,0.05); }
+        
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-group input, .form-group select {
             width: 100%;
             padding: 0.8rem;
             background: var(--bg-primary);
@@ -132,27 +66,15 @@
             color: var(--text-primary);
             border-radius: 8px;
             font-size: 0.95rem;
-            transition: 0.3s;
+            box-sizing: border-box;
         }
-
-        .form-group input:focus,
-        .form-group select:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
         }
-
-        .form-group input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .form-group select option {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
+        
         .btn-primary {
-            background: var(--accent);
+            background-color: var(--accent);
             color: white;
             border: none;
             padding: 0.8rem;
@@ -161,21 +83,16 @@
             font-size: 1rem;
             width: 100%;
             transition: 0.3s;
-            font-weight: 600;
+            font-weight: 500;
         }
-
         .btn-primary:hover:not(:disabled) {
-            background: var(--accent-hover);
-            transform: scale(1.01);
+            background-color: var(--accent-hover);
+            transform: scale(1.02);
         }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        
         .google-btn {
-            background: #ffffff;
+            background: #fff;
             color: #444;
             border: 1px solid #ddd;
             padding: 0.8rem;
@@ -189,18 +106,11 @@
             width: 100%;
             transition: 0.3s;
             font-weight: 500;
+            margin-top: 1rem;
         }
-
-        .google-btn:hover {
-            background: #f1f1f1;
-            transform: scale(1.01);
-        }
-
-        .google-btn svg {
-            width: 24px;
-            height: 24px;
-        }
-
+        .google-btn:hover { background: #f1f1f1; transform: scale(1.01); }
+        .google-btn svg { width: 24px; height: 24px; }
+        
         .divider {
             display: flex;
             align-items: center;
@@ -209,41 +119,24 @@
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
-
-        .divider::before,
-        .divider::after {
+        .divider::before, .divider::after {
             content: '';
             flex: 1;
             height: 1px;
             background: var(--border);
         }
-
-        .username-availability {
-            font-size: 0.9rem;
-            margin-top: 0.3rem;
-        }
-
-        .username-available {
-            color: var(--success);
-        }
-
-        .username-unavailable {
-            color: var(--danger);
-        }
-
-        .username-hint {
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            margin-top: 0.2rem;
-        }
-
+        
+        .username-availability { font-size: 0.9rem; margin-top: 0.3rem; }
+        .username-available { color: #4caf50; }
+        .username-unavailable { color: #e94560; }
+        .username-hint { color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.2rem; }
+        
         .captcha-wrapper {
             background: var(--bg-primary);
             border-radius: 8px;
             padding: 1rem;
             border: 1px solid var(--border);
         }
-
         .captcha-display {
             background: #0a0a1a;
             padding: 0.8rem;
@@ -261,17 +154,8 @@
             align-items: center;
             flex-wrap: wrap;
         }
-
-        .captcha-display span {
-            display: inline-block;
-            margin: 0 2px;
-        }
-
-        .captcha-input-group {
-            display: flex;
-            gap: 0.8rem;
-        }
-
+        .captcha-display span { display: inline-block; margin: 0 2px; }
+        .captcha-input-group { display: flex; gap: 0.8rem; }
         .captcha-input-group input {
             flex: 1;
             padding: 0.7rem;
@@ -283,14 +167,9 @@
             border-radius: 8px;
             font-size: 0.95rem;
         }
-
-        .captcha-input-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
+        .captcha-input-group input:focus { outline: none; border-color: var(--accent); }
         .btn-refresh {
-            background: var(--accent);
+            background-color: var(--accent);
             color: white;
             border: none;
             padding: 0.7rem 1rem;
@@ -300,189 +179,81 @@
             font-size: 0.9rem;
             transition: 0.3s;
         }
-
-        .btn-refresh:hover {
-            background: var(--accent-hover);
-        }
-
+        .btn-refresh:hover { background: var(--accent-hover); }
+        
         .spinner {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: #fff;
             animation: spin 0.8s ease-in-out infinite;
             vertical-align: middle;
         }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
         .auth-footer {
             margin-top: 1.5rem;
             font-size: 0.85rem;
             color: var(--text-secondary);
             text-align: center;
         }
-
-        .forgot-password {
-            text-align: right;
-            margin-top: 0.3rem;
-        }
-
+        .forgot-password { text-align: right; margin-top: 0.3rem; }
         .forgot-password a {
             color: var(--text-secondary);
             font-size: 0.85rem;
             text-decoration: none;
             transition: 0.3s;
         }
-
-        .forgot-password a:hover {
-            color: var(--accent);
-        }
-
+        .forgot-password a:hover { color: var(--accent); }
         .privacy-policy-text {
             text-align: center;
             font-size: 0.8rem;
             color: var(--text-secondary);
             margin-top: 0.5rem;
         }
-
-        .privacy-policy-text a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .privacy-policy-text a:hover {
-            text-decoration: underline;
-        }
-
-        .custom-alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            left: 20px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            color: white;
-            z-index: 10000;
-            max-width: 400px;
-            margin: 0 auto;
-            animation: slideIn 0.3s ease;
-            font-size: 0.95rem;
-        }
-
-        .custom-alert.success {
-            background: var(--success);
-        }
-
-        .custom-alert.error {
-            background: var(--danger);
-        }
-
-        .custom-alert.info {
-            background: var(--accent);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .custom-alert button {
-            background: none;
-            border: none;
-            color: white;
-            margin-left: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            float: right;
-        }
-
+        .privacy-policy-text a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        .privacy-policy-text a:hover { text-decoration: underline; }
+        
         @media (max-width: 480px) {
-            .auth-card {
-                padding: 1.5rem;
-            }
-
-            .auth-card h2 {
-                font-size: 1.4rem;
-            }
-
-            .logo {
-                font-size: 2.5rem;
-            }
-
-            .google-btn {
-                font-size: 0.95rem;
-                padding: 0.7rem;
-            }
-
-            .captcha-display {
-                font-size: 1.2rem;
-                min-height: 50px;
-            }
-
-            .auth-tab {
-                font-size: 0.8rem;
-                padding: 0.5rem;
-            }
-
-            .form-group input,
-            .form-group select {
-                font-size: 0.9rem;
-                padding: 0.7rem;
-            }
-        }
-
-        @media (min-width: 481px) and (max-width: 768px) {
-            .auth-card {
-                padding: 2rem;
-            }
+            .auth-card { padding: 1.5rem; }
+            .auth-card h2 { font-size: 1.4rem; }
+            .auth-card .logo { font-size: 2.5rem; }
+            .google-btn { font-size: 0.95rem; padding: 0.7rem; }
+            .captcha-display { font-size: 1.2rem; min-height: 50px; }
         }
     </style>
 </head>
 
-<body>
+<body class="dark-theme">
     <div class="auth-container">
         <div class="auth-card">
             <div class="logo">🔐</div>
-            <h2>Welcome</h2>
-            <p class="subtitle">Login or create an account</p>
-
+            <h2>স্বাগতম</h2>
+            <p class="subtitle">লগইন বা একাউন্ট তৈরি করুন</p>
+            
             <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">🔑 Login</button>
-                <button class="auth-tab" data-tab="register">📝 Register</button>
+                <button class="auth-tab active" data-tab="login">🔑 লগইন</button>
+                <button class="auth-tab" data-tab="register">📝 রেজিস্ট্রেশন</button>
             </div>
-
+            
             <!-- LOGIN FORM -->
             <div id="loginForm" class="auth-form active">
                 <div class="form-group">
-                    <label>Email or Username</label>
-                    <input type="text" id="loginIdentifier" placeholder="Enter email or username" required>
+                    <input type="email" id="loginEmail" placeholder="ইমেইল" required>
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড" required>
                 </div>
-                <button id="loginBtn" class="btn-primary">🔑 Login</button>
-
+                <button id="loginBtn" class="btn-primary">🔑 লগইন</button>
+                
                 <div class="forgot-password">
-                    <a href="resetpassword.html">🔒 Forgot password?</a>
+                    <a href="resetpassword.html">🔒 পাসওয়ার্ড ভুলে গেছেন?</a>
                 </div>
 
-                <div class="divider"><span>or</span></div>
-
+                <div class="divider"><span>অথবা</span></div>
+                
                 <button id="googleSignInBtn" class="google-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
                         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
@@ -490,315 +261,76 @@
                         <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
                         <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
                     </svg>
-                    <span>Continue with Google</span>
+                    <span>Google দিয়ে লগইন</span>
                 </button>
             </div>
-
+            
             <!-- REGISTER FORM -->
             <div id="registerForm" class="auth-form">
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" placeholder="Enter email" required>
+                    <input type="email" id="regEmail" placeholder="ইমেইল *" required>
                 </div>
                 <div class="form-group">
-                    <label>Password (6+ characters)</label>
-                    <input type="password" id="regPassword" placeholder="Enter password" minlength="6" required>
+                    <input type="password" id="regPassword" placeholder="পাসওয়ার্ড (৬+ অক্ষর) *" minlength="6" required>
                 </div>
                 <div class="form-group">
-                    <label>Username (A-Z, 0-9, max 10 chars)</label>
-                    <input type="text" id="regUsername" placeholder="Choose username" maxlength="10" pattern="[A-Za-z0-9]+" autocomplete="off">
+                    <input type="text" id="regUsername" placeholder="ইউজারনেম (শুধু A-z এবং ০-৯, সর্বোচ্চ ১০ অক্ষর) *" maxlength="10" pattern="[A-Za-z0-9]+" autocomplete="off">
                     <div id="regUsernameStatus" class="username-availability"></div>
-                    <div class="username-hint">💡 Only English letters and numbers (A-Z, 0-9)</div>
+                    <div class="username-hint">💡 শুধু ইংরেজি অক্ষর ও সংখ্যা (A-z, 0-9)</div>
                 </div>
                 <div class="form-group">
-                    <label>Country</label>
                     <select id="regCountry">
-                        <option value="">Select your country</option>
-                        <option value="Afghanistan">Afghanistan</option>
-                        <option value="Albania">Albania</option>
-                        <option value="Algeria">Algeria</option>
-                        <option value="Andorra">Andorra</option>
-                        <option value="Angola">Angola</option>
-                        <option value="Antigua and Barbuda">Antigua and Barbuda</option>
-                        <option value="Argentina">Argentina</option>
-                        <option value="Armenia">Armenia</option>
-                        <option value="Australia">Australia</option>
-                        <option value="Austria">Austria</option>
-                        <option value="Azerbaijan">Azerbaijan</option>
-                        <option value="Bahamas">Bahamas</option>
-                        <option value="Bahrain">Bahrain</option>
-                        <option value="Bangladesh">Bangladesh</option>
-                        <option value="Barbados">Barbados</option>
-                        <option value="Belarus">Belarus</option>
-                        <option value="Belgium">Belgium</option>
-                        <option value="Belize">Belize</option>
-                        <option value="Benin">Benin</option>
-                        <option value="Bhutan">Bhutan</option>
-                        <option value="Bolivia">Bolivia</option>
-                        <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
-                        <option value="Botswana">Botswana</option>
-                        <option value="Brazil">Brazil</option>
-                        <option value="Brunei">Brunei</option>
-                        <option value="Bulgaria">Bulgaria</option>
-                        <option value="Burkina Faso">Burkina Faso</option>
-                        <option value="Burundi">Burundi</option>
-                        <option value="Cambodia">Cambodia</option>
-                        <option value="Cameroon">Cameroon</option>
-                        <option value="Canada">Canada</option>
-                        <option value="Cape Verde">Cape Verde</option>
-                        <option value="Central African Republic">Central African Republic</option>
-                        <option value="Chad">Chad</option>
-                        <option value="Chile">Chile</option>
-                        <option value="China">China</option>
-                        <option value="Colombia">Colombia</option>
-                        <option value="Comoros">Comoros</option>
-                        <option value="Congo">Congo</option>
-                        <option value="Costa Rica">Costa Rica</option>
-                        <option value="Croatia">Croatia</option>
-                        <option value="Cuba">Cuba</option>
-                        <option value="Cyprus">Cyprus</option>
-                        <option value="Czech Republic">Czech Republic</option>
-                        <option value="Denmark">Denmark</option>
-                        <option value="Djibouti">Djibouti</option>
-                        <option value="Dominica">Dominica</option>
-                        <option value="Dominican Republic">Dominican Republic</option>
-                        <option value="East Timor">East Timor</option>
-                        <option value="Ecuador">Ecuador</option>
-                        <option value="Egypt">Egypt</option>
-                        <option value="El Salvador">El Salvador</option>
-                        <option value="Equatorial Guinea">Equatorial Guinea</option>
-                        <option value="Eritrea">Eritrea</option>
-                        <option value="Estonia">Estonia</option>
-                        <option value="Ethiopia">Ethiopia</option>
-                        <option value="Fiji">Fiji</option>
-                        <option value="Finland">Finland</option>
-                        <option value="France">France</option>
-                        <option value="Gabon">Gabon</option>
-                        <option value="Gambia">Gambia</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Germany">Germany</option>
-                        <option value="Ghana">Ghana</option>
-                        <option value="Greece">Greece</option>
-                        <option value="Grenada">Grenada</option>
-                        <option value="Guatemala">Guatemala</option>
-                        <option value="Guinea">Guinea</option>
-                        <option value="Guinea-Bissau">Guinea-Bissau</option>
-                        <option value="Guyana">Guyana</option>
-                        <option value="Haiti">Haiti</option>
-                        <option value="Honduras">Honduras</option>
-                        <option value="Hungary">Hungary</option>
-                        <option value="Iceland">Iceland</option>
-                        <option value="India">India</option>
-                        <option value="Indonesia">Indonesia</option>
-                        <option value="Iran">Iran</option>
-                        <option value="Iraq">Iraq</option>
-                        <option value="Ireland">Ireland</option>
-                        <option value="Israel">Israel</option>
-                        <option value="Italy">Italy</option>
-                        <option value="Ivory Coast">Ivory Coast</option>
-                        <option value="Jamaica">Jamaica</option>
-                        <option value="Japan">Japan</option>
-                        <option value="Jordan">Jordan</option>
-                        <option value="Kazakhstan">Kazakhstan</option>
-                        <option value="Kenya">Kenya</option>
-                        <option value="Kiribati">Kiribati</option>
-                        <option value="Korea (North)">Korea (North)</option>
-                        <option value="Korea (South)">Korea (South)</option>
-                        <option value="Kuwait">Kuwait</option>
-                        <option value="Kyrgyzstan">Kyrgyzstan</option>
-                        <option value="Laos">Laos</option>
-                        <option value="Latvia">Latvia</option>
-                        <option value="Lebanon">Lebanon</option>
-                        <option value="Lesotho">Lesotho</option>
-                        <option value="Liberia">Liberia</option>
-                        <option value="Libya">Libya</option>
-                        <option value="Liechtenstein">Liechtenstein</option>
-                        <option value="Lithuania">Lithuania</option>
-                        <option value="Luxembourg">Luxembourg</option>
-                        <option value="Macedonia">Macedonia</option>
-                        <option value="Madagascar">Madagascar</option>
-                        <option value="Malawi">Malawi</option>
-                        <option value="Malaysia">Malaysia</option>
-                        <option value="Maldives">Maldives</option>
-                        <option value="Mali">Mali</option>
-                        <option value="Malta">Malta</option>
-                        <option value="Marshall Islands">Marshall Islands</option>
-                        <option value="Mauritania">Mauritania</option>
-                        <option value="Mauritius">Mauritius</option>
-                        <option value="Mexico">Mexico</option>
-                        <option value="Micronesia">Micronesia</option>
-                        <option value="Moldova">Moldova</option>
-                        <option value="Monaco">Monaco</option>
-                        <option value="Mongolia">Mongolia</option>
-                        <option value="Montenegro">Montenegro</option>
-                        <option value="Morocco">Morocco</option>
-                        <option value="Mozambique">Mozambique</option>
-                        <option value="Myanmar">Myanmar</option>
-                        <option value="Namibia">Namibia</option>
-                        <option value="Nauru">Nauru</option>
-                        <option value="Nepal">Nepal</option>
-                        <option value="Netherlands">Netherlands</option>
-                        <option value="New Zealand">New Zealand</option>
-                        <option value="Nicaragua">Nicaragua</option>
-                        <option value="Niger">Niger</option>
-                        <option value="Nigeria">Nigeria</option>
-                        <option value="Norway">Norway</option>
-                        <option value="Oman">Oman</option>
-                        <option value="Pakistan">Pakistan</option>
-                        <option value="Palau">Palau</option>
-                        <option value="Panama">Panama</option>
-                        <option value="Papua New Guinea">Papua New Guinea</option>
-                        <option value="Paraguay">Paraguay</option>
-                        <option value="Peru">Peru</option>
-                        <option value="Philippines">Philippines</option>
-                        <option value="Poland">Poland</option>
-                        <option value="Portugal">Portugal</option>
-                        <option value="Qatar">Qatar</option>
-                        <option value="Romania">Romania</option>
-                        <option value="Russia">Russia</option>
-                        <option value="Rwanda">Rwanda</option>
-                        <option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
-                        <option value="Saint Lucia">Saint Lucia</option>
-                        <option value="Saint Vincent">Saint Vincent</option>
-                        <option value="Samoa">Samoa</option>
-                        <option value="San Marino">San Marino</option>
-                        <option value="Sao Tome and Principe">Sao Tome and Principe</option>
-                        <option value="Saudi Arabia">Saudi Arabia</option>
-                        <option value="Senegal">Senegal</option>
-                        <option value="Serbia">Serbia</option>
-                        <option value="Seychelles">Seychelles</option>
-                        <option value="Sierra Leone">Sierra Leone</option>
-                        <option value="Singapore">Singapore</option>
-                        <option value="Slovakia">Slovakia</option>
-                        <option value="Slovenia">Slovenia</option>
-                        <option value="Solomon Islands">Solomon Islands</option>
-                        <option value="Somalia">Somalia</option>
-                        <option value="South Africa">South Africa</option>
-                        <option value="South Sudan">South Sudan</option>
-                        <option value="Spain">Spain</option>
-                        <option value="Sri Lanka">Sri Lanka</option>
-                        <option value="Sudan">Sudan</option>
-                        <option value="Suriname">Suriname</option>
-                        <option value="Swaziland">Swaziland</option>
-                        <option value="Sweden">Sweden</option>
-                        <option value="Switzerland">Switzerland</option>
-                        <option value="Syria">Syria</option>
-                        <option value="Taiwan">Taiwan</option>
-                        <option value="Tajikistan">Tajikistan</option>
-                        <option value="Tanzania">Tanzania</option>
-                        <option value="Thailand">Thailand</option>
-                        <option value="Togo">Togo</option>
-                        <option value="Tonga">Tonga</option>
-                        <option value="Trinidad and Tobago">Trinidad and Tobago</option>
-                        <option value="Tunisia">Tunisia</option>
-                        <option value="Turkey">Turkey</option>
-                        <option value="Turkmenistan">Turkmenistan</option>
-                        <option value="Tuvalu">Tuvalu</option>
-                        <option value="Uganda">Uganda</option>
-                        <option value="Ukraine">Ukraine</option>
-                        <option value="United Arab Emirates">United Arab Emirates</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="United States">United States</option>
-                        <option value="Uruguay">Uruguay</option>
-                        <option value="Uzbekistan">Uzbekistan</option>
-                        <option value="Vanuatu">Vanuatu</option>
-                        <option value="Vatican City">Vatican City</option>
-                        <option value="Venezuela">Venezuela</option>
-                        <option value="Vietnam">Vietnam</option>
-                        <option value="Yemen">Yemen</option>
-                        <option value="Zambia">Zambia</option>
-                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="">🌍 দেশ নির্বাচন করুন *</option>
+                        <option value="বাংলাদেশ">বাংলাদেশ</option>
+                        <option value="ভারত">ভারত</option>
+                        <option value="পাকিস্তান">পাকিস্তান</option>
+                        <option value="আমেরিকা">আমেরিকা</option>
+                        <option value="যুক্তরাজ্য">যুক্তরাজ্য</option>
+                        <option value="কানাডা">কানাডা</option>
+                        <option value="অস্ট্রেলিয়া">অস্ট্রেলিয়া</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <div class="captcha-wrapper">
                         <div class="captcha-display" id="regCaptchaDisplay"></div>
                         <div class="captcha-input-group">
-                            <input type="text" id="regCaptchaInput" placeholder="Enter captcha code" autocomplete="off">
+                            <input type="text" id="regCaptchaInput" placeholder="ক্যাপচা কোড লিখুন *" autocomplete="off">
                             <button type="button" id="regRefreshCaptcha" class="btn-refresh">⟳</button>
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="privacy-policy-text">
-                    By creating an account you agree with our
-                    <a href="privacy.html">Privacy Policy</a> &amp;
-                    <a href="policy.html">Terms of Service</a>
+                    By creating account you agree with our 
+                    <a href="privacy.html">Privacy</a> &amp; 
+                    <a href="policy.html">Policy</a>
                 </div>
-
-                <button id="registerBtn" class="btn-primary" disabled>✅ Create Account</button>
+                
+                <button id="registerBtn" class="btn-primary" disabled>✅ একাউন্ট তৈরি করুন</button>
             </div>
-
-            <div class="auth-footer">🔒 Secure Login • Social Media Platform</div>
+            
+            <div class="auth-footer">🔒 নিরাপদ লগইন • সোশ্যাল মিডিয়া</div>
         </div>
     </div>
 
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    
     <script>
         // ============================================================
-        // SUPABASE CONFIG
+        // COMPLETE LOGIN SYSTEM
         // ============================================================
-        const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co';
-        const SUPABASE_ANON_KEY =
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
-
-        let supabaseClient = null;
-
-        function getSupabase() {
-            if (!supabaseClient) {
-                try {
-                    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-                        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                        console.log("✅ Supabase connected");
-                    }
-                } catch (e) {
-                    console.error("❌ Supabase error:", e);
-                }
-            }
-            return supabaseClient;
-        }
-
-        function showAlert(message, type) {
-            type = type || 'info';
-            const existing = document.querySelector('.custom-alert');
-            if (existing) existing.remove();
-
-            const alert = document.createElement('div');
-            alert.className = 'custom-alert ' + type;
-            alert.innerHTML = message +
-                '<button onclick="this.parentElement.remove()">✕</button>';
-            document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 4000);
-        }
-
-        // ============================================================
-        // GENERATE UUID v4 - MODERN VERSION
-        // ============================================================
-        function generateUUID() {
-            // Use crypto.randomUUID() if available
-            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-                return crypto.randomUUID();
-            }
-            
-            // Fallback: Manual UUID v4
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-
-        // ============================================================
+        
         // DOM REFERENCES
-        // ============================================================
         const loginTab = document.querySelector('[data-tab="login"]');
         const registerTab = document.querySelector('[data-tab="register"]');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-
-        const loginIdentifier = document.getElementById('loginIdentifier');
+        
+        const loginEmail = document.getElementById('loginEmail');
         const loginPassword = document.getElementById('loginPassword');
         const loginBtn = document.getElementById('loginBtn');
-
+        
         const regEmail = document.getElementById('regEmail');
         const regPassword = document.getElementById('regPassword');
         const regUsername = document.getElementById('regUsername');
@@ -809,20 +341,28 @@
         const regRefreshCaptcha = document.getElementById('regRefreshCaptcha');
         const registerBtn = document.getElementById('registerBtn');
         const googleSignInBtn = document.getElementById('googleSignInBtn');
-
+        
         let currentCaptcha = '';
         let isUsernameAvailable = false;
+        let googleUser = null;
 
-        // ============================================================
+        // ===== SUPABASE CHECK =====
+        function getSupabaseSafe() {
+            if (typeof window.getSupabase !== 'function') {
+                console.error('❌ getSupabase not defined!');
+                return null;
+            }
+            return window.getSupabase();
+        }
+
         // TABS
-        // ============================================================
         loginTab.addEventListener('click', () => {
             loginTab.classList.add('active');
             registerTab.classList.remove('active');
             loginForm.classList.add('active');
             registerForm.classList.remove('active');
         });
-
+        
         registerTab.addEventListener('click', () => {
             registerTab.classList.add('active');
             loginTab.classList.remove('active');
@@ -831,9 +371,7 @@
             updateRegCaptcha();
         });
 
-        // ============================================================
         // CAPTCHA
-        // ============================================================
         function generateCaptcha() {
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
             let captcha = '';
@@ -845,7 +383,7 @@
 
         function updateRegCaptcha() {
             currentCaptcha = generateCaptcha();
-            regCaptchaDisplay.innerHTML = currentCaptcha.split('').map(char =>
+            regCaptchaDisplay.innerHTML = currentCaptcha.split('').map(char => 
                 `<span style="transform:rotate(${Math.random() * 30 - 15}deg); font-size:24px; font-weight:bold; color:hsl(${Math.random() * 360}, 80%, 55%); text-shadow:1px 1px 2px rgba(0,0,0,0.3); font-family:monospace;">${char}</span>`
             ).join('');
         }
@@ -855,9 +393,7 @@
             regCaptchaInput.value = '';
         });
 
-        // ============================================================
-        // USERNAME AVAILABILITY CHECK
-        // ============================================================
+        // USERNAME AVAILABILITY
         async function checkRegUsernameAvailability(username) {
             if (!username || username.length < 2) {
                 regUsernameStatus.innerHTML = '';
@@ -868,7 +404,7 @@
 
             const validPattern = /^[A-Za-z0-9]+$/;
             if (!validPattern.test(username)) {
-                regUsernameStatus.innerHTML = '❌ Use only English letters and numbers';
+                regUsernameStatus.innerHTML = '❌ শুধু ইংরেজি অক্ষর ও সংখ্যা ব্যবহার করুন';
                 regUsernameStatus.className = 'username-availability username-unavailable';
                 isUsernameAvailable = false;
                 registerBtn.disabled = true;
@@ -876,42 +412,38 @@
             }
 
             try {
-                const supabase = getSupabase();
+                const supabase = getSupabaseSafe();
                 if (!supabase) {
-                    regUsernameStatus.innerHTML = '⚠️ Connection issue';
+                    regUsernameStatus.innerHTML = '⚠️ সংযোগ সমস্যা';
                     return;
                 }
 
                 const { data, error } = await supabase
-                    .from('users')
+                    .from('public_users')
                     .select('username')
                     .eq('username', username)
                     .maybeSingle();
 
                 if (error) {
                     console.error('Username check error:', error);
-                    regUsernameStatus.innerHTML = '⚠️ Check failed';
-                    isUsernameAvailable = false;
-                    registerBtn.disabled = true;
+                    regUsernameStatus.innerHTML = '⚠️ চেক করতে সমস্যা';
                     return;
                 }
 
                 if (data) {
-                    regUsernameStatus.innerHTML = '❌ Username already taken!';
+                    regUsernameStatus.innerHTML = '❌ এই ইউজারনেম নেওয়া হয়েছে!';
                     regUsernameStatus.className = 'username-availability username-unavailable';
                     isUsernameAvailable = false;
                     registerBtn.disabled = true;
                 } else {
-                    regUsernameStatus.innerHTML = '✅ Username available!';
+                    regUsernameStatus.innerHTML = '✅ ইউজারনেম available!';
                     regUsernameStatus.className = 'username-availability username-available';
                     isUsernameAvailable = true;
                     checkRegFormValidity();
                 }
             } catch (err) {
                 console.error('Username check exception:', err);
-                regUsernameStatus.innerHTML = '⚠️ Check failed';
-                isUsernameAvailable = false;
-                registerBtn.disabled = true;
+                regUsernameStatus.innerHTML = '⚠️ চেক করতে সমস্যা';
             }
         }
 
@@ -921,16 +453,13 @@
             checkRegUsernameAvailability(regUsername.value);
         });
 
-        // ============================================================
-        // REGISTER FORM VALIDITY
-        // ============================================================
         function checkRegFormValidity() {
             const email = regEmail.value.trim();
             const password = regPassword.value;
             const country = regCountry.value;
             const captcha = regCaptchaInput.value.trim();
             const isCaptchaValid = captcha.toUpperCase() === currentCaptcha.toUpperCase();
-
+            
             if (email && password.length >= 6 && isUsernameAvailable && country && isCaptchaValid) {
                 registerBtn.disabled = false;
             } else {
@@ -944,7 +473,92 @@
         regCaptchaInput.addEventListener('input', checkRegFormValidity);
 
         // ============================================================
-        // REGISTER - WITH BCRYPT
+        // LOGIN - হ্যাশ চেক সহ
+        // ============================================================
+        loginBtn.addEventListener('click', async () => {
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value;
+
+            if (!email || !password) {
+                alert('ইমেইল এবং পাসওয়ার্ড দিন!');
+                return;
+            }
+
+            loginBtn.innerHTML = '<span class="spinner"></span> লগইন হচ্ছে...';
+            loginBtn.disabled = true;
+
+            try {
+                const supabase = getSupabaseSafe();
+                if (!supabase) {
+                    alert('❌ Supabase সংযোগ নেই!');
+                    loginBtn.innerHTML = '🔑 লগইন';
+                    loginBtn.disabled = false;
+                    return;
+                }
+
+                console.log('🔍 Searching for user:', email);
+
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('id, username, email, password')
+                    .eq('email', email)
+                    .maybeSingle();
+
+                console.log('📊 User found:', user);
+                console.log('📊 Error:', error);
+
+                if (error || !user) {
+                    alert('❌ ইমেইল বা পাসওয়ার্ড ভুল!');
+                    loginBtn.innerHTML = '🔑 লগইন';
+                    loginBtn.disabled = false;
+                    return;
+                }
+
+                // ===== পাসওয়ার্ড চেক =====
+                let passwordMatch = false;
+
+                // যদি হ্যাশ করা থাকে
+                if (user.password && user.password.startsWith('$2a$')) {
+                    const { data: checkResult, error: checkError } = await supabase
+                        .rpc('check_password', {
+                            user_id: user.id,
+                            plain_password: password
+                        });
+
+                    if (checkError) {
+                        console.error('Password check error:', checkError);
+                        alert('❌ লগইন ব্যর্থ!');
+                        loginBtn.innerHTML = '🔑 লগইন';
+                        loginBtn.disabled = false;
+                        return;
+                    }
+
+                    passwordMatch = checkResult;
+                } else {
+                    passwordMatch = (user.password === password);
+                }
+
+                if (!passwordMatch) {
+                    alert('❌ ইমেইল বা পাসওয়ার্ড ভুল!');
+                    loginBtn.innerHTML = '🔑 লগইন';
+                    loginBtn.disabled = false;
+                    return;
+                }
+
+                localStorage.setItem('userId', user.id);
+                console.log('✅ Login successful!');
+                window.location.href = 'home.html';
+
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                alert('লগইন ব্যর্থ!');
+                loginBtn.innerHTML = '🔑 লগইন';
+                loginBtn.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // REGISTER
         // ============================================================
         registerBtn.addEventListener('click', async () => {
             const email = regEmail.value.trim();
@@ -954,35 +568,34 @@
             const captcha = regCaptchaInput.value.trim();
 
             if (!email || !password || !username || !country || !captcha) {
-                showAlert('Please fill all fields!', 'error');
+                alert('সব তথ্য পূরণ করুন!');
                 return;
             }
 
             if (password.length < 6) {
-                showAlert('Password must be 6+ characters!', 'error');
+                alert('পাসওয়ার্ড ৬+ অক্ষর হতে হবে!');
                 return;
             }
 
             if (captcha.toUpperCase() !== currentCaptcha.toUpperCase()) {
-                showAlert('❌ Invalid captcha!', 'error');
+                alert('❌ ক্যাপচা ভুল!');
                 updateRegCaptcha();
                 regCaptchaInput.value = '';
                 return;
             }
 
-            registerBtn.innerHTML = '<span class="spinner"></span> Creating account...';
+            registerBtn.innerHTML = '<span class="spinner"></span> একাউন্ট তৈরি হচ্ছে...';
             registerBtn.disabled = true;
 
             try {
-                const supabase = getSupabase();
+                const supabase = getSupabaseSafe();
                 if (!supabase) {
-                    showAlert('Connection failed!', 'error');
-                    registerBtn.innerHTML = '✅ Create Account';
+                    alert('❌ Supabase সংযোগ নেই!');
+                    registerBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
                     registerBtn.disabled = false;
                     return;
                 }
 
-                // Check email
                 const { data: existingEmail } = await supabase
                     .from('users')
                     .select('email')
@@ -990,38 +603,21 @@
                     .maybeSingle();
 
                 if (existingEmail) {
-                    showAlert('Email already registered!', 'error');
-                    registerBtn.innerHTML = '✅ Create Account';
+                    alert('এই ইমেইল ইতিমধ্যে ব্যবহার করা হয়েছে!');
+                    registerBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
                     registerBtn.disabled = false;
                     return;
                 }
 
-                // Hash password
-                let hashedPassword = password;
-                try {
-                    const { data: hashResult, error: hashError } = await supabase
-                        .rpc('hash_password', { plain_password: password });
+                const userId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
 
-                    if (!hashError && hashResult) {
-                        hashedPassword = hashResult;
-                        console.log('✅ Password hashed successfully');
-                    }
-                } catch (hashErr) {
-                    console.error('Hash exception:', hashErr);
-                }
-
-                // Generate proper UUID
-                const userId = generateUUID();
-                console.log('🔑 Generated UUID:', userId);
-
-                // Insert user
                 const { data: newUser, error } = await supabase
                     .from('users')
                     .insert({
                         id: userId,
                         username: username,
                         email: email,
-                        password: hashedPassword,
+                        password: password,
                         country: country,
                         role: 'user',
                         created_at: new Date().toISOString()
@@ -1030,131 +626,21 @@
                     .single();
 
                 if (error) {
-                    console.error('Registration error:', error);
-                    showAlert('Registration failed: ' + (error.message || 'Unknown error'), 'error');
-                    registerBtn.innerHTML = '✅ Create Account';
+                    console.error('❌ Registration Error:', error);
+                    alert('একাউন্ট তৈরি ব্যর্থ! ' + (error.message || 'অজানা ত্রুটি'));
+                    registerBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
                     registerBtn.disabled = false;
                     return;
                 }
 
-                // Insert into public_users for search
-                try {
-                    await supabase
-                        .from('public_users')
-                        .insert({
-                            id: userId,
-                            username: username,
-                            created_at: new Date().toISOString()
-                        });
-                } catch (pubErr) {
-                    console.log('Public users insert skipped:', pubErr);
-                }
-
                 localStorage.setItem('userId', newUser.id);
-                showAlert('✅ Account created successfully!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'home.html';
-                }, 500);
+                window.location.href = 'home.html';
 
             } catch (error) {
                 console.error('Registration error:', error);
-                showAlert('Registration failed!', 'error');
-                registerBtn.innerHTML = '✅ Create Account';
+                alert('একাউন্ট তৈরি ব্যর্থ!');
+                registerBtn.innerHTML = '✅ একাউন্ট তৈরি করুন';
                 registerBtn.disabled = false;
-            }
-        });
-
-        // ============================================================
-        // LOGIN
-        // ============================================================
-        loginBtn.addEventListener('click', async () => {
-            const identifier = loginIdentifier.value.trim();
-            const password = loginPassword.value;
-
-            if (!identifier || !password) {
-                showAlert('Please enter email/username and password!', 'error');
-                return;
-            }
-
-            loginBtn.innerHTML = '<span class="spinner"></span> Logging in...';
-            loginBtn.disabled = true;
-
-            try {
-                const supabase = getSupabase();
-                if (!supabase) {
-                    showAlert('Connection failed!', 'error');
-                    loginBtn.innerHTML = '🔑 Login';
-                    loginBtn.disabled = false;
-                    return;
-                }
-
-                let email = identifier;
-                if (!identifier.includes('@')) {
-                    const { data: userData } = await supabase
-                        .from('users')
-                        .select('email')
-                        .eq('username', identifier)
-                        .maybeSingle();
-
-                    if (userData) {
-                        email = userData.email;
-                    } else {
-                        showAlert('❌ Username not found!', 'error');
-                        loginBtn.innerHTML = '🔑 Login';
-                        loginBtn.disabled = false;
-                        return;
-                    }
-                }
-
-                const { data: user, error } = await supabase
-                    .from('users')
-                    .select('id, username, email, password')
-                    .eq('email', email)
-                    .maybeSingle();
-
-                if (error || !user) {
-                    showAlert('❌ Invalid credentials!', 'error');
-                    loginBtn.innerHTML = '🔑 Login';
-                    loginBtn.disabled = false;
-                    return;
-                }
-
-                // Check password
-                let passwordMatch = false;
-
-                if (user.password && (user.password.startsWith('$2a$') || user.password.startsWith('$2b$'))) {
-                    try {
-                        const { data: result } = await supabase
-                            .rpc('check_password', {
-                                user_id: user.id,
-                                plain_password: password
-                            });
-                        passwordMatch = result || false;
-                    } catch (e) {
-                        passwordMatch = (user.password === password);
-                    }
-                } else {
-                    passwordMatch = (user.password === password);
-                }
-
-                if (!passwordMatch) {
-                    showAlert('❌ Invalid credentials!', 'error');
-                    loginBtn.innerHTML = '🔑 Login';
-                    loginBtn.disabled = false;
-                    return;
-                }
-
-                localStorage.setItem('userId', user.id);
-                showAlert('✅ Login successful!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'home.html';
-                }, 500);
-
-            } catch (error) {
-                console.error('Login error:', error);
-                showAlert('Login failed!', 'error');
-                loginBtn.innerHTML = '🔑 Login';
-                loginBtn.disabled = false;
             }
         });
 
@@ -1162,72 +648,56 @@
         // GOOGLE LOGIN
         // ============================================================
         googleSignInBtn.addEventListener('click', async () => {
-            googleSignInBtn.innerHTML = '<span class="spinner"></span> Signing in...';
+            googleSignInBtn.innerHTML = '<span class="spinner"></span> লগইন হচ্ছে...';
             googleSignInBtn.disabled = true;
 
             try {
-                if (typeof window.signInWithGoogle !== 'function') {
-                    showAlert('Google sign-in is not configured. Please use email/password.', 'error');
-                    googleSignInBtn.innerHTML = '<span>Continue with Google</span>';
-                    googleSignInBtn.disabled = false;
-                    return;
-                }
-
                 const user = await window.signInWithGoogle();
+                googleUser = user;
                 console.log('✅ Google User:', user);
 
-                const supabase = getSupabase();
+                const supabase = getSupabaseSafe();
                 if (!supabase) {
-                    showAlert('Connection failed!', 'error');
-                    googleSignInBtn.innerHTML = '<span>Continue with Google</span>';
+                    alert('❌ Supabase সংযোগ নেই!');
+                    googleSignInBtn.innerHTML = '<span>Google দিয়ে লগইন</span>';
                     googleSignInBtn.disabled = false;
                     return;
                 }
 
-                const { data: existingUser } = await supabase
+                const { data: existingUser, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('email', user.email)
                     .maybeSingle();
 
+                if (error) {
+                    console.error('Supabase query error:', error);
+                    alert('ডাটাবেজ চেক করতে সমস্যা!');
+                    googleSignInBtn.innerHTML = '<span>Google দিয়ে লগইন</span>';
+                    googleSignInBtn.disabled = false;
+                    return;
+                }
+
                 if (existingUser) {
                     localStorage.setItem('userId', existingUser.id);
-                    showAlert('✅ Login successful!', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'home.html';
-                    }, 500);
+                    window.location.href = 'home.html';
                 } else {
                     registerTab.click();
                     regEmail.value = user.email;
                     regEmail.disabled = true;
                     regUsername.focus();
-
-                    googleSignInBtn.innerHTML = '<span>Continue with Google</span>';
+                    
+                    googleSignInBtn.innerHTML = '<span>Google দিয়ে লগইন</span>';
                     googleSignInBtn.disabled = false;
-
-                    showAlert('📝 Please complete registration with your Google email', 'info');
+                    
+                    alert('📝 আপনার Google একাউন্ট দিয়ে একাউন্ট তৈরি করতে নিচের ফর্ম পূরণ করুন!');
                 }
             } catch (error) {
                 console.error('Google Sign-In Error:', error);
-                showAlert('Google sign-in failed!', 'error');
-                googleSignInBtn.innerHTML = '<span>Continue with Google</span>';
+                alert('গুগল লগইন ব্যর্থ!');
+                googleSignInBtn.innerHTML = '<span>Google দিয়ে লগইন</span>';
                 googleSignInBtn.disabled = false;
             }
-        });
-
-        // ============================================================
-        // ENTER KEY SUPPORT
-        // ============================================================
-        loginPassword.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') loginBtn.click();
-        });
-
-        loginIdentifier.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') loginPassword.focus();
-        });
-
-        regCaptchaInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !registerBtn.disabled) registerBtn.click();
         });
 
         // ============================================================
@@ -1237,19 +707,20 @@
             console.log('🔧 Login page loaded');
             localStorage.clear();
             sessionStorage.clear();
-
-            const supabase = getSupabase();
+            
+            // Supabase চেক
+            const supabase = getSupabaseSafe();
             if (supabase) {
-                console.log('✅ Supabase connected');
+                console.log('✅ Supabase connected successfully!');
             } else {
-                console.error('❌ Supabase connection failed');
+                console.error('❌ Supabase connection failed!');
             }
-
+            
             updateRegCaptcha();
         });
 
         updateRegCaptcha();
-        console.log('🚀 Login page ready - Full English + All Countries!');
+        console.log('🚀 Login page ready!');
     </script>
 </body>
 </html>
