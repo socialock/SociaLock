@@ -1,6 +1,9 @@
-// Supabase কনফিগারেশন - আপনার তথ্য দিন
-const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co'; // আপনার URL দিন
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk'; // আপনার anon key দিন
+// ============================================================
+// 📁 js/config.js
+// ============================================================
+
+const SUPABASE_URL = 'https://mjuowfrzvgnqrazqnunr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
 
 let supabaseClient = null;
 
@@ -20,8 +23,7 @@ function initSupabase() {
     }
 }
 
-initSupabase();
-
+// ===== গ্লোবাল ফাংশন =====
 window.getSupabase = function() {
     if (!supabaseClient) {
         return initSupabase();
@@ -39,3 +41,8 @@ window.showAlert = function(message, type = 'info') {
     document.body.appendChild(alert);
     setTimeout(() => alert.remove(), 4000);
 };
+
+// Initialize on load
+initSupabase();
+
+console.log('🔧 Config loaded!');
