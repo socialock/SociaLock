@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>P2P Encrypted Chat</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <title>Messages</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
     </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         * {
             margin: 0;
@@ -16,88 +16,103 @@
         html,
         body {
             height: 100%;
-            overflow: hidden;
         }
         body {
-            background: #0f0f11;
+            background: #18191a;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             color: #e4e6eb;
             display: flex;
             flex-direction: column;
+            padding-top: 0;
         }
 
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3a3b3c;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4a4b4c;
-        }
-
-        .top-bar {
-            background: #1e1e21;
-            padding: 8px 16px;
-            border-bottom: 1px solid #2b2b2e;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-            height: 52px;
-            z-index: 10;
-        }
-        .top-bar .back-btn {
-            background: none;
-            border: none;
-            color: #8e8e93;
-            font-size: 22px;
-            cursor: pointer;
+        /* ===== BOTTOM NAVBAR ===== */
+        .navbar-bottom {
+            background: #242526;
             padding: 4px 8px;
-            border-radius: 50%;
-            transition: 0.2s;
-            width: 38px;
-            height: 38px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            border-bottom: 1px solid #3a3b3c;
+            height: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .top-bar .back-btn:hover {
-            background: #2b2b2e;
-            color: #e4e6eb;
-        }
-        .top-bar .title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #e4e6eb;
+
+        .nav-bottom-container {
+            max-width: 600px;
+            margin: 0 auto;
             display: flex;
+            justify-content: space-around;
             align-items: center;
-            gap: 8px;
+            width: 100%;
         }
-        .top-bar .title i {
-            color: #4a9eff;
-            font-size: 14px;
-        }
-        .top-bar .status {
-            font-size: 12px;
-            color: #4caf50;
+
+        .nav-icon-bottom {
+            font-size: 1.7rem;
+            text-decoration: none;
+            color: #b0b3b8;
+            padding: 4px 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+            position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 1px;
         }
-        .top-bar .status .dot {
-            width: 8px;
-            height: 8px;
+        .nav-icon-bottom:hover {
+            background: #3a3b3c;
+        }
+        .nav-icon-bottom.active {
+            color: #1877f2;
+        }
+        .nav-icon-bottom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: #1877f2;
+            border-radius: 2px;
+        }
+        .nav-icon-bottom .label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #b0b3b8;
+        }
+        .nav-icon-bottom.active .label {
+            color: #1877f2;
+        }
+
+        /* ===== NOTIFICATION BADGE ===== */
+        .nav-icon-bottom {
+            position: relative;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e94560;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
             border-radius: 50%;
-            background: #4caf50;
-            display: inline-block;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #242526;
+            line-height: 1;
+            z-index: 5;
         }
-        .top-bar .status .dot.offline {
-            background: #8e8e93;
+        .notif-badge.show {
+            display: flex;
         }
 
         .main-wrapper {
@@ -105,863 +120,226 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            margin-top: 46px;
         }
         .main-container {
             max-width: 700px;
             width: 100%;
             margin: 0 auto;
-            padding: 0 12px;
+            padding: 0 16px;
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            overflow-y: auto;
+            padding-bottom: 20px;
         }
 
-        #lobby {
-            flex: 1;
+        .messages-header {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-        }
-        #lobby .lobby-icon {
-            font-size: 72px;
-            color: #4a9eff;
+            padding: 16px 0 12px;
+            border-bottom: 1px solid #3a3b3c;
             margin-bottom: 16px;
         }
-        #lobby h2 {
-            font-size: 24px;
-            font-weight: 700;
+        .messages-header h1 {
+            font-size: 1.3rem;
             color: #e4e6eb;
-            margin-bottom: 4px;
-        }
-        #lobby p {
-            color: #8e8e93;
-            font-size: 14px;
-            margin-bottom: 28px;
-        }
-        .lobby-buttons {
             display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
-        .lobby-btn {
-            padding: 12px 32px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
+        .messages-header h1 i {
+            color: #1877f2;
+        }
+
+        .messages-options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .message-option-card {
+            background: #242526;
+            border-radius: 16px;
+            padding: 20px 24px;
+            border: 1px solid #3a3b3c;
             cursor: pointer;
             transition: 0.3s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 18px;
         }
-        .lobby-btn.create {
-            background: #4a9eff;
-            color: white;
+        .message-option-card:hover {
+            background: #2a2b2c;
+            border-color: #4a4b4c;
+            transform: scale(1.01);
         }
-        .lobby-btn.create:hover {
-            background: #3a8eef;
-            transform: scale(1.02);
-        }
-        .lobby-btn.join {
-            background: #2b2b2e;
-            color: #e4e6eb;
-        }
-        .lobby-btn.join:hover {
-            background: #3a3b3c;
-            transform: scale(1.02);
+        .message-option-card:active {
+            transform: scale(0.98);
         }
 
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(4px);
-        }
-        .modal-overlay.open {
-            display: flex;
-        }
-        .modal-box {
-            background: #1e1e21;
-            padding: 28px 24px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 380px;
-            border: 1px solid #2b2b2e;
-            animation: modalIn 0.25s ease;
-        }
-        @keyframes modalIn {
-            from {
-                transform: scale(0.9) translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
-        }
-        .modal-box h3 {
-            color: #e4e6eb;
-            font-size: 18px;
-            margin-bottom: 16px;
-            text-align: center;
-            font-weight: 600;
-        }
-        .modal-box h3 i {
-            color: #4a9eff;
-            margin-right: 8px;
-        }
-        .modal-box input {
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            background: #2b2b2e;
-            border: 1px solid #3a3b3c;
-            color: #e4e6eb;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-            transition: 0.2s;
-        }
-        .modal-box input:focus {
-            border-color: #4a9eff;
-        }
-        .modal-box input::placeholder {
-            color: #8e8e93;
-        }
-        .modal-box .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-        .modal-box .btn-row button {
-            flex: 1;
-            padding: 11px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .btn-primary-modal {
-            background: #4a9eff;
-            color: white;
-        }
-        .btn-primary-modal:hover {
-            background: #3a8eef;
-        }
-        .btn-primary-modal:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .btn-danger-modal {
-            background: #2b2b2e;
-            color: #e4e6eb;
-        }
-        .btn-danger-modal:hover {
-            background: #3a3b3c;
-        }
-
-        #chatRoom {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            overflow: hidden;
-            padding-top: 4px;
-        }
-
-        .chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0 10px;
-            border-bottom: 1px solid #2b2b2e;
-            flex-shrink: 0;
-        }
-        .chat-header .room-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 0;
-        }
-        .chat-header .room-avatar {
-            width: 36px;
-            height: 36px;
+        .message-option-icon {
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: #4a9eff;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
+            font-size: 26px;
             flex-shrink: 0;
         }
-        .chat-header .room-name {
-            font-weight: 600;
-            font-size: 15px;
-            color: #e4e6eb;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .message-option-icon.p2p {
+            background: #1877f2;
+            color: white;
         }
-        .chat-header .room-name i {
-            color: #4a9eff;
-            margin-right: 4px;
-        }
-        .chat-header .room-members {
-            font-size: 12px;
-            color: #8e8e93;
-            white-space: nowrap;
-        }
-        .chat-header .room-members i {
-            color: #4caf50;
-            margin-right: 4px;
-        }
-        .chat-header .menu-btn {
-            background: none;
-            border: none;
-            color: #8e8e93;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 50%;
-            transition: 0.2s;
-            position: relative;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .chat-header .menu-btn:hover {
-            background: #2b2b2e;
-            color: #e4e6eb;
+        .message-option-icon.live {
+            background: #e94560;
+            color: white;
         }
 
-        .members-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 40px;
-            background: #1e1e21;
-            border-radius: 12px;
-            border: 1px solid #2b2b2e;
-            min-width: 200px;
-            max-width: 260px;
-            padding: 6px 0;
-            z-index: 100;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-        }
-        .members-dropdown.show {
-            display: block;
-        }
-        .members-dropdown .dropdown-title {
-            padding: 8px 16px 10px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #8e8e93;
-            border-bottom: 1px solid #2b2b2e;
-        }
-        .members-dropdown .member-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 16px;
-            font-size: 13px;
-            color: #e4e6eb;
-            border-bottom: 1px solid #2b2b2e;
-        }
-        .members-dropdown .member-item:last-child {
-            border-bottom: none;
-        }
-        .members-dropdown .member-item .avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #4a9eff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 11px;
-            flex-shrink: 0;
-        }
-        .members-dropdown .member-item .name {
+        .message-option-info {
             flex: 1;
         }
-        .members-dropdown .member-item .online-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #4caf50;
-            flex-shrink: 0;
-        }
-        .members-dropdown .member-item .you-tag {
-            font-size: 10px;
-            color: #8e8e93;
-            background: #2b2b2e;
-            padding: 1px 8px;
-            border-radius: 8px;
-        }
-
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 4px 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .message {
-            display: flex;
-            margin-bottom: 1px;
-            max-width: 82%;
-        }
-        .message.own {
-            align-self: flex-end;
-        }
-        .message.other {
-            align-self: flex-start;
-        }
-
-        .message-bubble {
-            padding: 8px 14px;
-            border-radius: 14px;
-            font-size: 14px;
-            line-height: 1.4;
-            word-wrap: break-word;
-            max-width: 100%;
-            position: relative;
-        }
-        .message.own .message-bubble {
-            background: #4a9eff;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-        .message.other .message-bubble {
-            background: #2b2b2e;
+        .message-option-info h3 {
+            font-size: 17px;
             color: #e4e6eb;
-            border-bottom-left-radius: 4px;
-        }
-        .message .sender-name {
-            font-size: 11px;
-            color: #8e8e93;
             margin-bottom: 2px;
-            display: block;
-            font-weight: 500;
         }
-        .message.own .sender-name {
-            display: none;
+        .message-option-info p {
+            font-size: 13px;
+            color: #b0b3b8;
+            margin: 0;
         }
-        .message-time {
+        .message-option-info .badge {
+            display: inline-block;
+            background: #1877f2;
+            color: white;
             font-size: 10px;
-            color: #8e8e93;
-            margin-top: 2px;
-            text-align: right;
-            opacity: 0.7;
-        }
-        .message.other .message-time {
-            text-align: left;
-        }
-
-        .file-message {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 12px;
-            border-radius: 10px;
-            margin: 2px 0;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            min-width: 160px;
-        }
-        .file-message:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .file-message .file-icon {
-            font-size: 22px;
-            color: #4a9eff;
-            flex-shrink: 0;
-            width: 32px;
-            text-align: center;
-        }
-        .file-message .file-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .file-message .file-name {
-            font-size: 13px;
-            font-weight: 500;
-            color: #e4e6eb;
-            word-break: break-all;
-        }
-        .file-message .file-size {
-            font-size: 11px;
-            color: #8e8e93;
-        }
-        .file-message .download-icon {
-            color: #8e8e93;
-            font-size: 16px;
-            flex-shrink: 0;
-            transition: 0.2s;
-        }
-        .file-message:hover .download-icon {
-            color: #4a9eff;
-        }
-
-        .system-message {
-            text-align: center;
-            padding: 6px 0;
-            color: #8e8e93;
-            font-size: 12px;
-            font-style: italic;
-            opacity: 0.7;
-        }
-
-        .typing-indicator {
-            display: none;
-            font-size: 13px;
-            color: #8e8e93;
-            padding: 4px 6px;
-            align-items: center;
-            gap: 4px;
-            height: 24px;
-        }
-        .typing-indicator.show {
-            display: flex;
-        }
-        .typing-indicator .dots {
-            display: flex;
-            gap: 3px;
-        }
-        .typing-indicator .dot {
-            width: 7px;
-            height: 7px;
-            background: #8e8e93;
-            border-radius: 50%;
-            animation: typingDot 1.2s infinite;
-        }
-        .typing-indicator .dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-indicator .dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes typingDot {
-            0%,
-            60%,
-            100% {
-                transform: translateY(0);
-                opacity: 0.3;
-            }
-            30% {
-                transform: translateY(-5px);
-                opacity: 1;
-            }
-        }
-
-        .no-messages {
-            text-align: center;
-            color: #8e8e93;
-            padding: 40px 20px;
-            font-size: 14px;
-        }
-        .no-messages i {
-            font-size: 44px;
-            display: block;
-            margin-bottom: 12px;
-            color: #2b2b2e;
-        }
-        .no-messages .lock-icon {
-            color: #4a9eff;
-        }
-
-        .chat-input-wrapper {
-            background: #1e1e21;
-            padding: 8px 0 10px;
-            border-top: 1px solid #2b2b2e;
-            flex-shrink: 0;
-        }
-        .chat-input {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .chat-input .file-btn {
-            background: none;
-            border: none;
-            color: #8e8e93;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 6px 8px;
-            border-radius: 50%;
-            transition: 0.2s;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .chat-input .file-btn:hover {
-            background: #2b2b2e;
-            color: #e4e6eb;
-        }
-        .chat-input input[type="text"] {
-            flex: 1;
-            padding: 10px 16px;
-            border-radius: 20px;
-            border: none;
-            background: #2b2b2e;
-            color: #e4e6eb;
-            font-size: 14px;
-            outline: none;
-            min-height: 40px;
-            transition: 0.2s;
-        }
-        .chat-input input[type="text"]:focus {
-            background: #333336;
-            border: 1px solid #4a9eff;
-        }
-        .chat-input input[type="text"]::placeholder {
-            color: #8e8e93;
-        }
-        .chat-input input[type="text"]:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .chat-input button {
-            padding: 8px 18px;
-            border: none;
-            background: #4a9eff;
-            color: white;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: 0.2s;
-            min-height: 40px;
-            min-width: 60px;
-        }
-        .chat-input button:hover {
-            background: #3a8eef;
-        }
-        .chat-input button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .file-input-hidden {
-            display: none;
-        }
-
-        .custom-alert {
-            position: fixed;
-            top: 70px;
-            right: 10px;
-            left: 10px;
-            padding: 12px 16px;
+            padding: 2px 10px;
             border-radius: 12px;
-            color: white;
-            z-index: 10000;
-            max-width: 400px;
-            margin: 0 auto;
-            animation: slideIn 0.3s ease;
-            font-size: 14px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            font-weight: 600;
+            margin-left: 8px;
         }
-        .custom-alert.success {
-            background: #2b7a3a;
-        }
-        .custom-alert.error {
-            background: #b33a3a;
-        }
-        .custom-alert.info {
-            background: #1a4a7a;
-        }
-        @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        .custom-alert button {
-            background: none;
-            border: none;
-            color: white;
-            margin-left: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            float: right;
-            opacity: 0.7;
-        }
-        .custom-alert button:hover {
-            opacity: 1;
+        .message-option-info .badge.live-badge {
+            background: #e94560;
         }
 
-        .confirm-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(6px);
-        }
-        .confirm-overlay.open {
-            display: flex;
-        }
-        .confirm-box {
-            background: #1e1e21;
-            padding: 28px 24px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 360px;
-            border: 1px solid #2b2b2e;
-            animation: modalIn 0.25s ease;
-            text-align: center;
-        }
-        .confirm-box .icon {
-            font-size: 48px;
-            color: #f5a623;
-            margin-bottom: 12px;
-        }
-        .confirm-box h3 {
-            color: #e4e6eb;
+        .message-option-arrow {
+            color: #b0b3b8;
             font-size: 18px;
-            margin-bottom: 6px;
-        }
-        .confirm-box p {
-            color: #8e8e93;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        .confirm-box .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-        .confirm-box .btn-row button {
-            flex: 1;
-            padding: 11px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .confirm-box .btn-confirm-yes {
-            background: #4a9eff;
-            color: white;
-        }
-        .confirm-box .btn-confirm-yes:hover {
-            background: #3a8eef;
-        }
-        .confirm-box .btn-confirm-no {
-            background: #2b2b2e;
-            color: #e4e6eb;
-        }
-        .confirm-box .btn-confirm-no:hover {
-            background: #3a3b3c;
         }
 
         @media (max-width: 480px) {
+            .navbar-bottom {
+                height: 42px;
+            }
+            .nav-icon-bottom {
+                font-size: 1.3rem;
+                padding: 2px 8px;
+            }
+            .nav-icon-bottom .label {
+                font-size: 0.5rem;
+            }
+            .main-wrapper {
+                margin-top: 42px;
+            }
             .main-container {
-                padding: 0 8px;
+                padding: 0 10px;
             }
-            .message {
-                max-width: 90%;
+            .message-option-card {
+                padding: 16px 18px;
             }
-            .message-bubble {
-                font-size: 13px;
-                padding: 6px 12px;
-            }
-            .chat-input input[type="text"] {
-                font-size: 13px;
-                padding: 8px 12px;
-                min-height: 36px;
-            }
-            .chat-input button {
-                font-size: 13px;
-                padding: 6px 14px;
-                min-height: 36px;
-                min-width: 50px;
-            }
-            .top-bar .title {
-                font-size: 14px;
-            }
-            .top-bar {
+            .message-option-icon {
+                width: 46px;
                 height: 46px;
-                padding: 6px 12px;
+                font-size: 20px;
             }
-            .lobby-btn {
-                padding: 10px 20px;
-                font-size: 14px;
+            .message-option-info h3 {
+                font-size: 15px;
             }
-            .modal-box {
-                padding: 20px 18px;
-                max-width: 340px;
-            }
-            .members-dropdown {
-                min-width: 170px;
-                right: -10px;
-            }
-            .chat-header .room-name {
-                font-size: 14px;
-            }
-            .file-message {
-                padding: 4px 10px;
-                min-width: 120px;
-            }
-            .file-message .file-icon {
-                font-size: 18px;
-                width: 26px;
-            }
-            .file-message .file-name {
+            .message-option-info p {
                 font-size: 12px;
+            }
+            .messages-header h1 {
+                font-size: 1.1rem;
             }
         }
     </style>
 </head>
-<body>
 
-    <div class="top-bar">
-        <button class="back-btn" id="backBtn">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <span class="title"><i class="fas fa-lock"></i> P2P Chat</span>
-        <span class="status" id="connectionStatus">
-            <span class="dot" id="statusDot"></span>
-            <span id="statusText">Connecting...</span>
-        </span>
-    </div>
+<body class="dark-theme">
+    <!-- ===== BOTTOM NAVBAR ===== -->
+    <nav class="navbar-bottom">
+        <div class="nav-bottom-container">
+            <a href="home.html" class="nav-icon-bottom" title="Home">
+                <i class="fas fa-home"></i>
+                <span class="label">Home</span>
+            </a>
+            <a href="messages.html" class="nav-icon-bottom active" title="Messages">
+                <i class="fas fa-comment-dots"></i>
+                <span class="label">Messages</span>
+            </a>
+            <a href="tools.html" class="nav-icon-bottom" title="Tools">
+                <i class="fas fa-tools"></i>
+                <span class="label">Tools</span>
+            </a>
+            <a href="notifications.html" class="nav-icon-bottom" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="label">Notifications</span>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </a>
+            <a href="#" class="nav-icon-bottom" id="profileNavBtn" title="Profile">
+                <i class="fas fa-user-circle"></i>
+                <span class="label">Profile</span>
+            </a>
+        </div>
+    </nav>
 
+    <!-- ===== MAIN CONTENT ===== -->
     <div class="main-wrapper">
         <div class="main-container">
-
-            <div id="lobby">
-                <div class="lobby-icon"><i class="fas fa-comment-dots"></i></div>
-                <h2>P2P Encrypted Chat</h2>
-                <p>Create a room or join an existing one</p>
-                <div class="lobby-buttons">
-                    <button class="lobby-btn create" onclick="openCreateModal()">
-                        <i class="fas fa-plus-circle"></i> Create Room
-                    </button>
-                    <button class="lobby-btn join" onclick="openJoinModal()">
-                        <i class="fas fa-sign-in-alt"></i> Join Room
-                    </button>
-                </div>
+            <div class="messages-header">
+                <h1><i class="fas fa-comment-dots"></i> Messages</h1>
+                <span style="font-size:13px;color:#b0b3b8;">
+                    <i class="fas fa-lock" style="color:#1877f2;"></i> Secure
+                </span>
             </div>
 
-            <div id="chatRoom">
-                <div class="chat-header">
-                    <div class="room-info">
-                        <div class="room-avatar" id="roomAvatar">#</div>
-                        <div>
-                            <div class="room-name" id="roomNameDisplay"><i class="fas fa-hashtag"></i> Room</div>
-                            <div class="room-members"><i class="fas fa-users"></i> <span id="memberCount">0</span> members</div>
-                        </div>
+            <!-- ===== TWO OPTIONS ===== -->
+            <div class="messages-options">
+                <!-- Option 1: P2P Chat (Encrypted) -->
+                <div class="message-option-card" onclick="window.location.href='p2pchat.html'">
+                    <div class="message-option-icon p2p">
+                        <i class="fas fa-lock"></i>
                     </div>
-                    <div style="position:relative;">
-                        <button class="menu-btn" id="membersMenuBtn" onclick="toggleMembersDropdown()">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <div class="members-dropdown" id="membersDropdown">
-                            <div class="dropdown-title">👥 Members</div>
-                            <div id="membersList"></div>
-                        </div>
+                    <div class="message-option-info">
+                        <h3>
+                            P2P Chat
+                            <span class="badge">Encrypted</span>
+                        </h3>
+                        <p>🔒 Private &amp; secure peer-to-peer messaging with end-to-end encryption</p>
+                    </div>
+                    <div class="message-option-arrow">
+                        <i class="fas fa-chevron-right"></i>
                     </div>
                 </div>
 
-                <div class="messages-container" id="messagesContainer">
-                    <div class="no-messages">
-                        <i class="fas fa-lock lock-icon"></i>
-                        <p>🔒 End-to-End Encrypted</p>
-                        <p style="font-size:12px;color:#606770;margin-top:4px;">All messages are encrypted</p>
+                <!-- Option 2: Private Live -->
+                <div class="message-option-card" onclick="window.location.href='plive.html'">
+                    <div class="message-option-icon live">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <div class="message-option-info">
+                        <h3>
+                            Private Live
+                            <span class="badge live-badge">Live</span>
+                        </h3>
+                        <p>📡 Go live privately with your followers — real-time streaming</p>
+                    </div>
+                    <div class="message-option-arrow">
+                        <i class="fas fa-chevron-right"></i>
                     </div>
                 </div>
-
-                <div class="typing-indicator" id="typingIndicator">
-                    <span id="typingName">Someone</span> is typing
-                    <span class="dots">
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                    </span>
-                </div>
-
-                <div class="chat-input-wrapper">
-                    <div class="chat-input">
-                        <button class="file-btn" onclick="document.getElementById('fileInput').click()" title="Send File">
-                            <i class="fas fa-paperclip"></i>
-                        </button>
-                        <input type="file" id="fileInput" class="file-input-hidden" multiple>
-                        <input type="text" id="messageInput" placeholder="Type a message..." maxlength="500">
-                        <button id="sendBtn">Send</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="createModal">
-        <div class="modal-box">
-            <h3><i class="fas fa-plus-circle"></i> Create Room</h3>
-            <input type="text" id="roomNameInput" placeholder="Room Name" maxlength="30" autofocus>
-            <input type="password" id="roomPasswordInput" placeholder="Room Password (min 6 chars)">
-            <div class="btn-row">
-                <button class="btn-primary-modal" id="createRoomBtn">Create</button>
-                <button class="btn-danger-modal" onclick="closeModal('createModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="joinModal">
-        <div class="modal-box">
-            <h3><i class="fas fa-sign-in-alt"></i> Join Room</h3>
-            <input type="text" id="joinRoomNameInput" placeholder="Room Name" autofocus>
-            <input type="password" id="joinRoomPasswordInput" placeholder="Room Password">
-            <div class="btn-row">
-                <button class="btn-primary-modal" id="joinRoomBtn">Join</button>
-                <button class="btn-danger-modal" onclick="closeModal('joinModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="confirm-overlay" id="confirmOverlay">
-        <div class="confirm-box">
-            <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <h3 id="confirmTitle">Leave Room?</h3>
-            <p id="confirmMessage">Are you sure you want to leave? You will be disconnected.</p>
-            <div class="btn-row">
-                <button class="btn-confirm-yes" id="confirmYes">Yes, Leave</button>
-                <button class="btn-confirm-no" id="confirmNo">Stay</button>
             </div>
         </div>
     </div>
@@ -991,1047 +369,73 @@
         }
 
         // ============================================================
-        // GLOBALS
+        // UPDATE NOTIFICATION BADGE
         // ============================================================
-        let currentUser = null;
-        let currentRoom = null;
-        let currentPassword = null;
-        let isCreator = false;
-        let myPeerId = null;
-        let peer = null;
-        let connections = {};
-        let peers = {};
-        let memberNames = {};
-        let fileDataCache = {};
-        let messageHistory = [];
-        let isInRoom = false;
-        let signalChannel = null;
-        let isLeaving = false;
-
-        const supabase = getSupabase();
-
-        // DOM
-        const lobby = document.getElementById('lobby');
-        const chatRoom = document.getElementById('chatRoom');
-        const messagesContainer = document.getElementById('messagesContainer');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const roomNameDisplay = document.getElementById('roomNameDisplay');
-        const roomAvatar = document.getElementById('roomAvatar');
-        const memberCount = document.getElementById('memberCount');
-        const membersList = document.getElementById('membersList');
-        const membersDropdown = document.getElementById('membersDropdown');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const typingName = document.getElementById('typingName');
-        const fileInput = document.getElementById('fileInput');
-        const statusDot = document.getElementById('statusDot');
-        const statusText = document.getElementById('statusText');
-        const backBtn = document.getElementById('backBtn');
-
-        let typingTimeout = null;
-        let isTyping = false;
-
-        // ============================================================
-        // UTILITY FUNCTIONS
-        // ============================================================
-        function showAlert(msg, type = 'info') {
-            const existing = document.querySelector('.custom-alert');
-            if (existing) existing.remove();
-            const alert = document.createElement('div');
-            alert.className = 'custom-alert ' + type;
-            alert.innerHTML = msg +
-                '<button onclick="this.parentElement.remove()">✕</button>';
-            document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 4000);
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function getTime() {
-            return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        function generateId() {
-            return Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-            if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
-            return (bytes / 1073741824).toFixed(1) + ' GB';
-        }
-
-        function getFileIcon(fileName) {
-            const ext = fileName.split('.').pop().toLowerCase();
-            const icons = {
-                'jpg': 'fa-image',
-                'jpeg': 'fa-image',
-                'png': 'fa-image',
-                'gif': 'fa-image',
-                'svg': 'fa-image',
-                'webp': 'fa-image',
-                'mp4': 'fa-video',
-                'webm': 'fa-video',
-                'mov': 'fa-video',
-                'avi': 'fa-video',
-                'mkv': 'fa-video',
-                'mp3': 'fa-music',
-                'wav': 'fa-music',
-                'pdf': 'fa-file-pdf',
-                'doc': 'fa-file-word',
-                'docx': 'fa-file-word',
-                'xls': 'fa-file-excel',
-                'xlsx': 'fa-file-excel',
-                'ppt': 'fa-file-powerpoint',
-                'pptx': 'fa-file-powerpoint',
-                'zip': 'fa-file-archive',
-                'rar': 'fa-file-archive',
-                '7z': 'fa-file-archive',
-                'tar': 'fa-file-archive',
-                'gz': 'fa-file-archive',
-                'txt': 'fa-file-alt',
-                'js': 'fa-file-code',
-                'html': 'fa-file-code',
-                'css': 'fa-file-code',
-                'json': 'fa-file-code',
-                'xml': 'fa-file-code',
-                'php': 'fa-file-code',
-                'py': 'fa-file-code',
-                'java': 'fa-file-code',
-                'c': 'fa-file-code',
-                'cpp': 'fa-file-code',
-                'exe': 'fa-file',
-                'apk': 'fa-file',
-                'ipa': 'fa-file'
-            };
-            return icons[ext] || 'fa-file';
-        }
-
-        function base64ToBlob(base64) {
-            const binary = atob(base64);
-            const array = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-                array[i] = binary.charCodeAt(i);
-            }
-            return new Blob([array]);
-        }
-
-        // ============================================================
-        // CUSTOM CONFIRM DIALOG
-        // ============================================================
-        let confirmResolve = null;
-
-        function showConfirm(title, message, yesText = 'Yes, Leave', noText = 'Stay') {
-            return new Promise((resolve) => {
-                const overlay = document.getElementById('confirmOverlay');
-                document.getElementById('confirmTitle').textContent = title;
-                document.getElementById('confirmMessage').textContent = message;
-                document.getElementById('confirmYes').textContent = yesText;
-                document.getElementById('confirmNo').textContent = noText;
-                overlay.classList.add('open');
-                confirmResolve = resolve;
-            });
-        }
-
-        document.getElementById('confirmYes').addEventListener('click', () => {
-            document.getElementById('confirmOverlay').classList.remove('open');
-            if (confirmResolve) confirmResolve(true);
-        });
-
-        document.getElementById('confirmNo').addEventListener('click', () => {
-            document.getElementById('confirmOverlay').classList.remove('open');
-            if (confirmResolve) confirmResolve(false);
-        });
-
-        // ============================================================
-        // MODAL
-        // ============================================================
-        function openCreateModal() {
-            document.getElementById('createModal').classList.add('open');
-            setTimeout(() => document.getElementById('roomNameInput').focus(), 100);
-        }
-
-        function openJoinModal() {
-            document.getElementById('joinModal').classList.add('open');
-            setTimeout(() => document.getElementById('joinRoomNameInput').focus(), 100);
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
-        }
-
-        document.querySelectorAll('.modal-overlay').forEach(el => {
-            el.addEventListener('click', (e) => {
-                if (e.target === el) el.classList.remove('open');
-            });
-        });
-
-        document.getElementById('roomPasswordInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') document.getElementById('createRoomBtn').click();
-        });
-        document.getElementById('joinRoomPasswordInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') document.getElementById('joinRoomBtn').click();
-        });
-
-        // ============================================================
-        // CREATE ROOM - FIXED: একই Room ID ফরম্যাট
-        // ============================================================
-        document.getElementById('createRoomBtn').addEventListener('click', async function() {
-            const roomName = document.getElementById('roomNameInput').value.trim();
-            const password = document.getElementById('roomPasswordInput').value;
-
-            if (!roomName) {
-                showAlert('Please enter a room name!', 'error');
-                return;
-            }
-            if (password.length < 6) {
-                showAlert('Password must be at least 6 characters!', 'error');
-                return;
-            }
-
-            this.disabled = true;
-            this.textContent = '⏳ Creating...';
-
-            try {
-                // ✅ FIXED: একই ফরম্যাট - roomName + password hash
-                const roomId = roomName + '_' + btoa(password).substring(0, 8);
-                currentRoom = roomId;
-                currentPassword = password;
-                isCreator = true;
-
-                await initializePeer(roomId, password, true);
-                await enterRoom(roomName, roomId, true);
-
-                closeModal('createModal');
-                showAlert('✅ Room created! Share the room name with friends.', 'success');
-
-            } catch (err) {
-                console.error('Create error:', err);
-                showAlert('Failed to create room!', 'error');
-            }
-
-            this.disabled = false;
-            this.textContent = 'Create';
-        });
-
-        // ============================================================
-        // JOIN ROOM - একই ফরম্যাট
-        // ============================================================
-        document.getElementById('joinRoomBtn').addEventListener('click', async function() {
-            const roomName = document.getElementById('joinRoomNameInput').value.trim();
-            const password = document.getElementById('joinRoomPasswordInput').value;
-
-            if (!roomName) {
-                showAlert('Please enter room name!', 'error');
-                return;
-            }
-            if (password.length < 6) {
-                showAlert('Password must be at least 6 characters!', 'error');
-                return;
-            }
-
-            this.disabled = true;
-            this.textContent = '⏳ Joining...';
-
-            try {
-                // ✅ একই ফরম্যাট - roomName + password hash
-                const roomId = roomName + '_' + btoa(password).substring(0, 8);
-                currentRoom = roomId;
-                currentPassword = password;
-                isCreator = false;
-
-                await initializePeer(roomId, password, false);
-                await enterRoom(roomName, roomId, false);
-
-                closeModal('joinModal');
-                showAlert('✅ Joined room!', 'success');
-
-            } catch (err) {
-                console.error('Join error:', err);
-                showAlert('Failed to join room!', 'error');
-            }
-
-            this.disabled = false;
-            this.textContent = 'Join';
-        });
-
-        // ============================================================
-        // PEERJS INIT
-        // ============================================================
-        async function initializePeer(roomId, password, create) {
-            return new Promise((resolve, reject) => {
-                try {
-                    if (typeof Peer === 'undefined') {
-                        const script = document.createElement('script');
-                        script.src = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
-                        script.onload = () => {
-                            setupPeerJS(roomId, password, create, resolve, reject);
-                        };
-                        script.onerror = () => {
-                            reject(new Error('PeerJS failed to load'));
-                        };
-                        document.head.appendChild(script);
-                    } else {
-                        setupPeerJS(roomId, password, create, resolve, reject);
-                    }
-                } catch (err) {
-                    reject(err);
-                }
-            });
-        }
-
-        function setupPeerJS(roomId, password, create, resolve, reject) {
-            try {
-                const userId = localStorage.getItem('userId');
-                let username = 'User';
-
-                if (userId) {
-                    getSupabase().from('users').select('username').eq('id', userId).single()
-                        .then(({ data }) => {
-                            username = data?.username || 'User';
-                            createPeer(roomId, password, create, username, resolve, reject);
-                        }).catch(() => {
-                            createPeer(roomId, password, create, username, resolve, reject);
-                        });
-                } else {
-                    createPeer(roomId, password, create, username, resolve, reject);
-                }
-            } catch (err) {
-                reject(err);
-            }
-        }
-
-        function createPeer(roomId, password, create, username, resolve, reject) {
-            myPeerId = generateId() + '-' + Date.now();
-
-            peer = new Peer(myPeerId, {
-                debug: 1,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' }
-                    ]
-                }
-            });
-
-            peer.on('open', (id) => {
-                console.log('✅ Peer connected:', id);
-                setStatus(true, 'Connected');
-
-                window.roomId = roomId;
-                window.password = password;
-                window.username = username;
-
-                if (create) {
-                    setTimeout(() => {
-                        broadcastPresence(username);
-                    }, 500);
-                } else {
-                    findRoomCreator(roomId, username);
-                }
-
-                resolve();
-            });
-
-            peer.on('connection', (conn) => {
-                handleConnection(conn, username);
-            });
-
-            peer.on('error', (err) => {
-                console.error('Peer error:', err);
-                if (err.type === 'peer-unavailable') {
-                    showAlert('Room not found! Make sure the room exists.', 'error');
-                }
-                setStatus(false, 'Error');
-            });
-
-            peer.on('disconnected', () => {
-                setStatus(false, 'Disconnected');
-                showAlert('Disconnected from network!', 'error');
-            });
-
-            peer.on('close', () => {
-                setStatus(false, 'Disconnected');
-            });
-
-            setTimeout(() => {
-                if (!peer || !peer.id) {
-                    reject(new Error('Peer connection timeout'));
-                }
-            }, 15000);
-        }
-
-        function setStatus(online, text) {
-            if (online) {
-                statusDot.className = 'dot';
-                statusText.textContent = text || 'Connected';
-            } else {
-                statusDot.className = 'dot offline';
-                statusText.textContent = text || 'Offline';
-            }
-        }
-
-        // ============================================================
-        // FIND ROOM CREATOR
-        // ============================================================
-        function findRoomCreator(roomId, username) {
-            if (!supabase) {
-                showAlert('Signaling server not available!', 'error');
-                return;
-            }
-
-            if (signalChannel) {
-                signalChannel.unsubscribe();
-            }
-
-            signalChannel = supabase.channel('p2p-signal-' + roomId);
-
-            signalChannel.on('broadcast', { event: 'peer-announce' }, ({ payload }) => {
-                if (payload.peerId !== myPeerId && !connections[payload.peerId]) {
-                    console.log('Found creator:', payload.peerId);
-                    connectToPeer(payload.peerId, username);
-                }
-            });
-
-            signalChannel.on('broadcast', { event: 'peer-join' }, ({ payload }) => {
-                if (payload.peerId !== myPeerId && !connections[payload.peerId]) {
-                    console.log('New peer joined:', payload.peerId);
-                    connectToPeer(payload.peerId, username);
-                }
-            });
-
-            signalChannel.on('broadcast', { event: 'peer-request' }, ({ payload }) => {
-                if (payload.peerId !== myPeerId && !connections[payload.peerId]) {
-                    signalChannel.send({
-                        type: 'broadcast',
-                        event: 'peer-announce',
-                        payload: { peerId: myPeerId, username: username }
-                    });
-                }
-            });
-
-            signalChannel.subscribe((status) => {
-                if (status === 'SUBSCRIBED') {
-                    signalChannel.send({
-                        type: 'broadcast',
-                        event: 'peer-join',
-                        payload: { peerId: myPeerId, username: username }
-                    });
-
-                    setTimeout(() => {
-                        signalChannel.send({
-                            type: 'broadcast',
-                            event: 'peer-request',
-                            payload: { peerId: myPeerId, username: username }
-                        });
-                    }, 500);
-                }
-            });
-
-            window.announceInterval = setInterval(() => {
-                if (signalChannel) {
-                    signalChannel.send({
-                        type: 'broadcast',
-                        event: 'peer-announce',
-                        payload: { peerId: myPeerId, username: username }
-                    });
-                }
-            }, 15000);
-        }
-
-        // ============================================================
-        // BROADCAST PRESENCE
-        // ============================================================
-        function broadcastPresence(username) {
-            if (!supabase) return;
-
-            if (signalChannel) {
-                signalChannel.unsubscribe();
-            }
-
-            signalChannel = supabase.channel('p2p-signal-' + window.roomId);
-
-            signalChannel.on('broadcast', { event: 'peer-join' }, ({ payload }) => {
-                if (payload.peerId !== myPeerId && !connections[payload.peerId]) {
-                    console.log('New peer joined:', payload.peerId);
-                    connectToPeer(payload.peerId, username);
-                }
-            });
-
-            signalChannel.on('broadcast', { event: 'peer-request' }, ({ payload }) => {
-                if (payload.peerId !== myPeerId && !connections[payload.peerId]) {
-                    signalChannel.send({
-                        type: 'broadcast',
-                        event: 'peer-announce',
-                        payload: { peerId: myPeerId, username: username }
-                    });
-                }
-            });
-
-            signalChannel.subscribe((status) => {
-                if (status === 'SUBSCRIBED') {
-                    signalChannel.send({
-                        type: 'broadcast',
-                        event: 'peer-announce',
-                        payload: { peerId: myPeerId, username: username }
-                    });
-                }
-            });
-
-            window.announceInterval = setInterval(() => {
-                if (signalChannel) {
-                    signalChannel.send({
-                        type: 'broadcast',
-                        event: 'peer-announce',
-                        payload: { peerId: myPeerId, username: username }
-                    });
-                }
-            }, 15000);
-        }
-
-        // ============================================================
-        // CONNECT TO PEER
-        // ============================================================
-        function connectToPeer(peerId, username) {
-            if (connections[peerId]) return;
-            if (peerId === myPeerId) return;
-
-            console.log('Connecting to peer:', peerId);
-
-            try {
-                const conn = peer.connect(peerId, {
-                    reliable: true,
-                    metadata: { username: username }
-                });
-
-                conn.on('open', () => {
-                    console.log('✅ Connected to peer:', peerId);
-                    connections[peerId] = conn;
-                    peers[peerId] = conn;
-                    memberNames[peerId] = conn.metadata?.username || 'User';
-                    updateMemberList();
-
-                    conn.send({
-                        type: 'presence',
-                        username: currentUser?.username || 'User'
-                    });
-
-                    conn.on('data', (data) => {
-                        handleIncomingData(data, peerId);
-                    });
-
-                    conn.on('close', () => {
-                        console.log('❌ Peer disconnected:', peerId);
-                        delete connections[peerId];
-                        delete peers[peerId];
-                        updateMemberList();
-                        showAlert('👋 ' + (memberNames[peerId] || 'Someone') + ' left the room', 'info');
-                        delete memberNames[peerId];
-                    });
-                });
-
-                conn.on('error', (err) => {
-                    console.error('Connection error:', err);
-                });
-
-            } catch (err) {
-                console.error('Connect error:', err);
-            }
-        }
-
-        // ============================================================
-        // HANDLE INCOMING CONNECTION
-        // ============================================================
-        function handleConnection(conn, username) {
-            const peerId = conn.peer;
-
-            conn.on('open', () => {
-                console.log('✅ Incoming connection from:', peerId);
-                connections[peerId] = conn;
-                peers[peerId] = conn;
-                memberNames[peerId] = conn.metadata?.username || 'User';
-                updateMemberList();
-
-                conn.on('data', (data) => {
-                    handleIncomingData(data, peerId);
-                });
-
-                conn.on('close', () => {
-                    console.log('❌ Peer disconnected:', peerId);
-                    delete connections[peerId];
-                    delete peers[peerId];
-                    updateMemberList();
-                    showAlert('👋 ' + (memberNames[peerId] || 'Someone') + ' left the room', 'info');
-                    delete memberNames[peerId];
-                });
-            });
-
-            conn.on('error', (err) => {
-                console.error('Connection error:', err);
-            });
-        }
-
-        // ============================================================
-        // HANDLE INCOMING DATA
-        // ============================================================
-        function handleIncomingData(data, peerId) {
-            if (!data) return;
-
-            try {
-                if (data.type === 'message') {
-                    appendMessage(data.content, data.sender, false, data.timestamp);
-                } else if (data.type === 'file') {
-                    receiveFile(data.fileName, data.fileSize, data.fileData, data.sender, data.timestamp);
-                } else if (data.type === 'typing') {
-                    showTyping(data.sender);
-                } else if (data.type === 'system') {
-                    appendSystemMessage(data.content);
-                } else if (data.type === 'presence') {
-                    memberNames[peerId] = data.username || 'User';
-                    updateMemberList();
-                }
-            } catch (err) {
-                console.error('Data handling error:', err);
-            }
-        }
-
-        // ============================================================
-        // ENTER ROOM
-        // ============================================================
-        function enterRoom(roomName, roomId, create) {
-            lobby.style.display = 'none';
-            chatRoom.style.display = 'flex';
-            roomNameDisplay.innerHTML = '<i class="fas fa-hashtag"></i> ' + escapeHtml(roomName);
-            roomAvatar.textContent = roomName.charAt(0).toUpperCase();
-            isInRoom = true;
-            isLeaving = false;
-
-            setTimeout(() => {
-                broadcastToAll({
-                    type: 'presence',
-                    username: currentUser?.username || 'User'
-                });
-            }, 1000);
-
-            messageInput.focus();
-
-            appendSystemMessage('🔒 End-to-End Encrypted Chat');
-            appendSystemMessage('📡 Connected to: ' + roomName);
-
-            updateMemberList();
-
-            setupTyping();
-            setupSend();
-            setupFileUpload();
-
-            messageInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-                if (e.key !== 'Enter' && e.key !== 'Shift') {
-                    sendTyping();
-                }
-            });
-
-            backBtn.addEventListener('click', handleBackClick);
-            window.addEventListener('beforeunload', handleBeforeUnload);
-        }
-
-        // ============================================================
-        // BEFORE UNLOAD & BACK BUTTON
-        // ============================================================
-        function handleBeforeUnload(e) {
-            if (isInRoom && !isLeaving) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-        }
-
-        async function handleBackClick(e) {
-            if (isInRoom && !isLeaving) {
-                e.preventDefault();
-
-                const confirmed = await showConfirm(
-                    'Leave Room?',
-                    'Are you sure you want to leave? You will be disconnected from the chat.',
-                    'Yes, Leave',
-                    'Stay'
-                );
-
-                if (confirmed) {
-                    isLeaving = true;
-                    cleanupRoom();
-                    window.location.href = 'messages.html';
-                }
-            } else {
-                window.location.href = 'messages.html';
-            }
-        }
-
-        // ============================================================
-        // CLEANUP ROOM
-        // ============================================================
-        function cleanupRoom() {
-            isInRoom = false;
-
-            for (const [peerId, conn] of Object.entries(connections)) {
-                try { conn.close(); } catch (e) {}
-            }
-            connections = {};
-            peers = {};
-            memberNames = {};
-
-            if (peer) {
-                try { peer.destroy(); } catch (e) {}
-                peer = null;
-            }
-
-            if (signalChannel) {
-                try { signalChannel.unsubscribe(); } catch (e) {}
-                signalChannel = null;
-            }
-
-            if (window.announceInterval) {
-                clearInterval(window.announceInterval);
-                window.announceInterval = null;
-            }
-
-            fileDataCache = {};
-            messageHistory = [];
-
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            backBtn.removeEventListener('click', handleBackClick);
-        }
-
-        // ============================================================
-        // SEND MESSAGE
-        // ============================================================
-        function setupSend() {
-            sendBtn.addEventListener('click', sendMessage);
-        }
-
-        function sendMessage() {
-            const content = messageInput.value.trim();
-            if (!content) return;
-
-            const messageData = {
-                type: 'message',
-                content: content,
-                sender: currentUser?.username || 'You',
-                timestamp: Date.now()
-            };
-
-            appendMessage(content, 'You', true, Date.now());
-            broadcastToAll(messageData);
-
-            messageHistory.push(messageData);
-            messageInput.value = '';
-            messageInput.focus();
-        }
-
-        // ============================================================
-        // TYPING
-        // ============================================================
-        function setupTyping() {
-            let typingTimer;
-
-            messageInput.addEventListener('input', () => {
-                clearTimeout(typingTimer);
-                if (!isTyping) {
-                    isTyping = true;
-                    broadcastToAll({
-                        type: 'typing',
-                        sender: currentUser?.username || 'Someone'
-                    });
-                }
-                typingTimer = setTimeout(() => {
-                    isTyping = false;
-                }, 2000);
-            });
-        }
-
-        function sendTyping() {
-            broadcastToAll({
-                type: 'typing',
-                sender: currentUser?.username || 'Someone'
-            });
-        }
-
-        function showTyping(sender) {
-            typingName.textContent = sender;
-            typingIndicator.classList.add('show');
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                typingIndicator.classList.remove('show');
-            }, 2000);
-        }
-
-        // ============================================================
-        // BROADCAST
-        // ============================================================
-        function broadcastToAll(data) {
-            const peersList = Object.values(peers);
-            for (const conn of peersList) {
-                try {
-                    conn.send(data);
-                } catch (err) {
-                    console.error('Send error:', err);
-                }
-            }
-        }
-
-        // ============================================================
-        // APPEND MESSAGE
-        // ============================================================
-        function appendMessage(content, sender, isOwn, timestamp) {
-            const noMsg = messagesContainer.querySelector('.no-messages');
-            if (noMsg) noMsg.remove();
-
-            const div = document.createElement('div');
-            div.className = `message ${isOwn ? 'own' : 'other'}`;
-
-            const time = timestamp ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) :
-                getTime();
-
-            let senderNameHtml = '';
-            if (!isOwn && sender && sender !== 'You') {
-                senderNameHtml = `<span class="sender-name">${escapeHtml(sender)}</span>`;
-            }
-
-            div.innerHTML = `
-                ${senderNameHtml}
-                <div class="message-bubble">
-                    <div>${escapeHtml(content)}</div>
-                    <div class="message-time">${time}</div>
-                </div>
-            `;
-
-            messagesContainer.appendChild(div);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // ============================================================
-        // FILE TRANSFER
-        // ============================================================
-        function setupFileUpload() {
-            fileInput.addEventListener('change', async function(e) {
-                const files = this.files;
-                if (!files || files.length === 0) return;
-
-                for (const file of files) {
-                    await sendFile(file);
-                }
-                this.value = '';
-            });
-        }
-
-        async function sendFile(file) {
-            if (file.size > 100 * 1024 * 1024) {
-                showAlert('File too large! Max 100MB.', 'error');
-                return;
-            }
-
-            try {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function(e) {
-                    const base64Data = e.target.result.split(',')[1];
-
-                    const fileData = {
-                        type: 'file',
-                        fileName: file.name,
-                        fileSize: file.size,
-                        fileData: base64Data,
-                        sender: currentUser?.username || 'You',
-                        timestamp: Date.now()
-                    };
-
-                    receiveFile(file.name, file.size, base64Data, 'You', Date.now());
-                    broadcastToAll(fileData);
-                    showAlert('✅ File sent: ' + file.name, 'success');
-                };
-                reader.onerror = function() {
-                    showAlert('Failed to read file!', 'error');
-                };
-            } catch (err) {
-                console.error('File send error:', err);
-                showAlert('Failed to send file!', 'error');
-            }
-        }
-
-        function receiveFile(fileName, fileSize, fileData, sender, timestamp) {
-            const noMsg = messagesContainer.querySelector('.no-messages');
-            if (noMsg) noMsg.remove();
-
-            const div = document.createElement('div');
-            const isOwn = sender === 'You' || sender === currentUser?.username;
-            div.className = `message ${isOwn ? 'own' : 'other'}`;
-
-            const time = timestamp ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) :
-                getTime();
-            const fileId = generateId();
-            const fileSizeStr = formatFileSize(fileSize);
-            const fileIcon = getFileIcon(fileName);
-
-            fileDataCache[fileId] = fileData;
-
-            let senderNameHtml = '';
-            if (!isOwn && sender && sender !== 'You') {
-                senderNameHtml = `<span class="sender-name">${escapeHtml(sender)}</span>`;
-            }
-
-            div.innerHTML = `
-                ${senderNameHtml}
-                <div class="message-bubble" style="padding:6px 10px;">
-                    <div class="file-message" onclick="downloadFile('${fileId}', '${escapeHtml(fileName)}')">
-                        <span class="file-icon"><i class="fas ${fileIcon}"></i></span>
-                        <div class="file-info">
-                            <div class="file-name">${escapeHtml(fileName)}</div>
-                            <div class="file-size">${fileSizeStr}</div>
-                        </div>
-                        <span class="download-icon"><i class="fas fa-download"></i></span>
-                    </div>
-                    <div class="message-time">${time}</div>
-                </div>
-            `;
-
-            messagesContainer.appendChild(div);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function downloadFile(fileId, fileName) {
-            const data = fileDataCache[fileId];
-            if (!data) {
-                showAlert('File data not available!', 'error');
-                return;
-            }
-
-            try {
-                const blob = base64ToBlob(data);
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showAlert('✅ Downloading: ' + fileName, 'success');
-            } catch (err) {
-                console.error('Download error:', err);
-                showAlert('Failed to download file!', 'error');
-            }
-        }
-
-        // ============================================================
-        // SYSTEM MESSAGE
-        // ============================================================
-        function appendSystemMessage(content) {
-            const noMsg = messagesContainer.querySelector('.no-messages');
-            if (noMsg) noMsg.remove();
-
-            const div = document.createElement('div');
-            div.className = 'system-message';
-            div.textContent = content;
-            messagesContainer.appendChild(div);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // ============================================================
-        // MEMBERS LIST
-        // ============================================================
-        function updateMemberList() {
-            const count = Object.keys(connections).length + 1;
-            memberCount.textContent = count;
-
-            const list = document.getElementById('membersList');
-            const myUsername = currentUser?.username || 'You';
-
-            let html = `
-                <div class="member-item">
-                    <div class="avatar">${myUsername.charAt(0).toUpperCase()}</div>
-                    <div class="name">${escapeHtml(myUsername)}</div>
-                    <div class="online-dot"></div>
-                    <span class="you-tag">You</span>
-                </div>
-            `;
-
-            for (const [peerId, conn] of Object.entries(connections)) {
-                const name = memberNames[peerId] || 'User';
-                html += `
-                    <div class="member-item">
-                        <div class="avatar">${name.charAt(0).toUpperCase()}</div>
-                        <div class="name">${escapeHtml(name)}</div>
-                        <div class="online-dot"></div>
-                    </div>
-                `;
-            }
-
-            list.innerHTML = html;
-        }
-
-        function toggleMembersDropdown() {
-            membersDropdown.classList.toggle('show');
-        }
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.menu-btn') && !e.target.closest('.members-dropdown')) {
-                membersDropdown.classList.remove('show');
-            }
-        });
-
-        // ============================================================
-        // LOAD USER
-        // ============================================================
-        async function loadUser() {
+        async function updateNotifBadge() {
+            const badge = document.getElementById('notifBadge');
+            if (!badge) return;
+
+            const supabase = getSupabase();
             const userId = localStorage.getItem('userId');
-            if (!userId) return;
+            if (!supabase || !userId) {
+                badge.classList.remove('show');
+                return;
+            }
 
             try {
-                const supabase = getSupabase();
-                if (!supabase) return;
+                const { count, error } = await supabase
+                    .from('notifications')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', userId)
+                    .eq('is_read', false);
 
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('username')
-                    .eq('id', userId)
-                    .single();
-
-                if (!error && data) {
-                    currentUser = { id: userId, username: data.username };
-                    console.log('User loaded:', currentUser.username);
+                if (error) {
+                    console.error('Badge count error:', error);
+                    badge.classList.remove('show');
+                    return;
                 }
+
+                const unreadCount = count || 0;
+                const display = unreadCount > 9 ? '9+' : unreadCount;
+
+                if (unreadCount > 0) {
+                    badge.textContent = display;
+                    badge.classList.add('show');
+                } else {
+                    badge.classList.remove('show');
+                }
+
+                localStorage.setItem('unreadNotificationCount', unreadCount);
+
             } catch (err) {
-                console.error('Load user error:', err);
+                console.error('Badge update error:', err);
+                badge.classList.remove('show');
             }
         }
 
         // ============================================================
         // PAGE LOAD
         // ============================================================
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             const userId = localStorage.getItem('userId');
             if (!userId) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            await loadUser();
-            console.log('🚀 P2P Chat loaded - FIXED Room ID issue!');
-        });
+            // Update badge
+            updateNotifBadge();
 
-        window.addEventListener('unload', function() {
-            if (isInRoom) {
-                cleanupRoom();
-            }
+            // Profile nav
+            document.getElementById('profileNavBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = `userprofile.html?userId=${userId}`;
+            });
+
+            // Periodic badge update (every 30 seconds)
+            setInterval(updateNotifBadge, 30000);
+
+            console.log('🚀 Messages page loaded with P2P Chat & Private Live options!');
         });
     </script>
 </body>
