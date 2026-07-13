@@ -37,7 +37,6 @@
             border-radius: 10px;
         }
 
-        /* ===== TOP BAR ===== */
         .top-bar {
             background: #1e1e21;
             padding: 8px 16px;
@@ -130,7 +129,6 @@
             overflow: hidden;
         }
 
-        /* ===== LOBBY ===== */
         #lobby {
             flex: 1;
             display: flex;
@@ -190,7 +188,6 @@
             transform: scale(1.02);
         }
 
-        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -289,7 +286,6 @@
             background: #3a3b3c;
         }
 
-        /* ===== LIVE ROOM ===== */
         #liveRoom {
             display: none;
             flex: 1;
@@ -298,7 +294,6 @@
             padding-top: 4px;
         }
 
-        /* ===== LIVE HEADER ===== */
         .live-header {
             display: flex;
             align-items: center;
@@ -379,7 +374,6 @@
             color: #e4e6eb;
         }
 
-        /* ===== VIEWERS DROPDOWN ===== */
         .viewers-dropdown {
             display: none;
             position: absolute;
@@ -488,7 +482,6 @@
             background: #1a2b1a;
         }
 
-        /* ===== LIVE VIDEO AREA ===== */
         .live-video-area {
             flex: 1;
             display: flex;
@@ -528,7 +521,6 @@
             background: #0a0a0c;
         }
 
-        /* ===== LIVE TOOLS ===== */
         .live-tools {
             display: flex;
             gap: 8px;
@@ -565,7 +557,6 @@
             cursor: not-allowed;
         }
 
-        /* ===== COMMENTS ===== */
         .comments-section {
             flex: 1;
             display: flex;
@@ -659,7 +650,6 @@
             background: #2b1a1a;
         }
 
-        /* ===== REPLIES ===== */
         .replies-container {
             margin-left: 36px;
             padding-left: 8px;
@@ -754,7 +744,6 @@
             color: #2b2b2e;
         }
 
-        /* ===== COMMENT INPUT ===== */
         .comment-input-wrapper {
             background: #1e1e21;
             padding: 6px 0 8px;
@@ -1053,6 +1042,9 @@
                     <button class="tool-btn" id="cameraBtn" onclick="toggleCamera()">
                         <i class="fas fa-video"></i> Camera
                     </button>
+                    <button class="tool-btn" id="switchCameraBtn" onclick="switchCamera()" title="Switch Camera">
+                        <i class="fas fa-sync-alt"></i> Switch
+                    </button>
                     <button class="tool-btn" id="screenBtn" onclick="toggleScreenShare()">
                         <i class="fas fa-desktop"></i> Screen
                     </button>
@@ -1161,13 +1153,13 @@
         let isInRoom = false;
         let signalChannel = null;
         let isLeaving = false;
-        let peerReady = false;
         let localStream = null;
         let remoteStream = null;
         let isMicOn = true;
         let isCameraOn = true;
         let isScreenSharing = false;
         let activeRooms = JSON.parse(localStorage.getItem('activeLiveRooms') || '{}');
+        let currentCamera = 'environment'; // 'environment' or 'user'
 
         const supabase = getSupabase();
 
@@ -1193,6 +1185,7 @@
         const endLiveBtn = document.getElementById('endLiveBtn');
         const liveBadge = document.getElementById('liveBadge');
         const banAllBtn = document.getElementById('banAllBtn');
+        const switchCameraBtn = document.getElementById('switchCameraBtn');
 
         let typingTimeout = null;
         let isTyping = false;
@@ -1259,7 +1252,7 @@
 
         function setRoomActive(roomId, active) {
             if (active) {
-                activeRooms[roomId] = { active: true, created: Date.now() };
+                activeRooms[roomId] = { active: true, created: Date.now(), hostId: currentUser?.id };
             } else {
                 delete activeRooms[roomId];
             }
@@ -1354,11 +1347,12 @@
                 currentRoom = roomId;
                 currentPassword = password;
                 isHost = true;
+                currentCamera = 'environment';
 
                 // Get camera & mic
                 try {
                     localStream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
+                        video: { facingMode: currentCamera },
                         audio: true
                     });
                     localVideo.srcObject = localStream;
@@ -1574,9 +1568,12 @@
 
             signalChannel = supabase.channel('live-signal-' + roomId);
 
+            let hostFound = false;
+
             signalChannel.on('broadcast', { event: 'host-announce' }, ({ payload }) => {
                 if (payload.peerId !== myPeerId && !connections[payload.peerId]) {
                     console.log('Found host:', payload.peerId);
+                    hostFound = true;
                     connectToPeer(payload.peerId, username);
                     // Request video
                     setTimeout(() => {
@@ -1630,7 +1627,15 @@
                         payload: { peerId: myPeerId, username: username }
                     });
                 }
-            }, 10000);
+            }, 5000);
+
+            // If host not found after 10 seconds, show error
+            setTimeout(() => {
+                if (!hostFound && !isHost) {
+                    showAlert('❌ No host found. The stream may have ended.', 'error');
+                    leaveRoom();
+                }
+            }, 15000);
         }
 
         // ============================================================
@@ -1695,7 +1700,7 @@
                         payload: { peerId: myPeerId, username: username }
                     });
                 }
-            }, 10000);
+            }, 5000);
         }
 
         // ============================================================
@@ -1812,7 +1817,6 @@
             try {
                 if (data.type === 'comment') {
                     if (isUserBanned(data.userId)) {
-                        // Ignore banned user's comments
                         return;
                     }
                     appendComment(data.username, data.content, data.userId, data.timestamp);
@@ -1825,7 +1829,6 @@
                     viewerNames[peerId] = data.username || 'User';
                     updateViewersList();
                 } else if (data.type === 'request-video' && isHost) {
-                    // Send video stream to viewer
                     if (localStream && connections[peerId]) {
                         const call = peer.call(peerId, localStream);
                         call.on('stream', (stream) => {});
@@ -1866,10 +1869,12 @@
                 streamStatus.textContent = '🟢 Live now!';
                 liveBadge.textContent = '● LIVE';
                 statusDot.className = 'dot live';
+                switchCameraBtn.style.display = 'flex';
             } else {
                 liveTools.style.display = 'none';
                 endLiveBtn.style.display = 'none';
                 banAllBtn.style.display = 'none';
+                switchCameraBtn.style.display = 'none';
                 streamStatus.textContent = '📺 Watching live stream...';
                 liveBadge.textContent = '● WATCHING';
                 statusDot.className = 'dot';
@@ -2156,6 +2161,58 @@
             showAlert(isCameraOn ? '📷 Camera on' : '📷 Camera off', 'info');
         }
 
+        // ============================================================
+        // SWITCH CAMERA (Front/Back)
+        // ============================================================
+        async function switchCamera() {
+            if (!isHost || !localStream) {
+                showAlert('Only host can switch camera!', 'error');
+                return;
+            }
+
+            try {
+                // Toggle camera
+                currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+
+                // Get new stream with different camera
+                const newStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: currentCamera },
+                    audio: true
+                });
+
+                // Replace tracks
+                const videoTrack = newStream.getVideoTracks()[0];
+                const oldVideoTrack = localStream.getVideoTracks()[0];
+                localStream.removeTrack(oldVideoTrack);
+                oldVideoTrack.stop();
+                localStream.addTrack(videoTrack);
+
+                // Update local video
+                localVideo.srcObject = localStream;
+
+                // Broadcast new stream to all viewers
+                for (const [peerId, conn] of Object.entries(connections)) {
+                    try {
+                        const call = peer.call(peerId, localStream);
+                        call.on('stream', (stream) => {});
+                    } catch (err) {
+                        console.error('Broadcast stream error:', err);
+                    }
+                }
+
+                showAlert('📷 Switched to ' + (currentCamera === 'environment' ? 'Back' : 'Front') + ' camera', 'success');
+
+            } catch (err) {
+                console.error('Switch camera error:', err);
+                showAlert('Failed to switch camera!', 'error');
+                // Revert
+                currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+            }
+        }
+
+        // ============================================================
+        // TOGGLE SCREEN SHARE
+        // ============================================================
         async function toggleScreenShare() {
             if (!isHost) {
                 showAlert('Only host can share screen!', 'error');
@@ -2181,13 +2238,21 @@
                     document.getElementById('screenBtn').innerHTML = '<i class="fas fa-desktop"></i> Screen';
                     showAlert('🖥️ Screen sharing started', 'success');
 
+                    // Broadcast new stream
+                    for (const [peerId, conn] of Object.entries(connections)) {
+                        try {
+                            const call = peer.call(peerId, localStream);
+                            call.on('stream', (stream) => {});
+                        } catch (err) {}
+                    }
+
                     screenStream.getVideoTracks()[0].onended = () => {
                         toggleScreenShare();
                     };
                 } else {
                     // Stop screen share, revert to camera
                     const cameraStream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
+                        video: { facingMode: currentCamera },
                         audio: true
                     });
                     localStream.getVideoTracks().forEach(track => {
@@ -2202,6 +2267,14 @@
                     document.getElementById('screenBtn').classList.remove('active');
                     document.getElementById('screenBtn').innerHTML = '<i class="fas fa-desktop"></i> Screen';
                     showAlert('📷 Camera restored', 'info');
+
+                    // Broadcast new stream
+                    for (const [peerId, conn] of Object.entries(connections)) {
+                        try {
+                            const call = peer.call(peerId, localStream);
+                            call.on('stream', (stream) => {});
+                        } catch (err) {}
+                    }
                 }
             } catch (err) {
                 console.error('Screen share error:', err);
@@ -2369,7 +2442,7 @@
             }
 
             await loadUser();
-            console.log('🚀 Private Live loaded!');
+            console.log('🚀 Private Live loaded with Switch Camera!');
         });
 
         // Cleanup on unload
