@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Notifications - SociaLock</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; display: flex; flex-direction: column; padding-top: 0; }
+
+        .navbar-bottom {
+            background: #242526;
+            padding: 4px 8px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            border-bottom: 1px solid #3a3b3c;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-bottom-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+        .nav-icon-bottom {
+            font-size: 1.7rem; text-decoration: none; color: #b0b3b8; padding: 4px 16px; border-radius: 8px;
+            transition: 0.3s; position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px;
+        }
+        .nav-icon-bottom:hover { background: #3a3b3c; }
+        .nav-icon-bottom.active { color: #1877f2; }
+        .nav-icon-bottom.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 20%; right: 20%; height: 3px; background: #1877f2; border-radius: 2px;
+        }
+        .nav-icon-bottom .label { font-size: 0.6rem; font-weight: 500; color: #b0b3b8; }
+        .nav-icon-bottom.active .label { color: #1877f2; }
+
+        .notif-badge {
+            position: absolute; top: -6px; right: -6px; background: #e94560; color: white;
+            font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%;
+            display: none; align-items: center; justify-content: center; padding: 0 5px;
+            border: 2px solid #242526; line-height: 1; z-index: 5;
+        }
+        .notif-badge.show { display: flex; }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 46px;
+        }
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 12px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .notif-header h1 { font-size: 1.3rem; color: #e4e6eb; }
+        .notif-header .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .notif-header button {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 16px;
+            transition: 0.3s;
+        }
+        .notif-header button:hover { background: #3a3b3c; color: #e4e6eb; }
+        .notif-header .delete-all-btn {
+            color: #e94560;
+        }
+        .notif-header .delete-all-btn:hover {
+            background: #3a1a1a;
+            color: #ff4757;
+        }
+
+        .notif-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #242526;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #3a3b3c;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .notif-item:hover { background: #2a2b2c; border-color: #4a4b4c; }
+        .notif-item.unread { border-left: 3px solid #1877f2; background: #1e2a3a; }
+
+        .notif-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .notif-body { flex: 1; min-width: 0; }
+        .notif-text { font-size: 0.95rem; line-height: 1.4; color: #e4e6eb; }
+        .notif-text strong { color: #e4e6eb; font-weight: 600; }
+        .notif-text .highlight { color: #1877f2; font-weight: 500; }
+        .notif-time { font-size: 0.75rem; color: #b0b3b8; margin-top: 2px; }
+
+        .notif-icon { font-size: 1.2rem; color: #b0b3b8; flex-shrink: 0; }
+        .notif-icon.like { color: #e94560; }
+        .notif-icon.comment { color: #4caf50; }
+        .notif-icon.reply { color: #f7b731; }
+
+        .notif-delete-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .notif-delete-btn:hover { background: #3a3b3c; color: #e94560; }
+
+        .loading-spinner { text-align: center; padding: 2rem; color: #b0b3b8; }
+        .no-notifs {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: #b0b3b8;
+        }
+        .no-notifs .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        .no-notifs h3 { font-size: 1.1rem; color: #e4e6eb; margin-bottom: 0.3rem; }
+        .no-notifs p { font-size: 0.9rem; }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success { background: #4caf50; }
+        .custom-alert.error { background: #e94560; }
+        .custom-alert.info { background: #1877f2; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 480px) {
+            .navbar-bottom { height: 42px; }
+            .nav-icon-bottom { font-size: 1.3rem; padding: 2px 8px; }
+            .nav-icon-bottom .label { font-size: 0.5rem; }
+            .main-wrapper { margin-top: 42px; }
+            .main-container { padding: 0 10px; }
+            .notif-item { padding: 10px 12px; }
+            .notif-avatar { width: 38px; height: 38px; font-size: 15px; }
+            .notif-text { font-size: 0.85rem; }
+            .notif-header h1 { font-size: 1.1rem; }
+            .notif-header button { font-size: 0.75rem; padding: 3px 8px; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar-bottom">
+        <div class="nav-bottom-container">
+            <a href="home.html" class="nav-icon-bottom"><i class="fas fa-home"></i><span class="label">Home</span></a>
+            <a href="messages.html" class="nav-icon-bottom"><i class="fas fa-comment-dots"></i><span class="label">Messages</span></a>
+            <a href="tools.html" class="nav-icon-bottom"><i class="fas fa-tools"></i><span class="label">Tools</span></a>
+            <a href="notifications.html" class="nav-icon-bottom active"><i class="fas fa-bell"></i><span class="label">Notifications</span><span class="notif-badge" id="notifBadge">0</span></a>
+            <a href="#" class="nav-icon-bottom" id="profileNavBtn"><i class="fas fa-user-circle"></i><span class="label">Profile</span></a>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="main-container" id="mainContainer">
+            <div class="notif-header">
+                <h1>🔔 Notifications</h1>
+                <div class="header-actions">
+                    <button id="markAllReadBtn">✅ Mark all read</button>
+                    <button id="deleteAllBtn" class="delete-all-btn">🗑️ Delete all</button>
+                </div>
+            </div>
+            <div id="notificationsContainer"><div class="loading-spinner">⏳ Loading notifications...</div></div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        // ============================================================
+        // NOTIFICATIONS - INDIVIDUAL READ REMOVED
+        // ============================================================
+
+        console.log('🔔 Notifications page loading...');
+
+        let currentUser = null;
+        let allNotifications = [];
+        let container = document.getElementById('notificationsContainer');
+        let badge = document.getElementById('notifBadge');
+
+        // ============================================================
+        // DELETE NOTIFICATION (keep this)
+        // ============================================================
+        async function deleteNotification(notifId, event) {
+            event.stopPropagation();
+            if (!confirm('Delete this notification?')) return;
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            try {
+                const result = await window.apiRequest(`/notifications/${notifId}`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                if (result && result.success) {
+                    allNotifications = allNotifications.filter(n => n.id !== notifId);
+                    renderNotifications(allNotifications);
+                    await updateBadge();
+                    showAlert('✅ Notification deleted!', 'success');
+                } else {
+                    showAlert('Failed to delete!', 'error');
+                }
+            } catch (err) {
+                console.error('Delete error:', err);
+                showAlert('Failed to delete!', 'error');
+            }
+        }
+
+        // ============================================================
+        // MARK ALL READ - works, keep this
+        // ============================================================
+        async function markAllAsRead() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            try {
+                const result = await window.apiRequest('/notifications/read-all', {
+                    method: 'PUT',
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                if (result && result.success) {
+                    allNotifications.forEach(n => n.is_read = true);
+                    renderNotifications(allNotifications);
+                    await updateBadge();
+                    showAlert('✅ All marked as read!', 'success');
+                } else {
+                    showAlert('Failed to mark all as read!', 'error');
+                }
+            } catch (err) {
+                console.error('Mark all error:', err);
+                showAlert('Failed to mark all as read!', 'error');
+            }
+        }
+
+        // ============================================================
+        // DELETE ALL
+        // ============================================================
+        async function deleteAllNotifications() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            if (!confirm('⚠️ Delete all notifications? This cannot be undone!')) return;
+
+            try {
+                const result = await window.apiRequest('/notifications/delete-all', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                if (result && result.success) {
+                    allNotifications = [];
+                    renderNotifications(allNotifications);
+                    await updateBadge();
+                    showAlert('✅ All notifications deleted!', 'success');
+                } else {
+                    showAlert('Failed to delete all!', 'error');
+                }
+            } catch (err) {
+                console.error('Delete all error:', err);
+                showAlert('Failed to delete all!', 'error');
+            }
+        }
+
+        // ============================================================
+        // FETCH NOTIFICATIONS
+        // ============================================================
+        async function fetchNotifications() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return [];
+
+            try {
+                const result = await window.apiRequest(`/notifications?userId=${userId}`);
+                if (result && result.success) {
+                    return result.data || [];
+                }
+            } catch (err) {
+                console.error('Fetch error:', err);
+            }
+            return [];
+        }
+
+        // ============================================================
+        // GET UNREAD COUNT
+        // ============================================================
+        async function getUnreadCount() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return 0;
+
+            try {
+                const result = await window.apiRequest(`/notifications?userId=${userId}`);
+                if (result && result.success) {
+                    return (result.data || []).filter(n => !n.is_read).length;
+                }
+            } catch (err) { }
+            return 0;
+        }
+
+        // ============================================================
+        // UPDATE BADGE
+        // ============================================================
+        async function updateBadge() {
+            if (!badge) return;
+            try {
+                const count = await getUnreadCount();
+                badge.textContent = count > 9 ? '9+' : count;
+                badge.classList.toggle('show', count > 0);
+            } catch (e) { }
+        }
+
+        // ============================================================
+        // RENDER NOTIFICATIONS - No individual mark as read
+        // ============================================================
+        function renderNotifications(notifications) {
+            if (!notifications || notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="no-notifs">
+                        <span class="icon">🔔</span>
+                        <h3>No notifications yet</h3>
+                        <p>When someone likes, comments or replies to your posts, you will see it here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            notifications.forEach(notif => {
+                const isUnread = !notif.is_read;
+                const timeAgoText = timeAgo(notif.created_at);
+
+                let iconHtml = '';
+                let iconClass = '';
+                if (notif.type === 'like') {
+                    iconHtml = '<i class="fas fa-heart"></i>';
+                    iconClass = 'like';
+                } else if (notif.type === 'comment') {
+                    iconHtml = '<i class="fas fa-comment"></i>';
+                    iconClass = 'comment';
+                } else if (notif.type === 'reply') {
+                    iconHtml = '<i class="fas fa-reply"></i>';
+                    iconClass = 'reply';
+                } else {
+                    iconHtml = '<i class="fas fa-bell"></i>';
+                    iconClass = '';
+                }
+
+                const actorName = escapeHtml(notif.actor_username || 'User');
+                const actorInitial = (notif.actor_username || 'U').charAt(0).toUpperCase();
+
+                let message = '';
+                if (notif.type === 'like') {
+                    message = `<strong>${actorName}</strong> liked your post`;
+                } else if (notif.type === 'comment') {
+                    message = `<strong>${actorName}</strong> commented on your post`;
+                } else if (notif.type === 'reply') {
+                    message = `<strong>${actorName}</strong> replied to your comment`;
+                } else {
+                    message = `<strong>${actorName}</strong> interacted with your post`;
+                }
+
+                const navUrl = notif.post_id ? `post.html?postId=${notif.post_id}` : '#';
+                const unreadClass = isUnread ? 'unread' : '';
+
+                // ✅ onclick শুধু নেভিগেট করবে, markAsRead কল করবে না
+                html += `
+                    <div class="notif-item ${unreadClass}" data-id="${notif.id}" onclick="window.location.href='${navUrl}';">
+                        <div class="notif-avatar" onclick="event.stopPropagation(); window.location.href='userprofile.html?userId=${notif.actor_id}'">${actorInitial}</div>
+                        <div class="notif-body">
+                            <div class="notif-text">${message}</div>
+                            <div class="notif-time">${timeAgoText}</div>
+                        </div>
+                        <div class="notif-icon ${iconClass}">${iconHtml}</div>
+                        <button class="notif-delete-btn" onclick="event.stopPropagation(); deleteNotification('${notif.id}', event)"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Load user
+                const userResult = await window.apiRequest(`/users/${userId}`);
+                if (userResult && userResult.success) {
+                    currentUser = userResult.data;
+                } else {
+                    localStorage.removeItem('userId');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Load notifications
+                allNotifications = await fetchNotifications();
+                renderNotifications(allNotifications);
+                await updateBadge();
+
+                // Event listeners
+                document.getElementById('markAllReadBtn').addEventListener('click', markAllAsRead);
+                document.getElementById('deleteAllBtn').addEventListener('click', deleteAllNotifications);
+
+                document.getElementById('profileNavBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (currentUser) {
+                        window.location.href = `userprofile.html?userId=${currentUser.id}`;
+                    }
+                });
+
+                setInterval(async () => {
+                    allNotifications = await fetchNotifications();
+                    renderNotifications(allNotifications);
+                    await updateBadge();
+                }, 30000);
+
+                console.log('✅ Notifications page loaded successfully!');
+
+            } catch (err) {
+                console.error('Page load error:', err);
+                container.innerHTML = `
+                    <div class="no-notifs" style="padding:40px;text-align:center;">
+                        <span class="icon" style="font-size:48px;">❌</span>
+                        <h3>Error Loading Page</h3>
+                        <p>${err.message || 'Something went wrong'}</p>
+                        <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:#1877f2;border:none;color:white;border-radius:8px;cursor:pointer;">Retry</button>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Messages - SociaLock</title>
+    
+    <!-- ===== FIREBASE CDN ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; display: flex; flex-direction: column; padding-top: 0; }
+
+        .navbar-bottom {
+            background: #242526;
+            padding: 4px 8px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            border-bottom: 1px solid #3a3b3c;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-bottom-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+        .nav-icon-bottom {
+            font-size: 1.7rem;
+            text-decoration: none;
+            color: #b0b3b8;
+            padding: 4px 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            cursor: pointer;
+        }
+        .nav-icon-bottom:hover { background: #3a3b3c; }
+        .nav-icon-bottom.active { color: #1877f2; }
+        .nav-icon-bottom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: #1877f2;
+            border-radius: 2px;
+        }
+        .nav-icon-bottom .label { font-size: 0.6rem; font-weight: 500; color: #b0b3b8; }
+        .nav-icon-bottom.active .label { color: #1877f2; }
+
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e94560;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #242526;
+            line-height: 1;
+            z-index: 5;
+        }
+        .notif-badge.show { display: flex; }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 46px;
+        }
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        /* ===== Header ===== */
+        .messages-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 12px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 16px;
+        }
+        .messages-header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e4e6eb;
+        }
+        .messages-header .header-icon {
+            font-size: 1.2rem;
+            color: #b0b3b8;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .messages-header .header-icon:hover {
+            background: #3a3b3c;
+        }
+
+        /* ===== Chat Options ===== */
+        .chat-options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 4px;
+        }
+        .chat-option {
+            background: #242526;
+            border-radius: 14px;
+            padding: 20px 18px;
+            border: 1px solid #3a3b3c;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: #e4e6eb;
+        }
+        .chat-option:hover {
+            border-color: #1877f2;
+            background: #2a2b2c;
+            transform: scale(1.01);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        .chat-option .icon-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+        .chat-option .icon-box.p2p {
+            background: rgba(24,119,242,0.15);
+            color: #1877f2;
+        }
+        .chat-option .icon-box.live {
+            background: rgba(233,69,96,0.15);
+            color: #e94560;
+        }
+        .chat-option .icon-box.global {
+            background: rgba(76,175,80,0.15);
+            color: #4caf50;
+        }
+        .chat-option .option-info {
+            flex: 1;
+        }
+        .chat-option .option-info h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #e4e6eb;
+        }
+        .chat-option .option-info p {
+            font-size: 0.85rem;
+            color: #b0b3b8;
+            margin-top: 2px;
+        }
+        .chat-option .arrow-icon {
+            color: #b0b3b8;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+        .chat-option:hover .arrow-icon {
+            color: #1877f2;
+            transform: translateX(4px);
+        }
+
+        .loading-spinner { text-align: center; padding: 30px; color: #b0b3b8; }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success { background: #4caf50; }
+        .custom-alert.error { background: #e94560; }
+        .custom-alert.info { background: #1877f2; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 480px) {
+            .navbar-bottom { height: 42px; }
+            .nav-icon-bottom { font-size: 1.3rem; padding: 2px 8px; }
+            .nav-icon-bottom .label { font-size: 0.5rem; }
+            .main-wrapper { margin-top: 42px; }
+            .main-container { padding: 0 12px; }
+            .messages-header h1 { font-size: 1.2rem; }
+            .chat-option { padding: 16px 14px; }
+            .chat-option .icon-box { width: 44px; height: 44px; font-size: 1.3rem; }
+            .chat-option .option-info h3 { font-size: 0.95rem; }
+            .chat-option .option-info p { font-size: 0.75rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== BOTTOM NAVBAR ===== -->
+    <nav class="navbar-bottom">
+        <div class="nav-bottom-container">
+            <span class="nav-icon-bottom" onclick="window.location.href='home.html'">
+                <i class="fas fa-home"></i>
+                <span class="label">Home</span>
+            </span>
+            <span class="nav-icon-bottom active" onclick="window.location.href='messages.html'">
+                <i class="fas fa-comment-dots"></i>
+                <span class="label">Messages</span>
+            </span>
+            <span class="nav-icon-bottom" onclick="window.location.href='tools.html'">
+                <i class="fas fa-tools"></i>
+                <span class="label">Tools</span>
+            </span>
+            <span class="nav-icon-bottom" onclick="window.location.href='notifications.html'">
+                <i class="fas fa-bell"></i>
+                <span class="label">Notifications</span>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </span>
+            <span class="nav-icon-bottom" id="profileNavBtn">
+                <i class="fas fa-user-circle"></i>
+                <span class="label">Profile</span>
+            </span>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-wrapper">
+        <div class="main-container">
+            <div class="messages-header">
+                <h1>💬 Messages</h1>
+                <span class="header-icon" title="Settings"><i class="fas fa-ellipsis-v"></i></span>
+            </div>
+
+            <div class="chat-options">
+                <!-- ===== 1. P2P Chat ===== -->
+                <a href="p2p.html" class="chat-option">
+                    <div class="icon-box p2p">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <div class="option-info">
+                        <h3>P2P Chat</h3>
+                        <p>Private one-to-one messaging with friends</p>
+                    </div>
+                    <div class="arrow-icon">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+
+                <!-- ===== 2. Live Rooms ===== -->
+                <a href="live.html" class="chat-option">
+                    <div class="icon-box live">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <div class="option-info">
+                        <h3>Live Rooms</h3>
+                        <p>Join real-time audio/video rooms</p>
+                    </div>
+                    <div class="arrow-icon">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+
+                <!-- ===== 3. Global Chat ===== -->
+                <a href="gchat.html" class="chat-option">
+                    <div class="icon-box global">
+                        <i class="fas fa-globe-asia"></i>
+                    </div>
+                    <div class="option-info">
+                        <h3>Global Chat</h3>
+                        <p>Chat with everyone around the world</p>
+                    </div>
+                    <div class="arrow-icon">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- ===== Footer Info ===== -->
+            <div style="text-align:center; margin-top:28px; padding:12px 0; color:#b0b3b8; font-size:0.75rem; border-top:1px solid #3a3b3c;">
+                <i class="fas fa-lock" style="margin-right:4px;"></i> End-to-end encrypted · SociaLock
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        // ============================================================
+        // MESSAGES.JS - Complete
+        // ============================================================
+
+        console.log('💬 Messages page loading...');
+
+        var currentUser = null;
+
+        // ===== Notification Badge =====
+        async function updateNotifBadge() {
+            var badge = document.getElementById('notifBadge');
+            if (!badge) return;
+
+            var userId = localStorage.getItem('userId');
+            if (!userId) {
+                badge.classList.remove('show');
+                return;
+            }
+
+            try {
+                var result = await window.apiRequest('/notifications?userId=' + userId);
+                if (result && result.success) {
+                    var unread = (result.data || []).filter(function(n) { return !n.is_read; }).length;
+                    if (unread > 0) {
+                        badge.textContent = unread > 9 ? '9+' : unread;
+                        badge.classList.add('show');
+                    } else {
+                        badge.classList.remove('show');
+                    }
+                }
+            } catch (e) {
+                console.error('Badge update error:', e);
+                badge.classList.remove('show');
+            }
+        }
+
+        // ===== Profile Navigation =====
+        document.getElementById('profileNavBtn').addEventListener('click', function(e) {
+            var userId = localStorage.getItem('userId');
+            if (userId) {
+                window.location.href = 'userprofile.html?userId=' + userId;
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // ===== Page Load =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check login
+            var userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Load user
+            window.apiRequest('/users/' + userId)
+                .then(function(result) {
+                    if (result && result.success) {
+                        currentUser = result.data;
+                        console.log('✅ User loaded:', currentUser.username);
+                    } else {
+                        localStorage.removeItem('userId');
+                        window.location.href = 'login.html';
+                    }
+                })
+                .catch(function(err) {
+                    console.error('User load error:', err);
+                    localStorage.removeItem('userId');
+                    window.location.href = 'login.html';
+                });
+
+            // Update badge
+            updateNotifBadge();
+            setInterval(updateNotifBadge, 30000);
+
+            console.log('✅ Messages page loaded!');
+        });
+
+        console.log('💬 Messages page ready!');
+    </script>
+</body>
+</html>

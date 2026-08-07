@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>🔧 Tools - SociaLock</title>
+    
+    <!-- ===== ✅ FIREBASE CDN (সবার আগে) ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; display: flex; flex-direction: column; padding-top: 0; }
+
+        /* ===== BOTTOM NAVBAR ===== */
+        .navbar-bottom {
+            background: #242526;
+            padding: 4px 8px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            border-bottom: 1px solid #3a3b3c;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-bottom-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+        .nav-icon-bottom {
+            font-size: 1.7rem;
+            text-decoration: none;
+            color: #b0b3b8;
+            padding: 4px 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .nav-icon-bottom:hover { background: #3a3b3c; }
+        .nav-icon-bottom.active { color: #1877f2; }
+        .nav-icon-bottom.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: #1877f2;
+            border-radius: 2px;
+        }
+        .nav-icon-bottom .label { font-size: 0.6rem; font-weight: 500; color: #b0b3b8; }
+        .nav-icon-bottom.active .label { color: #1877f2; }
+
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e94560;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #242526;
+            line-height: 1;
+            z-index: 5;
+        }
+        .notif-badge.show { display: flex; }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 46px;
+        }
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .tools-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 16px 0 12px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 12px;
+        }
+        .tools-header h2 { font-size: 1.3rem; color: #e4e6eb; }
+        .tools-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tools-actions button {
+            background: #1877f2;
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            white-space: nowrap;
+        }
+        .tools-actions button:hover { background: #166fe5; transform: scale(1.02); }
+
+        .search-tools {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: #3a3b3c;
+            border: 1px solid #3a3b3c;
+            color: #e4e6eb;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            outline: none;
+        }
+        .search-tools:focus { border-color: #1877f2; }
+        .search-tools::placeholder { color: #b0b3b8; }
+
+        .filter-bar {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #3a3b3c;
+        }
+        .filter-chip {
+            background: #3a3b3c;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.3s;
+            color: #b0b3b8;
+            white-space: nowrap;
+        }
+        .filter-chip:hover { border-color: #1877f2; color: #e4e6eb; }
+        .filter-chip.active { background: #1877f2; color: white; border-color: #1877f2; }
+
+        .tools-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .tool-item {
+            background: #242526;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #3a3b3c;
+        }
+        .tool-item:hover { background: #2a2b2c; border-color: #4a4b4c; }
+        .tool-info { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }
+        .tool-name { font-weight: bold; font-size: 1rem; word-break: break-word; color: #e4e6eb; }
+        .tool-type {
+            font-size: 0.7rem;
+            color: #b0b3b8;
+            background: #3a3b3c;
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            width: fit-content;
+        }
+        .tool-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; margin-left: 0.5rem; }
+        .tool-share-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .tool-share-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .tool-delete-btn {
+            background: #e94560;
+            border: none;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        .tool-delete-btn:hover { background: #ff4757; }
+
+        .tools-ad-card {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            padding: 0.6rem 0.8rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            text-align: center;
+            border: 1px solid #3a3b3c;
+            transition: 0.3s;
+        }
+        .tools-ad-card:hover { transform: scale(1.01); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .tools-ad-card a { color: white; text-decoration: none; display: flex; align-items: center; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+        .tools-ad-card img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #0a0a1a; }
+        .tools-ad-card .ad-caption { font-size: 0.8rem; font-weight: 500; }
+
+        .my-tools-section {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #1877f2;
+            display: none;
+        }
+        .my-tools-section.show { display: block; }
+        .my-tools-section h3 { font-size: 1.1rem; color: #e4e6eb; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+        .my-tools-section .tools-list { background: #18191a; border-radius: 12px; padding: 0.5rem; }
+        .my-tools-section .no-tools { text-align: center; padding: 1.5rem; color: #b0b3b8; }
+
+        .see-more-btn {
+            background: #1877f2;
+            border: none;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin: 0.5rem auto;
+            display: block;
+            width: fit-content;
+        }
+        .see-more-btn:hover { background: #166fe5; transform: scale(1.02); }
+        .see-more-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #242526;
+            padding: 1.5rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #3a3b3c;
+        }
+        .modal-box h3 { margin-bottom: 1rem; text-align: center; color: #e4e6eb; }
+        .modal-box input, .modal-box select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            background: #3a3b3c;
+            border: 1px solid #3a3b3c;
+            color: #e4e6eb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .modal-box input:focus, .modal-box select:focus { border-color: #1877f2; }
+        .modal-box input::placeholder { color: #b0b3b8; }
+        .modal-box .btn-row { display: flex; gap: 0.5rem; }
+        .modal-box .btn-row button { flex: 1; padding: 0.6rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        .btn-primary-modal { background: #1877f2; color: white; }
+        .btn-primary-modal:hover { background: #166fe5; }
+        .btn-danger-modal { background: #e94560; color: white; }
+        .btn-danger-modal:hover { background: #ff4757; }
+
+        .no-tools { text-align: center; padding: 2rem; color: #b0b3b8; }
+        .loading-spinner { text-align: center; padding: 2rem; color: #b0b3b8; }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success { background: #4caf50; }
+        .custom-alert.error { background: #e94560; }
+        .custom-alert.info { background: #1877f2; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 480px) {
+            .navbar-bottom { height: 42px; }
+            .nav-icon-bottom { font-size: 1.3rem; padding: 2px 8px; }
+            .nav-icon-bottom .label { font-size: 0.5rem; }
+            .main-wrapper { margin-top: 42px; }
+            .main-container { padding: 0 10px; }
+            .tools-header h2 { font-size: 1.1rem; }
+            .tools-actions button { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+            .filter-chip { font-size: 0.6rem; padding: 0.2rem 0.6rem; }
+            .tool-item { padding: 0.6rem 0.8rem; }
+            .tool-name { font-size: 0.9rem; }
+            .tools-ad-card a { font-size: 0.75rem; }
+            .tools-ad-card img { width: 40px; height: 40px; }
+            .my-tools-section .tools-list { padding: 0.3rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== BOTTOM NAVBAR ===== -->
+    <nav class="navbar-bottom">
+        <div class="nav-bottom-container">
+            <a href="home.html" class="nav-icon-bottom"><i class="fas fa-home"></i><span class="label">Home</span></a>
+            <a href="messages.html" class="nav-icon-bottom"><i class="fas fa-comment-dots"></i><span class="label">Messages</span></a>
+            <a href="tools.html" class="nav-icon-bottom active"><i class="fas fa-tools"></i><span class="label">Tools</span></a>
+            <a href="notifications.html" class="nav-icon-bottom"><i class="fas fa-bell"></i><span class="label">Notifications</span><span class="notif-badge" id="notifBadge">0</span></a>
+            <a href="#" class="nav-icon-bottom" id="profileNavBtn"><i class="fas fa-user-circle"></i><span class="label">Profile</span></a>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-wrapper">
+        <div class="main-container" id="toolsContainer">
+            <div class="tools-header">
+                <h2>🔧 Tools</h2>
+                <div class="tools-actions">
+                    <button id="addToolBtn">➕ Add Tool</button>
+                    <button id="myToolsToggleBtn">📁 My Tools</button>
+                </div>
+            </div>
+
+            <input type="text" class="search-tools" id="searchToolsInput" placeholder="🔍 Search tools by name...">
+
+            <div class="filter-bar" id="filterBar">
+                <span class="filter-chip active" data-type="all">All</span>
+                <span class="filter-chip" data-type="Cyber Security">🛡️ Cyber</span>
+                <span class="filter-chip" data-type="Business">💼 Business</span>
+                <span class="filter-chip" data-type="Earn">💰 Earn</span>
+                <span class="filter-chip" data-type="Job">💼 Job</span>
+                <span class="filter-chip" data-type="Web">🌐 Web</span>
+                <span class="filter-chip" data-type="Video">🎥 Video</span>
+                <span class="filter-chip" data-type="Documents">📄 Docs</span>
+                <span class="filter-chip" data-type="Government">🏛️ Gov</span>
+                <span class="filter-chip" data-type="Data">📊 Data</span>
+                <span class="filter-chip" data-type="Secret">🔒 Secret</span>
+                <span class="filter-chip" data-type="Article">📰 Article</span>
+                <span class="filter-chip" data-type="Others">📌 Other</span>
+            </div>
+
+            <div class="tools-list" id="toolsList"><div class="loading-spinner">⏳ Loading tools...</div></div>
+            <button class="see-more-btn" id="seeMoreBtn">See More ↓</button>
+
+            <div class="my-tools-section" id="myToolsSection">
+                <h3>📁 My Published Tools</h3>
+                <div class="tools-list" id="myToolsList"><div class="no-tools">You haven't published any tools yet</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Tool Modal -->
+    <div class="modal-overlay" id="addToolModal">
+        <div class="modal-box">
+            <h3>➕ Publish New Tool</h3>
+            <input type="text" id="toolNameInput" placeholder="Tool Name *" maxlength="100">
+            <select id="toolTypeSelect">
+                <option value="Cyber Security">🛡️ Cyber Security</option>
+                <option value="Business">💼 Business</option>
+                <option value="Earn">💰 Earn</option>
+                <option value="Job">💼 Job</option>
+                <option value="Web">🌐 Web</option>
+                <option value="Video">🎥 Video</option>
+                <option value="Documents">📄 Documents</option>
+                <option value="Government">🏛️ Government</option>
+                <option value="Data">📊 Data</option>
+                <option value="Secret">🔒 Secret</option>
+                <option value="Article">📰 Article</option>
+                <option value="Others">📌 Others</option>
+            </select>
+            <input type="url" id="toolLinkInput" placeholder="Tool Link (https://...) *">
+            <div class="btn-row">
+                <button class="btn-primary-modal" id="publishToolBtn">📤 Publish</button>
+                <button class="btn-danger-modal" id="closeAddModalBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        // ============================================================
+        // TOOLS.JS - COMPLETE (FIXED)
+        // ============================================================
+
+        console.log('🔧 Tools page loading...');
+
+        let currentUser = null;
+        let allTools = [];
+        let myTools = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let showingMyTools = false;
+        let isLoading = false;
+        let currentPage = 0;
+        const TOOLS_PER_PAGE = 15;
+        let hasMoreTools = true;
+        let filteredTools = [];
+        let allToolsAds = [];
+
+        const toolsListEl = document.getElementById('toolsList');
+        const myToolsListEl = document.getElementById('myToolsList');
+        const myToolsSection = document.getElementById('myToolsSection');
+        const searchInput = document.getElementById('searchToolsInput');
+        const filterBar = document.getElementById('filterBar');
+        const addToolBtn = document.getElementById('addToolBtn');
+        const myToolsToggleBtn = document.getElementById('myToolsToggleBtn');
+        const addModal = document.getElementById('addToolModal');
+        const closeAddModalBtn = document.getElementById('closeAddModalBtn');
+        const publishBtn = document.getElementById('publishToolBtn');
+        const toolNameInput = document.getElementById('toolNameInput');
+        const toolTypeSelect = document.getElementById('toolTypeSelect');
+        const toolLinkInput = document.getElementById('toolLinkInput');
+        const seeMoreBtn = document.getElementById('seeMoreBtn');
+
+        // ============================================================
+        // API REQUEST
+        // ============================================================
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${window.API_BASE_URL}${endpoint}`;
+            const userId = localStorage.getItem('userId');
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (userId) headers['Authorization'] = `Bearer ${userId}`;
+            try {
+                const response = await fetch(url, { ...options, headers });
+                const data = await response.json();
+                if (!response.ok) {
+                    console.error('API Error:', data);
+                    return null;
+                }
+                return data;
+            } catch (error) {
+                console.error('API Request failed:', error);
+                return null;
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            alert.innerHTML = message + '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function shuffleArray(array) {
+            if (!Array.isArray(array)) return [];
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // ============================================================
+        // NOTIFICATION BADGE
+        // ============================================================
+        async function updateNotifBadge() {
+            const badge = document.getElementById('notifBadge');
+            if (!badge) return;
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                badge.classList.remove('show');
+                return;
+            }
+
+            try {
+                const result = await apiRequest(`/notifications?userId=${userId}`);
+                if (result && result.success) {
+                    const unread = (result.data || []).filter(n => !n.is_read).length;
+                    if (unread > 0) {
+                        badge.textContent = unread > 9 ? '9+' : unread;
+                        badge.classList.add('show');
+                    } else {
+                        badge.classList.remove('show');
+                    }
+                }
+            } catch (err) {
+                console.error('Badge update error:', err);
+                badge.classList.remove('show');
+            }
+        }
+
+        // ============================================================
+        // FETCH FUNCTIONS
+        // ============================================================
+        async function fetchToolsAds(country) {
+            try {
+                const result = await apiRequest(`/tools_ads?country=${country}`);
+                if (result && result.success) return result.data || [];
+            } catch (err) { console.error('Fetch tools ads error:', err); }
+            return [];
+        }
+
+        async function fetchTools() {
+            try {
+                const result = await apiRequest('/tools');
+                if (result && result.success) return result.data || [];
+            } catch (err) { console.error('Fetch tools error:', err); }
+            return [];
+        }
+
+        async function fetchMyTools(userId) {
+            if (!userId) return [];
+            try {
+                const result = await apiRequest(`/users/${userId}/tools`);
+                if (result && result.success && Array.isArray(result.data)) {
+                    return result.data;
+                }
+                return [];
+            } catch (err) {
+                console.error('Fetch my tools error:', err);
+                return [];
+            }
+        }
+
+        async function publishTool(name, type, link) {
+            if (!currentUser) return false;
+            try {
+                // Check if tool with same name exists
+                const existing = allTools.find(t => t.name.toLowerCase() === name.toLowerCase());
+                if (existing) {
+                    showAlert('❌ A tool with this name already exists!', 'error');
+                    return false;
+                }
+
+                const result = await apiRequest('/tools', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        name: name.trim(),
+                        type: type,
+                        link: link.trim()
+                    })
+                });
+                if (result && result.success) return true;
+                if (result && result.errors) {
+                    showAlert(result.errors.join(', '), 'error');
+                }
+            } catch (err) {
+                console.error('Publish error:', err);
+                showAlert('Failed to publish tool!', 'error');
+            }
+            return false;
+        }
+
+        async function deleteTool(toolId) {
+            if (!currentUser) return false;
+            try {
+                const result = await apiRequest(`/tools/${toolId}`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ user_id: currentUser.id })
+                });
+                if (result && result.success) return true;
+            } catch (err) {
+                console.error('Delete error:', err);
+                showAlert('Failed to delete tool!', 'error');
+            }
+            return false;
+        }
+
+        // ============================================================
+        // SHARE FUNCTION
+        // ============================================================
+        function getToolShareUrl(toolId) {
+            const baseUrl = window.location.origin + window.location.pathname.replace('tools.html', '');
+            return `${baseUrl}tool.html?id=${toolId}`;
+        }
+
+        async function shareTool(toolId, event) {
+            if (event) event.stopPropagation();
+
+            const tool = allTools.find(t => t.id === toolId) || myTools.find(t => t.id === toolId);
+            if (!tool) {
+                showAlert('Tool not found!', 'error');
+                return;
+            }
+
+            const shareUrl = getToolShareUrl(toolId);
+            const shareData = {
+                title: tool.name,
+                text: `🔧 ${tool.name} - ${tool.type}`,
+                url: shareUrl
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                    return;
+                } catch (err) { if (err.name === 'AbortError') return; }
+            }
+
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                showAlert('✅ Link copied to clipboard!', 'success');
+            } catch (err) {
+                prompt('Copy this link:', shareUrl);
+            }
+        }
+
+        // ============================================================
+        // RENDER FUNCTIONS
+        // ============================================================
+        function renderTools(tools, container, showDelete = false, append = false, isMyTools = false) {
+            if (!append) container.innerHTML = '';
+            if (!tools || tools.length === 0) {
+                if (!append) {
+                    container.innerHTML = isMyTools ?
+                        '<div class="no-tools">You haven\'t published any tools yet</div>' :
+                        '<div class="no-tools">🔧 No tools found</div>';
+                }
+                return;
+            }
+
+            tools.forEach((tool, index) => {
+                const item = document.createElement('div');
+                item.className = 'tool-item';
+                item.setAttribute('data-id', tool.id);
+
+                let domain = '';
+                try { if (tool.link) domain = new URL(tool.link).hostname; } catch (e) {}
+
+                item.innerHTML = `
+                    <div class="tool-info">
+                        <div class="tool-name">${escapeHtml(tool.name)}</div>
+                        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                            <span class="tool-type">${escapeHtml(tool.type)}</span>
+                            ${domain ? `<span style="font-size:0.6rem; color:#b0b3b8;">${escapeHtml(domain)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="tool-actions">
+                        <button class="tool-share-btn" onclick="shareTool('${tool.id}', event)" title="Share">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        ${showDelete ? `<button class="tool-delete-btn" data-id="${tool.id}" title="Delete">🗑️</button>` : ''}
+                    </div>
+                `;
+
+                item.addEventListener('click', (e) => {
+                    if (e.target.closest('.tool-share-btn') || e.target.closest('.tool-delete-btn')) return;
+                    if (tool.link) window.open(tool.link, '_blank');
+                    else showAlert('No link available!', 'error');
+                });
+
+                const deleteBtn = item.querySelector('.tool-delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = deleteBtn.getAttribute('data-id');
+                        if (confirm('Delete this tool?')) {
+                            const success = await deleteTool(id);
+                            if (success) {
+                                showAlert('✅ Tool deleted!', 'success');
+                                await refreshAll();
+                            }
+                        }
+                    });
+                }
+
+                container.appendChild(item);
+
+                if (!showDelete && !isMyTools && Math.random() < 0.15 && index < tools.length - 1) {
+                    const ad = getRandomToolsAd();
+                    if (ad) {
+                        const adDiv = createToolsAdElement(ad);
+                        container.appendChild(adDiv);
+                    }
+                }
+            });
+        }
+
+        function getRandomToolsAd() {
+            if (!allToolsAds || allToolsAds.length === 0) return null;
+            return allToolsAds[Math.floor(Math.random() * allToolsAds.length)];
+        }
+
+        function createToolsAdElement(ad) {
+            if (!ad) return null;
+            const adDiv = document.createElement('div');
+            adDiv.className = 'tools-ad-card';
+            const imgHtml = ad.image_url ?
+                `<img src="${escapeHtml(ad.image_url)}" alt="${escapeHtml(ad.caption)}" loading="lazy" onerror="this.style.display='none'">` :
+                '<span class="ad-emoji">📢</span>';
+            adDiv.innerHTML = `
+                <a href="${escapeHtml(ad.link || '#')}" target="_blank" rel="noopener noreferrer">
+                    ${imgHtml}
+                    <span class="ad-caption">${escapeHtml(ad.caption || 'Advertisement')}</span>
+                </a>
+            `;
+            return adDiv;
+        }
+
+        async function loadToolsAdsRandomly() {
+            try {
+                const country = currentUser?.country || 'Bangladesh';
+                allToolsAds = await fetchToolsAds(country);
+            } catch (err) { console.error('Tools ads load error:', err); }
+        }
+
+        // ============================================================
+        // PAGINATION
+        // ============================================================
+        function loadMoreTools() {
+            if (isLoading || !hasMoreTools) return;
+            const start = currentPage * TOOLS_PER_PAGE;
+            const end = start + TOOLS_PER_PAGE;
+            const nextBatch = filteredTools.slice(start, end);
+            if (nextBatch.length === 0) {
+                hasMoreTools = false;
+                seeMoreBtn.textContent = 'No more tools';
+                seeMoreBtn.disabled = true;
+                return;
+            }
+            renderTools(nextBatch, toolsListEl, false, true, false);
+            currentPage++;
+            if (end >= filteredTools.length) {
+                hasMoreTools = false;
+                seeMoreBtn.textContent = 'No more tools';
+                seeMoreBtn.disabled = true;
+            } else {
+                seeMoreBtn.textContent = `See More ↓ (${filteredTools.length - end} remaining)`;
+                seeMoreBtn.disabled = false;
+            }
+        }
+
+        // ============================================================
+        // REFRESH & FILTER
+        // ============================================================
+        async function refreshAll() {
+            if (isLoading) return;
+            isLoading = true;
+            try {
+                if (!currentUser) {
+                    toolsListEl.innerHTML = `<div class="no-tools">🔒 Please login</div>`;
+                    return;
+                }
+                allTools = await fetchTools();
+                myTools = await fetchMyTools(currentUser.id) || [];
+                await loadToolsAdsRandomly();
+                applyFilters();
+            } catch (err) {
+                console.error('Refresh error:', err);
+                toolsListEl.innerHTML = `<div class="no-tools">❌ Failed to load tools</div>`;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function applyFilters() {
+            currentPage = 0;
+            hasMoreTools = true;
+            seeMoreBtn.textContent = 'See More ↓';
+            seeMoreBtn.disabled = false;
+
+            let shuffledTools = Array.isArray(allTools) ? shuffleArray(allTools) : [];
+
+            if (searchQuery.trim()) {
+                const q = searchQuery.trim().toLowerCase();
+                shuffledTools = shuffledTools.filter(t => t.name.toLowerCase().includes(q));
+            }
+
+            if (currentFilter !== 'all') {
+                shuffledTools = shuffledTools.filter(t => t.type === currentFilter);
+            }
+
+            filteredTools = shuffledTools;
+
+            if (showingMyTools) {
+                myToolsSection.classList.add('show');
+
+                let filteredMyTools = Array.isArray(myTools) ? [...myTools] : [];
+                
+                if (searchQuery.trim()) {
+                    const q = searchQuery.trim().toLowerCase();
+                    filteredMyTools = filteredMyTools.filter(t => t.name.toLowerCase().includes(q));
+                }
+                if (currentFilter !== 'all') {
+                    filteredMyTools = filteredMyTools.filter(t => t.type === currentFilter);
+                }
+
+                renderTools(filteredMyTools, myToolsListEl, true, false, true);
+                toolsListEl.style.display = 'none';
+                seeMoreBtn.style.display = 'none';
+            } else {
+                myToolsSection.classList.remove('show');
+                toolsListEl.style.display = 'flex';
+                seeMoreBtn.style.display = 'block';
+
+                const firstBatch = filteredTools.slice(0, TOOLS_PER_PAGE);
+                renderTools(firstBatch, toolsListEl, false, false, false);
+                currentPage = 1;
+
+                if (filteredTools.length <= TOOLS_PER_PAGE) {
+                    hasMoreTools = false;
+                    seeMoreBtn.textContent = 'No more tools';
+                    seeMoreBtn.disabled = true;
+                } else {
+                    hasMoreTools = true;
+                    seeMoreBtn.textContent = `See More ↓ (${filteredTools.length - TOOLS_PER_PAGE} remaining)`;
+                    seeMoreBtn.disabled = false;
+                }
+            }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            applyFilters();
+        });
+
+        filterBar.addEventListener('click', (e) => {
+            const chip = e.target.closest('.filter-chip');
+            if (!chip) return;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.getAttribute('data-type');
+            applyFilters();
+        });
+
+        myToolsToggleBtn.addEventListener('click', () => {
+            showingMyTools = !showingMyTools;
+            myToolsToggleBtn.textContent = showingMyTools ? '📁 All Tools' : '📁 My Tools';
+            if (showingMyTools) {
+                myToolsToggleBtn.style.background = '#4caf50';
+            } else {
+                myToolsToggleBtn.style.background = '#1877f2';
+            }
+            applyFilters();
+        });
+
+        seeMoreBtn.addEventListener('click', loadMoreTools);
+
+        addToolBtn.addEventListener('click', () => {
+            addModal.classList.add('open');
+            toolNameInput.value = '';
+            toolLinkInput.value = '';
+            toolTypeSelect.value = 'Cyber Security';
+            toolNameInput.focus();
+        });
+
+        closeAddModalBtn.addEventListener('click', () => addModal.classList.remove('open'));
+        addModal.addEventListener('click', (e) => { if (e.target === addModal) addModal.classList.remove('open'); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && addModal.classList.contains('open')) addModal.classList.remove('open'); });
+
+        publishBtn.addEventListener('click', async () => {
+            const name = toolNameInput.value.trim();
+            const type = toolTypeSelect.value;
+            const link = toolLinkInput.value.trim();
+            if (!name) { showAlert('Please enter tool name!', 'error'); toolNameInput.focus(); return; }
+            if (name.length < 2) { showAlert('Name must be at least 2 characters!', 'error'); toolNameInput.focus(); return; }
+            if (!link) { showAlert('Please enter tool link!', 'error'); toolLinkInput.focus(); return; }
+            try { new URL(link); } catch { showAlert('Please enter a valid link (http/https)', 'error'); toolLinkInput.focus(); return; }
+
+            publishBtn.disabled = true;
+            publishBtn.textContent = '⏳ Publishing...';
+            const success = await publishTool(name, type, link);
+            if (success) {
+                showAlert('✅ Tool published!', 'success');
+                addModal.classList.remove('open');
+                await refreshAll();
+                if (showingMyTools) applyFilters();
+            }
+            publishBtn.disabled = false;
+            publishBtn.textContent = '📤 Publish';
+        });
+
+        // ===== Profile Nav =====
+        document.getElementById('profileNavBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentUser) {
+                window.location.href = `userprofile.html?userId=${currentUser.id}`;
+            }
+        });
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔧 Tools page loading...');
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userResult = await apiRequest(`/users/${userId}`);
+                if (userResult && userResult.success) {
+                    currentUser = userResult.data;
+                    console.log('✅ User loaded:', currentUser.username);
+                } else {
+                    localStorage.removeItem('userId');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                await refreshAll();
+                await updateNotifBadge();
+                setInterval(updateNotifBadge, 30000);
+
+            } catch (err) {
+                console.error('Page load error:', err);
+                showAlert('Failed to load page!', 'error');
+                toolsListEl.innerHTML = `<div class="no-tools">❌ Load failed</div>`;
+            }
+        });
+
+        console.log('🔧 Tools page loaded with Worker API!');
+    </script>
+</body>
+</html>

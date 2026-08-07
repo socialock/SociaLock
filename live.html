@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Live - SociaLock</title>
+
+    <!-- ===== FIREBASE CDN ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* ===== রিসেট ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== হেডার ===== */
+        .app-header {
+            background: #242526;
+            padding: 10px 16px;
+            border-bottom: 1px solid #3a3b3c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .app-header .back-btn:hover { background: #3a3b3c; color: #fff; }
+        .app-header h1 { font-size: 1.2rem; font-weight: 600; flex: 1; }
+        .app-header .user-badge {
+            background: #3a3b3c;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #b0b3b8;
+        }
+
+        /* ===== লবি ===== */
+        .lobby-container {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .action-card {
+            background: #242526;
+            border-radius: 14px;
+            padding: 16px 18px;
+            border: 1px solid #3a3b3c;
+        }
+        .action-card h3 { font-size: 0.95rem; margin-bottom: 12px; color: #e4e6eb; }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .row input, .row select {
+            flex: 1;
+            padding: 8px 12px;
+            background: #3a3b3c;
+            border: 1px solid #3a3b3c;
+            border-radius: 8px;
+            color: #e4e6eb;
+            outline: none;
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+        .row input:focus { border-color: #1877f2; }
+        .row .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #b0b3b8;
+            flex-wrap: wrap;
+        }
+        .row .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #1877f2;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #1877f2;
+            border: none;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .btn-primary:hover { background: #166fe5; }
+        .btn-success { background: #4caf50; }
+        .btn-success:hover { background: #43a047; }
+        .btn-danger { background: #e94560; }
+        .btn-danger:hover { background: #c62828; }
+
+        .room-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .room-item {
+            background: #242526;
+            border: 1px solid #3a3b3c;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .room-item:hover { border-color: #1877f2; }
+        .room-item .info .name { font-weight: 600; font-size: 0.9rem; }
+        .room-item .info .meta { font-size: 0.7rem; color: #b0b3b8; }
+        .room-item .join-btn {
+            background: #1877f2;
+            border: none;
+            color: white;
+            padding: 5px 14px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .privacy-tag {
+            font-size: 0.6rem;
+            background: #3a3b3c;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+            color: #b0b3b8;
+        }
+        .privacy-tag.public { background: rgba(76,175,80,0.15); color: #4caf50; }
+        .privacy-tag.private { background: rgba(233,69,96,0.15); color: #e94560; }
+
+        .status-msg { font-size: 0.8rem; color: #b0b3b8; margin-top: 6px; }
+
+        /* ===== স্ট্রিম রুম ===== */
+        .stream-room {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+        .stream-room.active { display: flex; }
+
+        .stream-main {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+        }
+        .video-area {
+            flex: 3;
+            min-width: 300px;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 100%;
+            min-height: 250px;
+        }
+        .video-area video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-height: 80vh;
+        }
+        .video-area .stream-info {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .video-area .stream-info .viewer-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #4caf50;
+        }
+        .video-area .live-badge {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: #e94560;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .side-panel {
+            flex: 1;
+            min-width: 220px;
+            max-width: 360px;
+            background: #18191a;
+            border-left: 1px solid #3a3b3c;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .chat-msg {
+            font-size: 0.85rem;
+            padding: 4px 0;
+            word-break: break-word;
+        }
+        .chat-msg .sender { font-weight: 600; color: #1877f2; margin-right: 6px; }
+        .chat-msg .sender.host { color: #e94560; }
+        .chat-msg.system { color: #b0b3b8; font-style: italic; font-size: 0.8rem; text-align: center; }
+
+        .chat-input-area {
+            padding: 10px 12px;
+            border-top: 1px solid #3a3b3c;
+            display: flex;
+            gap: 8px;
+            background: #242526;
+            flex-shrink: 0;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 8px 12px;
+            background: #3a3b3c;
+            border: none;
+            border-radius: 20px;
+            color: #e4e6eb;
+            outline: none;
+            font-size: 0.85rem;
+        }
+        .chat-input-area input:focus { border: 1px solid #1877f2; }
+        .chat-input-area button {
+            background: #1877f2;
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .chat-input-area button:hover { background: #166fe5; }
+
+        .participant-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border-top: 1px solid #3a3b3c;
+            padding: 8px 12px;
+            background: #1c1c1e;
+            flex-shrink: 0;
+        }
+        .participant-list .p-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            padding: 2px 0;
+        }
+        .participant-list .p-item .badge { font-size: 0.6rem; color: #b0b3b8; }
+        .participant-list .p-item .ban-btn {
+            background: none;
+            border: none;
+            color: #e94560;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .stream-controls {
+            padding: 10px 16px;
+            background: #242526;
+            border-top: 1px solid #3a3b3c;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .stream-controls button {
+            background: #3a3b3c;
+            border: none;
+            color: #b0b3b8;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stream-controls button:hover { background: #4a4b4c; color: #fff; }
+        .stream-controls button.active { background: #1877f2; color: white; }
+        .stream-controls button.danger { background: #e94560; color: white; }
+        .stream-controls button.danger:hover { background: #c62828; }
+
+        /* ===== কাস্টম মডাল ===== */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .custom-modal-overlay.show { display: flex; }
+        .custom-modal {
+            background: #242526;
+            border-radius: 16px;
+            padding: 24px 20px 20px;
+            max-width: 340px;
+            width: 90%;
+            border: 1px solid #3a3b3c;
+            text-align: center;
+        }
+        .custom-modal .modal-icon { font-size: 2.4rem; margin-bottom: 6px; }
+        .custom-modal h3 { font-size: 1.1rem; margin-bottom: 6px; }
+        .custom-modal p { font-size: 0.9rem; color: #b0b3b8; margin-bottom: 16px; }
+        .custom-modal .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .custom-modal .modal-actions button {
+            padding: 6px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .custom-modal .modal-actions .btn-cancel { background: #3a3b3c; color: #b0b3b8; }
+        .custom-modal .modal-actions .btn-confirm { background: #e94560; color: white; }
+
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .custom-alert.success { background: #4caf50; }
+        .custom-alert.error { background: #e94560; }
+        .custom-alert.info { background: #1877f2; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .side-panel { max-width: 100%; border-left: none; border-top: 1px solid #3a3b3c; max-height: 50vh; }
+            .stream-main { flex-direction: column; }
+            .video-area { min-height: 200px; }
+            .row { flex-direction: column; align-items: stretch; }
+            .row .checkbox-group { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== হেডার ===== -->
+    <div class="app-header">
+        <button class="back-btn" onclick="window.location.href='messages.html'"><i class="fas fa-arrow-left"></i></button>
+        <h1>📡 Live</h1>
+        <span class="user-badge" id="userBadge">Loading...</span>
+    </div>
+
+    <!-- ===== লবি ===== -->
+    <div class="lobby-container" id="lobbyContainer">
+        <div class="action-card">
+            <h3>🎬 Create Live</h3>
+            <div class="row">
+                <input type="text" id="createRoomName" placeholder="Room Name *">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isPrivate">
+                    <label for="isPrivate">Private</label>
+                </div>
+                <input type="text" id="createPassword" placeholder="Password (if private)" style="flex:0.5; min-width:100px;">
+                <button class="btn-primary" id="createBtn"><i class="fas fa-video"></i> Start</button>
+            </div>
+            <div id="createStatus" class="status-msg"></div>
+        </div>
+
+        <div class="action-card">
+            <h3>🔑 Join Live</h3>
+            <div class="row">
+                <input type="text" id="joinRoomName" placeholder="Room Name / ID *">
+                <input type="text" id="joinPassword" placeholder="Password (if private)">
+                <button class="btn-primary btn-success" id="joinBtn"><i class="fas fa-sign-in-alt"></i> Join</button>
+            </div>
+            <div id="joinStatus" class="status-msg"></div>
+        </div>
+
+        <div class="action-card">
+            <h3>🌍 Public Live Streams</h3>
+            <div id="publicRoomList" class="room-list">
+                <div style="text-align:center; color:#b0b3b8; padding:16px;">Loading public streams...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== স্ট্রিম রুম ===== -->
+    <div class="stream-room" id="streamRoom">
+        <div class="stream-main">
+            <div class="video-area">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <video id="localVideo" autoplay muted playsinline style="position:absolute; bottom:16px; right:16px; width:120px; border-radius:8px; border:2px solid #3a3b3c; display:none;"></video>
+                <div class="stream-info">
+                    <span id="streamTitle">Loading...</span>
+                    <span class="viewer-count"><i class="fas fa-user"></i> <span id="viewerCount">0</span></span>
+                </div>
+                <div class="live-badge"><i class="fas fa-circle"></i> LIVE</div>
+            </div>
+            <div class="side-panel">
+                <div class="chat-box" id="chatMessages"></div>
+                <div class="participant-list" id="participantList">
+                    <div style="font-size:0.75rem; color:#b0b3b8; padding:4px;">Participants (0)</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Send a message...">
+                    <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="stream-controls">
+            <button id="toggleMicBtn"><i class="fas fa-microphone"></i> Mic</button>
+            <button id="toggleCamBtn"><i class="fas fa-video"></i> Cam</button>
+            <button id="endStreamBtn" class="danger"><i class="fas fa-sign-out-alt"></i> End</button>
+        </div>
+    </div>
+
+    <!-- ===== কাস্টম মডাল ===== -->
+    <div class="custom-modal-overlay" id="customModal">
+        <div class="custom-modal">
+            <div class="modal-icon" id="modalIcon">⚠️</div>
+            <h3 id="modalTitle">Are you sure?</h3>
+            <p id="modalMessage">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="modalCancel">Cancel</button>
+                <button class="btn-confirm" id="modalConfirm">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        // ============================================================
+        // LIVE.JS - সম্পূর্ণ (ভিউয়ার কাউন্ট সহ)
+        // ============================================================
+
+        console.log('📡 Live Frontend loaded');
+
+        // ===== গ্লোবাল =====
+        var currentUser = null;
+        var roomId = null;
+        var isHost = false;
+        var hostId = null;
+        var peerConnections = {};
+        var dataChannels = {};
+        var localStream = null;
+        var participantList = {};
+        var isMicOn = true;
+        var isCamOn = true;
+
+        // ===== DOM =====
+        var lobby = document.getElementById('lobbyContainer');
+        var streamRoom = document.getElementById('streamRoom');
+        var localVideo = document.getElementById('localVideo');
+        var remoteVideo = document.getElementById('remoteVideo');
+        var chatMessages = document.getElementById('chatMessages');
+        var chatInput = document.getElementById('chatInput');
+        var sendChatBtn = document.getElementById('sendChatBtn');
+        var participantListEl = document.getElementById('participantList');
+        var streamTitle = document.getElementById('streamTitle');
+        var viewerCountSpan = document.getElementById('viewerCount');
+        var toggleMicBtn = document.getElementById('toggleMicBtn');
+        var toggleCamBtn = document.getElementById('toggleCamBtn');
+        var endStreamBtn = document.getElementById('endStreamBtn');
+
+        var createBtn = document.getElementById('createBtn');
+        var joinBtn = document.getElementById('joinBtn');
+        var createRoomName = document.getElementById('createRoomName');
+        var createPassword = document.getElementById('createPassword');
+        var joinRoomName = document.getElementById('joinRoomName');
+        var joinPassword = document.getElementById('joinPassword');
+        var isPrivateCheck = document.getElementById('isPrivate');
+        var publicList = document.getElementById('publicRoomList');
+        var createStatus = document.getElementById('createStatus');
+        var joinStatus = document.getElementById('joinStatus');
+
+        // ===== মডাল =====
+        var modal = document.getElementById('customModal');
+        var modalTitle = document.getElementById('modalTitle');
+        var modalMessage = document.getElementById('modalMessage');
+        var modalIcon = document.getElementById('modalIcon');
+        var modalCancel = document.getElementById('modalCancel');
+        var modalConfirm = document.getElementById('modalConfirm');
+        var pendingResolve = null;
+
+        function showConfirm(title, message, icon = '⚠️') {
+            return new Promise(function(resolve) {
+                modalIcon.textContent = icon;
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                modal.classList.add('show');
+                pendingResolve = resolve;
+            });
+        }
+        modalCancel.onclick = function() { modal.classList.remove('show'); if (pendingResolve) { pendingResolve(false);
+                pendingResolve = null; } };
+        modalConfirm.onclick = function() { modal.classList.remove('show'); if (pendingResolve) { pendingResolve(true);
+                pendingResolve = null; } };
+        modal.onclick = function(e) { if (e.target === modal) { modal.classList.remove('show'); if (pendingResolve) { pendingResolve(
+                        false);
+                    pendingResolve = null; } } };
+
+        // ===== ইউটিলিটি =====
+        function showAlert(msg, type = 'info') {
+            var el = document.querySelector('.custom-alert');
+            if (el) el.remove();
+            var div = document.createElement('div');
+            div.className = 'custom-alert ' + type;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(function() { div.remove(); }, 4000);
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===== সিগন্যালিং =====
+        async function sendSignal(targetUserId, data) {
+            try {
+                await window.apiRequest('/live/signal', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        room_id: roomId,
+                        from: currentUser.id,
+                        to: targetUserId,
+                        data: data
+                    })
+                });
+            } catch (e) { console.error('Signal send error', e); }
+        }
+
+        async function pollSignals() {
+            if (!roomId || !currentUser) return;
+            try {
+                var res = await window.apiRequest('/live/signals?room_id=' + roomId + '&user_id=' + currentUser.id);
+                if (res && res.success && res.data) {
+                    res.data.forEach(function(signal) {
+                        handleSignal(signal.from, signal.data);
+                    });
+                }
+            } catch (e) { console.error('Poll error', e); }
+        }
+
+        // ===== WebRTC =====
+        function createPeerConnection(targetUserId) {
+            var config = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            };
+            var pc = new RTCPeerConnection(config);
+            peerConnections[targetUserId] = pc;
+
+            var dc = pc.createDataChannel('live-chat');
+            dataChannels[targetUserId] = dc;
+            dc.onmessage = function(e) {
+                try {
+                    var data = JSON.parse(e.data);
+                    if (data.type === 'chat') {
+                        appendMessage(data.from, data.text, data.from === currentUser.id);
+                    } else if (data.type === 'system') {
+                        appendSystemMessage(data.text);
+                    }
+                } catch (e) { console.log('DC parse error', e); }
+            };
+            dc.onopen = function() { console.log('DC open for', targetUserId); };
+
+            if (localStream && isHost) {
+                localStream.getTracks().forEach(function(t) { pc.addTrack(t, localStream); });
+            }
+
+            pc.ontrack = function(event) {
+                if (event.streams && event.streams[0]) {
+                    if (!isHost) {
+                        remoteVideo.srcObject = event.streams[0];
+                        remoteVideo.style.display = 'block';
+                    }
+                }
+            };
+
+            pc.onicecandidate = function(event) {
+                if (event.candidate) {
+                    sendSignal(targetUserId, { type: 'candidate', candidate: event.candidate });
+                }
+            };
+
+            return pc;
+        }
+
+        async function hostCreateOffer(viewerId) {
+            var pc = createPeerConnection(viewerId);
+            var offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            sendSignal(viewerId, { type: 'offer', sdp: offer });
+        }
+
+        async function viewerCreateOffer(hostId) {
+            var pc = createPeerConnection(hostId);
+            var offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            sendSignal(hostId, { type: 'offer', sdp: offer });
+        }
+
+        async function handleSignal(from, data) {
+            if (data.type === 'offer') {
+                var pc = createPeerConnection(from);
+                await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                var answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                sendSignal(from, { type: 'answer', sdp: answer });
+            } else if (data.type === 'answer') {
+                var pc = peerConnections[from];
+                if (pc) await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+            } else if (data.type === 'candidate') {
+                var pc = peerConnections[from];
+                if (pc) await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+            }
+        }
+
+        // ===== ইউআই =====
+        function appendMessage(sender, text, isOwn) {
+            var div = document.createElement('div');
+            div.className = 'chat-msg';
+            var isHostUser = (sender === currentUser?.id && isHost) || sender === 'Host';
+            var senderName = isOwn ? 'You' : (participantList[sender] || sender.substring(0, 6));
+            if (isHostUser) senderName = '🎙️ Host';
+            div.innerHTML = '<span class="sender' + (isHostUser ? ' host' : '') + '">' + escapeHtml(senderName) + ':</span> ' +
+                escapeHtml(text);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function appendSystemMessage(text) {
+            var div = document.createElement('div');
+            div.className = 'chat-msg system';
+            div.textContent = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function updateParticipantsUI() {
+            var total = Object.keys(participantList).length;
+            viewerCountSpan.textContent = total;
+            var html = '<div style="font-size:0.75rem; color:#b0b3b8; padding:4px;">Participants (' + total + ')</div>';
+            var userId = currentUser.id;
+            Object.keys(participantList).forEach(function(id) {
+                var name = participantList[id] || id.substring(0, 6);
+                var isHostUser = (id === hostId);
+                var isYou = (id === userId);
+                var badge = '';
+                if (isHostUser) badge = '🎙️';
+                if (isYou) badge = '👤';
+                var banBtn = '';
+                if (isHost && !isHostUser && !isYou) {
+                    banBtn = '<button class="ban-btn" onclick="banUser(\'' + id + '\')"><i class="fas fa-ban"></i></button>';
+                }
+                html += '<div class="p-item"><span>' + badge + ' ' + escapeHtml(name) + (isYou ? ' (You)' : '') + '</span>' +
+                    banBtn + '</div>';
+            });
+            participantListEl.innerHTML = html;
+        }
+
+        // ===== হোস্ট & ভিউয়ার =====
+        function switchToStream(roomIdParam, isHostParam, hostIdParam) {
+            roomId = roomIdParam;
+            isHost = isHostParam;
+            hostId = hostIdParam || currentUser.id;
+
+            lobby.style.display = 'none';
+            streamRoom.classList.add('active');
+            streamTitle.textContent = 'Room: ' + roomId.substring(0, 8) + (isHost ? ' (Host)' : '');
+
+            if (isHost) {
+                initHostMedia();
+                setInterval(pollSignals, 3000);
+                loadParticipants();
+                setInterval(loadParticipants, 5000);
+            } else {
+                remoteVideo.style.display = 'block';
+                setTimeout(function() {
+                    if (hostId) viewerCreateOffer(hostId);
+                }, 1000);
+                setInterval(pollSignals, 3000);
+            }
+
+            sendChatBtn.onclick = sendChatMessage;
+            chatInput.onkeydown = function(e) { if (e.key === 'Enter') sendChatMessage(); };
+            toggleMicBtn.onclick = toggleMic;
+            toggleCamBtn.onclick = toggleCam;
+            endStreamBtn.onclick = endStream;
+        }
+
+        // ===== মিডিয়া =====
+        async function initHostMedia() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localVideo.srcObject = localStream;
+                localVideo.style.display = 'block';
+                isMicOn = true;
+                isCamOn = true;
+                toggleMicBtn.innerHTML = '<i class="fas fa-microphone"></i> Mic';
+                toggleCamBtn.innerHTML = '<i class="fas fa-video"></i> Cam';
+            } catch (e) {
+                showAlert('Camera/Mic access denied', 'error');
+            }
+        }
+
+        function toggleMic() {
+            if (!localStream) return;
+            var track = localStream.getAudioTracks()[0];
+            if (track) {
+                track.enabled = !track.enabled;
+                isMicOn = track.enabled;
+                toggleMicBtn.innerHTML = isMicOn ? '<i class="fas fa-microphone"></i> Mic' :
+                    '<i class="fas fa-microphone-slash"></i> Mic';
+                toggleMicBtn.style.color = isMicOn ? '#fff' : '#e94560';
+            }
+        }
+
+        function toggleCam() {
+            if (!localStream) return;
+            var track = localStream.getVideoTracks()[0];
+            if (track) {
+                track.enabled = !track.enabled;
+                isCamOn = track.enabled;
+                toggleCamBtn.innerHTML = isCamOn ? '<i class="fas fa-video"></i> Cam' :
+                    '<i class="fas fa-video-slash"></i> Cam';
+                toggleCamBtn.style.color = isCamOn ? '#fff' : '#e94560';
+                localVideo.style.display = isCamOn ? 'block' : 'none';
+            }
+        }
+
+        // ===== চ্যাট =====
+        function sendChatMessage() {
+            var text = chatInput.value.trim();
+            if (!text) return;
+            appendMessage(currentUser.id, text, true);
+            Object.keys(dataChannels).forEach(function(key) {
+                var dc = dataChannels[key];
+                if (dc.readyState === 'open') {
+                    dc.send(JSON.stringify({ type: 'chat', from: currentUser.id, text: text }));
+                }
+            });
+            chatInput.value = '';
+        }
+
+        // ===== লোড পার্টিসিপ্যান্ট & ভিউয়ার কাউন্ট আপডেট =====
+        async function loadParticipants() {
+            if (!roomId) return;
+            try {
+                var res = await window.apiRequest('/live/participants?room_id=' + roomId);
+                if (res && res.success) {
+                    var newList = {};
+                    res.data.forEach(function(p) {
+                        newList[p.user_id] = p.user_name;
+                    });
+                    participantList = newList;
+                    updateParticipantsUI();
+                }
+            } catch (e) { console.error('Load participants error', e); }
+        }
+
+        // ===== ব্যান =====
+        window.banUser = async function(targetUserId) {
+            var ok = await showConfirm('Ban User', 'This user will be removed and cannot rejoin.', '🚫');
+            if (!ok) return;
+            try {
+                await window.apiRequest('/live/ban', {
+                    method: 'POST',
+                    body: JSON.stringify({ room_id: roomId, host_id: currentUser.id, user_id: targetUserId })
+                });
+                showAlert('User banned!', 'success');
+                if (peerConnections[targetUserId]) {
+                    peerConnections[targetUserId].close();
+                    delete peerConnections[targetUserId];
+                    delete dataChannels[targetUserId];
+                }
+                loadParticipants();
+            } catch (e) { showAlert('Failed to ban', 'error'); }
+        };
+
+        // ===== স্ট্রিম শেষ =====
+        async function endStream() {
+            var ok = await showConfirm('End Stream', 'Are you sure you want to end the live stream?', '⚠️');
+            if (!ok) return;
+            if (isHost) {
+                await window.apiRequest('/live/delete-room', {
+                    method: 'POST',
+                    body: JSON.stringify({ room_id: roomId, host_id: currentUser.id })
+                });
+            }
+            Object.keys(peerConnections).forEach(function(k) { peerConnections[k].close(); });
+            if (localStream) localStream.getTracks().forEach(function(t) { t.stop(); });
+            location.reload();
+        }
+
+        // ===== ক্রিয়েট =====
+        createBtn.onclick = async function() {
+            var name = createRoomName.value.trim();
+            var priv = isPrivateCheck.checked;
+            var pass = createPassword.value.trim();
+
+            if (!name) { showAlert('Enter room name', 'error'); return; }
+            if (priv && !pass) { showAlert('Enter password for private room', 'error'); return; }
+
+            try {
+                var res = await window.apiRequest('/live/create', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        host_id: currentUser.id,
+                        host_name: currentUser.username,
+                        room_name: name,
+                        type: priv ? 'private' : 'public',
+                        password: pass
+                    })
+                });
+                if (res && res.success) {
+                    var rid = res.data.room_id;
+                    createStatus.textContent = '✅ Room created! ID: ' + rid;
+                    showAlert('Live stream started!', 'success');
+                    switchToStream(rid, true, currentUser.id);
+                } else {
+                    showAlert(res.error || 'Failed to create', 'error');
+                }
+            } catch (e) { showAlert('Error creating room', 'error'); }
+        };
+
+        // ===== জয়েন =====
+        joinBtn.onclick = async function() {
+            var name = joinRoomName.value.trim();
+            var pass = joinPassword.value.trim();
+
+            if (!name) { showAlert('Enter room name', 'error'); return; }
+
+            try {
+                var res = await window.apiRequest('/live/join', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        room_id: name,
+                        user_id: currentUser.id,
+                        user_name: currentUser.username,
+                        password: pass
+                    })
+                });
+                if (res && res.success) {
+                    joinStatus.textContent = '✅ Joined!';
+                    showAlert('Joined live stream!', 'success');
+                    switchToStream(name, false, res.data.host_id);
+                } else {
+                    showAlert(res.error || 'Failed to join', 'error');
+                    joinStatus.textContent = '❌ ' + (res.error || 'Failed');
+                }
+            } catch (e) { showAlert('Error joining room', 'error'); }
+        };
+
+        // ===== পাবলিক লিস্ট =====
+        async function loadPublicRooms() {
+            try {
+                var res = await window.apiRequest('/live/rooms');
+                if (res && res.success) {
+                    if (res.data.length === 0) {
+                        publicList.innerHTML = '<div style="text-align:center; color:#b0b3b8; padding:12px;">No public streams active</div>';
+                        return;
+                    }
+                    publicList.innerHTML = res.data.map(function(room) {
+                        return '<div class="room-item"><div class="info"><div class="name">📡 ' + escapeHtml(room.room_name) +
+                            ' <span class="privacy-tag public">Public</span></div><div class="meta">🎙️ ' + escapeHtml(room
+                                .host_name) + ' · 👥 ' + (room.viewers || 0) + ' viewers</div></div><button class="join-btn" onclick="quickJoin(\'' +
+                            room.room_id + '\')">Join</button></div>';
+                    }).join('');
+                }
+            } catch (e) { console.error('Load public rooms error', e); }
+        }
+
+        window.quickJoin = function(id) {
+            joinRoomName.value = id;
+            joinBtn.click();
+        };
+
+        // ===== পেজ লোড =====
+        document.addEventListener('DOMContentLoaded', function() {
+            var userId = localStorage.getItem('userId');
+            if (!userId) { window.location.href = 'login.html'; return; }
+
+            window.apiRequest('/users/' + userId).then(function(result) {
+                if (result && result.success) {
+                    currentUser = result.data;
+                    document.getElementById('userBadge').textContent = '@' + currentUser.username;
+                    loadPublicRooms();
+                    setInterval(loadPublicRooms, 10000);
+                } else {
+                    localStorage.removeItem('userId');
+                    window.location.href = 'login.html';
+                }
+            }).catch(function() {
+                localStorage.removeItem('userId');
+                window.location.href = 'login.html';
+            });
+        });
+
+        console.log('📡 Live Frontend ready with viewer count');
+    </script>
+</body>
+</html>

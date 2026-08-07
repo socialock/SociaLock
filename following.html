@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Following - SociaLock</title>
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; display: flex; flex-direction: column; padding-top: 0; }
+
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-top: 0; }
+        .main-container { max-width: 700px; width: 100%; margin: 0 auto; padding: 0 16px; flex: 1; overflow-y: auto; padding-bottom: 20px; }
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0 8px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 16px;
+        }
+        .back-header .back-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; color: #e4e6eb; }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #242526;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #3a3b3c;
+            transition: 0.2s;
+        }
+        .user-item:hover { background: #2a2b2c; border-color: #4a4b4c; }
+
+        .user-item .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .user-item .user-info .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .user-item .user-info .name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #e4e6eb;
+        }
+        .user-item .user-info .name .verified-badge {
+            color: #1877f2;
+            font-size: 14px;
+            margin-left: 4px;
+        }
+
+        .user-item .action-btn {
+            background: #3a3b3c;
+            border: none;
+            color: #e4e6eb;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .user-item .action-btn:hover { background: #e94560; color: white; }
+        .user-item .action-btn.following { background: #1877f2; }
+        .user-item .action-btn.following:hover { background: #166fe5; }
+
+        .no-users {
+            text-align: center;
+            padding: 40px;
+            color: #b0b3b8;
+        }
+        .no-users .icon { font-size: 48px; margin-bottom: 16px; display: block; }
+        .no-users h3 { font-size: 18px; color: #e4e6eb; margin-bottom: 4px; }
+        .no-users p { font-size: 14px; }
+
+        .loading-spinner { text-align: center; padding: 30px; color: #b0b3b8; }
+        .custom-alert {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            left: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            max-width: 400px;
+            margin: 0 auto;
+            animation: slideIn 0.3s ease;
+        }
+        .custom-alert.success { background: #4caf50; }
+        .custom-alert.error { background: #e94560; }
+        .custom-alert.info { background: #1877f2; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 480px) {
+            .main-container { padding: 0 12px; }
+            .user-item { padding: 10px 12px; }
+            .user-item .user-info .avatar { width: 38px; height: 38px; font-size: 15px; }
+            .user-item .user-info .name { font-size: 14px; }
+            .user-item .action-btn { font-size: 12px; padding: 4px 12px; }
+            .back-header .back-btn { font-size: 20px; }
+            .back-header .back-title { font-size: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <div class="main-container">
+            <div class="back-header">
+                <button class="back-btn" onclick="window.location.href='userprofile.html?userId=' + (new URLSearchParams(window.location.search).get('userId') || localStorage.getItem('userId'))">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span class="back-title">Following</span>
+            </div>
+            <div id="usersContainer"><div class="loading-spinner">⏳ Loading...</div></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // FOLLOWING.JS - সম্পূর্ণ API ভার্সন
+        // ============================================================
+
+        let currentUser = null;
+        let targetUserId = null;
+        let followingList = [];
+
+        const container = document.getElementById('usersContainer');
+
+        // ============================================================
+        // LOAD FOLLOWING (Worker API)
+        // ============================================================
+        async function loadFollowing() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // 1. Current user load
+                const userResult = await window.apiRequest(`/users/${userId}`);
+                if (userResult && userResult.success) {
+                    currentUser = userResult.data;
+                } else {
+                    localStorage.removeItem('userId');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // 2. Get target user ID (profile page থেকে আসছে)
+                const params = new URLSearchParams(window.location.search);
+                targetUserId = params.get('userId') || userId;
+
+                // 3. Get following list from API
+                const result = await window.apiRequest(`/users/${targetUserId}/following`);
+                if (!result || !result.success) {
+                    container.innerHTML = '<div class="no-users">❌ Failed to load</div>';
+                    return;
+                }
+
+                const followingUsers = result.data || [];
+
+                if (followingUsers.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-users">
+                            <span class="icon">👤</span>
+                            <h3>Not following anyone yet</h3>
+                            <p>When you follow people, they'll appear here.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 4. Get current user's following list for follow button
+                const myFollowingResult = await window.apiRequest(`/users/${userId}/following`);
+                if (myFollowingResult && myFollowingResult.success) {
+                    followingList = myFollowingResult.data.map(u => u.id);
+                }
+
+                // 5. Render
+                container.innerHTML = '';
+                followingUsers.forEach(user => {
+                    const isVerified = user.is_verified || false;
+                    const verifiedBadge = isVerified ?
+                        `<span class="verified-badge"><i class="fas fa-check-circle"></i></span>` : '';
+                    
+                    const isFollowing = followingList.includes(user.id);
+                    const isOwn = user.id === currentUser.id;
+
+                    const item = document.createElement('div');
+                    item.className = 'user-item';
+                    item.innerHTML = `
+                        <div class="user-info" onclick="window.location.href='userprofile.html?userId=${user.id}'">
+                            <div class="avatar">${user.username.charAt(0).toUpperCase()}</div>
+                            <div class="name">${escapeHtml(user.username)} ${verifiedBadge}</div>
+                        </div>
+                        ${!isOwn ? `
+                            <button class="action-btn ${isFollowing ? 'following' : ''}" 
+                                    onclick="toggleFollow('${user.id}', this)">
+                                ${isFollowing ? 'Following' : 'Follow'}
+                            </button>
+                        ` : `
+                            <span style="font-size:12px;color:#b0b3b8;">You</span>
+                        `}
+                    `;
+                    container.appendChild(item);
+                });
+
+            } catch (err) {
+                console.error('Load following error:', err);
+                container.innerHTML = '<div class="no-users">❌ Something went wrong</div>';
+            }
+        }
+
+        // ============================================================
+        // TOGGLE FOLLOW (Worker API)
+        // ============================================================
+        async function toggleFollow(userId, btn) {
+            if (!currentUser) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            if (userId === currentUser.id) {
+                showAlert('You cannot follow yourself!', 'info');
+                return;
+            }
+
+            const isFollowing = btn.classList.contains('following');
+
+            try {
+                if (isFollowing) {
+                    // Unfollow
+                    const result = await window.apiRequest('/users/follow', {
+                        method: 'DELETE',
+                        body: JSON.stringify({
+                            follower_id: currentUser.id,
+                            following_id: userId
+                        })
+                    });
+
+                    if (result && result.success) {
+                        btn.classList.remove('following');
+                        btn.textContent = 'Follow';
+                        btn.style.background = '#3a3b3c';
+                        showAlert('Unfollowed', 'info');
+                        // Update following list
+                        followingList = followingList.filter(id => id !== userId);
+                    }
+                } else {
+                    // Follow
+                    const result = await window.apiRequest('/users/follow', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            follower_id: currentUser.id,
+                            following_id: userId
+                        })
+                    });
+
+                    if (result && result.success) {
+                        btn.classList.add('following');
+                        btn.textContent = 'Following';
+                        btn.style.background = '#1877f2';
+                        showAlert('Following!', 'success');
+                        followingList.push(userId);
+                    }
+                }
+
+            } catch (err) {
+                console.error('Follow error:', err);
+                showAlert('Something went wrong!', 'error');
+            }
+        }
+
+        // ============================================================
+        // UTILITY
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showAlert(msg, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            alert.innerHTML = msg +
+                '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFollowing();
+        });
+
+        console.log('🚀 Following page loaded with Worker API!');
+    </script>
+</body>
+</html>

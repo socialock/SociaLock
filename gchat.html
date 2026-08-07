@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Global Chat - SociaLock</title>
+
+    <!-- ===== FIREBASE CDN (ঐচ্ছিক, কিন্তু অন্যান্য পেজের সাথে সামঞ্জস্যের জন্য) ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            background: #242526;
+            padding: 12px 20px;
+            border-bottom: 1px solid #3a3b3c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .app-header .back-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .app-header .back-btn:hover { background: #3a3b3c; color: #fff; }
+        .app-header h1 { font-size: 1.2rem; font-weight: 600; flex: 1; }
+
+        .coming-soon-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        .coming-soon-icon {
+            font-size: 4rem;
+            color: #1877f2;
+            margin-bottom: 16px;
+        }
+        .coming-soon-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #1877f2, #4caf50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .coming-soon-sub {
+            font-size: 1rem;
+            color: #b0b3b8;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+        .coming-soon-features {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+        }
+        .feature-chip {
+            background: #242526;
+            border: 1px solid #3a3b3c;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: #b0b3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .feature-chip i { color: #1877f2; }
+
+        .footer-note {
+            margin-top: 32px;
+            font-size: 0.75rem;
+            color: #606770;
+        }
+
+        @media (max-width: 480px) {
+            .coming-soon-title { font-size: 1.5rem; }
+            .coming-soon-icon { font-size: 3rem; }
+            .feature-chip { font-size: 0.7rem; padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <button class="back-btn" onclick="window.location.href='messages.html'"><i class="fas fa-arrow-left"></i></button>
+        <h1>🌍 Global Chat</h1>
+    </div>
+
+    <div class="coming-soon-container">
+        <div class="coming-soon-icon"><i class="fas fa-globe-asia"></i></div>
+        <div class="coming-soon-title">Coming Soon</div>
+        <div class="coming-soon-sub">
+            We're working on a real-time global chat experience.
+            Stay tuned for updates!
+        </div>
+
+        <div class="coming-soon-features">
+            <span class="feature-chip"><i class="fas fa-user-friends"></i> 100+ users</span>
+            <span class="feature-chip"><i class="fas fa-link"></i> Link preview</span>
+            <span class="feature-chip"><i class="fas fa-shield-alt"></i> Safe & secure</span>
+            <span class="feature-chip"><i class="fas fa-bolt"></i> Real-time</span>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-code"></i> SociaLock · Global Chat
+        </div>
+    </div>
+
+    <!-- ===== স্ক্রিপ্ট (শুধু ইউজার চেক) ===== -->
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+            // বাকি কিছু না – শুধু কামিং সুন পেজ
+        });
+    </script>
+
+</body>
+</html>

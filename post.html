@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Post - SociaLock</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* ===== ALL STYLES SAME AS BEFORE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; display: flex; flex-direction: column; overflow: hidden; }
+
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; height: 100vh; }
+        .main-container { flex: 1; overflow-y: auto; padding: 0 16px 100px 16px; max-width: 700px; width: 100%; margin: 0 auto; padding-bottom: 100px; }
+
+        /* ===== STICKY COMMENT INPUT ===== */
+        .comment-input-wrapper {
+            position: sticky;
+            bottom: 0;
+            background: #242526;
+            padding: 10px 16px;
+            border-top: 1px solid #3a3b3c;
+            margin: 0 -16px;
+            z-index: 10;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+        }
+        @media (max-width: 480px) {
+            .main-container { padding: 0 12px 90px 12px; }
+            .comment-input-wrapper { margin: 0 -12px; padding: 8px 12px; }
+        }
+
+        /* ===== BACK HEADER ===== */
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0 8px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 16px;
+            position: sticky;
+            top: 0;
+            background: #18191a;
+            z-index: 5;
+        }
+        .back-header .back-btn { background: none; border: none; color: #b0b3b8; font-size: 24px; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; color: #e4e6eb; }
+
+        /* ===== POST CARD ===== */
+        .post-card { background: #242526; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #3a3b3c; }
+        .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .post-avatar { width: 44px; height: 44px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; flex-shrink: 0; cursor: pointer; }
+        .post-user-info { flex: 1; }
+        .post-username { font-weight: 700; font-size: 16px; cursor: pointer; color: #e4e6eb; }
+        .post-username:hover { text-decoration: underline; }
+        .post-username .verified-badge { color: #1877f2; font-size: 16px; margin-left: 4px; }
+        .post-time { font-size: 13px; color: #b0b3b8; }
+        .post-content { font-size: 16px; line-height: 1.6; margin-bottom: 12px; word-wrap: break-word; white-space: pre-wrap; color: #e4e6eb; }
+        .post-content a { color: #1877f2; text-decoration: none; }
+        .post-content a:hover { text-decoration: underline; }
+
+        .post-stats { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 1px solid #3a3b3c; border-bottom: 1px solid #3a3b3c; margin-bottom: 4px; font-size: 14px; color: #b0b3b8; }
+        .post-stats span { cursor: pointer; }
+        .post-stats span:hover { color: #1877f2; }
+
+        .post-actions { display: flex; gap: 8px; padding: 4px 0 8px; }
+        .post-action-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px; border: none; background: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #b0b3b8; transition: 0.2s; }
+        .post-action-btn:hover { background: #3a3b3c; }
+        .post-action-btn.liked { color: #e94560; }
+        .post-action-btn svg { width: 20px; height: 20px; }
+
+        .comments-title { font-weight: 700; font-size: 17px; margin-bottom: 12px; color: #e4e6eb; }
+        
+        .comment-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #3a3b3c; }
+        .comment-item:last-child { border-bottom: none; }
+        .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 15px; flex-shrink: 0; cursor: pointer; margin-top: 2px; }
+        .comment-body { flex: 1; min-width: 0; }
+        .comment-bubble { background: #3a3b3c; border-radius: 18px; padding: 8px 14px; display: inline-block; max-width: 100%; }
+        .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; }
+        .comment-username { font-weight: 700; font-size: 13px; cursor: pointer; color: #e4e6eb; }
+        .comment-username:hover { text-decoration: underline; }
+        .comment-time { font-size: 11px; color: #b0b3b8; font-weight: 400; }
+        .comment-text { font-size: 15px; line-height: 1.4; word-wrap: break-word; color: #e4e6eb; }
+        
+        .comment-actions { margin-top: 4px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+        .comment-action-btn { background: none; border: none; font-size: 12px; color: #b0b3b8; cursor: pointer; padding: 2px 0; transition: 0.2s; font-weight: 500; }
+        .comment-action-btn:hover { color: #1877f2; }
+        .comment-action-btn.danger:hover { color: #e94560; }
+        .comment-reply-btn { background: none; border: none; font-size: 12px; color: #b0b3b8; cursor: pointer; padding: 2px 0; transition: 0.2s; font-weight: 600; }
+        .comment-reply-btn:hover { color: #e4e6eb; }
+        .comment-reply-btn.replying { color: #1877f2; }
+
+        .replies-container { 
+            margin-left: 48px; 
+            margin-top: 4px; 
+            padding-left: 4px; 
+            border-left: 2px solid #3a3b3c; 
+            overflow: hidden; 
+        }
+        .replies-container.hidden { display: none; }
+        .replies-container .reply-item { 
+            display: flex; 
+            gap: 12px; 
+            padding: 8px 0; 
+            border-bottom: 1px solid #3a3b3c; 
+        }
+        .replies-container .reply-item:last-child { border-bottom: none; }
+        .reply-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 13px; flex-shrink: 0; cursor: pointer; margin-top: 2px; }
+        .reply-body { flex: 1; min-width: 0; }
+        .reply-bubble { background: #3a3b3c; border-radius: 16px; padding: 6px 12px; display: inline-block; max-width: 100%; }
+        .reply-header { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; flex-wrap: wrap; }
+        .reply-username { font-weight: 700; font-size: 12px; cursor: pointer; color: #e4e6eb; }
+        .reply-username:hover { text-decoration: underline; }
+        .reply-time { font-size: 10px; color: #b0b3b8; }
+        .reply-text { font-size: 14px; line-height: 1.4; word-wrap: break-word; color: #e4e6eb; }
+        
+        .reply-actions { margin-top: 2px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .reply-action-btn { background: none; border: none; font-size: 11px; color: #b0b3b8; cursor: pointer; padding: 2px 0; transition: 0.2s; font-weight: 500; }
+        .reply-action-btn:hover { color: #1877f2; }
+        .reply-action-btn.danger:hover { color: #e94560; }
+        .reply-reply-btn { background: none; border: none; font-size: 11px; color: #b0b3b8; cursor: pointer; padding: 2px 0; transition: 0.2s; font-weight: 600; }
+        .reply-reply-btn:hover { color: #e4e6eb; }
+        .reply-reply-btn.replying { color: #1877f2; }
+
+        .nested-replies-container { 
+            margin-left: 40px; 
+            margin-top: 4px; 
+            padding-left: 4px; 
+            border-left: 2px solid #3a3b3c; 
+            overflow: hidden; 
+        }
+        .nested-replies-container.hidden { display: none; }
+        .nested-reply-item { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid #3a3b3c; }
+        .nested-reply-item:last-child { border-bottom: none; }
+        .nested-reply-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 11px; flex-shrink: 0; cursor: pointer; margin-top: 2px; }
+        .nested-reply-body { flex: 1; min-width: 0; }
+        .nested-reply-bubble { background: #3a3b3c; border-radius: 14px; padding: 4px 10px; display: inline-block; max-width: 100%; }
+        .nested-reply-header { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; flex-wrap: wrap; }
+        .nested-reply-username { font-weight: 700; font-size: 11px; cursor: pointer; color: #e4e6eb; }
+        .nested-reply-username:hover { text-decoration: underline; }
+        .nested-reply-time { font-size: 9px; color: #b0b3b8; }
+        .nested-reply-text { font-size: 13px; line-height: 1.4; word-wrap: break-word; color: #e4e6eb; }
+
+        .see-replies-btn { 
+            background: none; 
+            border: none; 
+            font-size: 13px; 
+            color: #1877f2; 
+            cursor: pointer; 
+            padding: 6px 0 2px; 
+            font-weight: 600; 
+            transition: 0.2s; 
+            display: inline-block; 
+        }
+        .see-replies-btn:hover { color: #1a8bf5; text-decoration: underline; }
+        .nested-see-btn { font-size: 12px; padding: 4px 0 2px; }
+
+        .reply-indicator {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: #3a3b3c;
+            padding: 6px 14px;
+            border-radius: 20px 20px 0 0;
+            margin-bottom: 0px;
+            font-size: 13px;
+            color: #b0b3b8;
+        }
+        .reply-indicator.show { display: flex; }
+        .reply-indicator .reply-to { display: flex; align-items: center; gap: 6px; }
+        .reply-indicator .reply-to .reply-avatar-small {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .reply-indicator .reply-to strong { color: #e4e6eb; font-weight: 600; }
+        .reply-indicator .cancel-reply-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .reply-indicator .cancel-reply-btn:hover { background: #4a4b4c; color: #e4e6eb; }
+
+        .comment-input { display: flex; gap: 12px; align-items: center; }
+        .comment-input-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; flex-shrink: 0; }
+        .comment-input input { flex: 1; padding: 10px 16px; border-radius: 20px; border: none; background: #3a3b3c; color: #e4e6eb; font-size: 15px; outline: none; min-height: 42px; transition: 0.3s; }
+        .comment-input input:focus { border: 1px solid #1877f2; background: #3a3b3c; }
+        .comment-input input::placeholder { color: #b0b3b8; }
+        .comment-input button { padding: 8px 20px; border: none; background: #1877f2; color: white; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 14px; transition: 0.2s; flex-shrink: 0; min-height: 42px; white-space: nowrap; }
+        .comment-input button:hover { background: #166fe5; }
+        .comment-input button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .view-more-comments { color: #b0b3b8; font-size: 14px; font-weight: 500; cursor: pointer; padding: 12px 0 4px; display: block; text-align: center; transition: 0.2s; }
+        .view-more-comments:hover { color: #e4e6eb; }
+        .no-comments { text-align: center; padding: 16px 0 4px; color: #b0b3b8; font-size: 14px; }
+        .loading-spinner { text-align: center; padding: 20px; color: #b0b3b8; font-size: 14px; }
+
+        .custom-alert { position: fixed; top: 70px; right: 10px; left: 10px; padding: 12px; border-radius: 8px; color: white; z-index: 10000; max-width: 400px; margin: 0 auto; animation: slideIn 0.3s ease; }
+        .custom-alert.success { background: #4caf50; }
+        .custom-alert.error { background: #e94560; }
+        .custom-alert.info { background: #1877f2; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 480px) {
+            .main-container { padding: 0 12px 90px 12px; }
+            .comment-input-wrapper { margin: 0 -12px; padding: 8px 12px; }
+            .post-card { padding: 12px; }
+            .post-avatar { width: 38px; height: 38px; font-size: 17px; }
+            .post-username { font-size: 15px; }
+            .post-content { font-size: 15px; }
+            .comment-avatar { width: 32px; height: 32px; font-size: 13px; }
+            .comment-bubble { padding: 6px 12px; border-radius: 16px; }
+            .comment-username { font-size: 12px; }
+            .comment-text { font-size: 14px; }
+            .comment-time { font-size: 10px; }
+            .replies-container { margin-left: 40px; }
+            .reply-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .reply-bubble { padding: 5px 10px; border-radius: 14px; }
+            .reply-username { font-size: 11px; }
+            .reply-text { font-size: 13px; }
+            .nested-replies-container { margin-left: 32px; }
+            .nested-reply-avatar { width: 24px; height: 24px; font-size: 10px; }
+            .nested-reply-bubble { padding: 4px 8px; border-radius: 12px; }
+            .nested-reply-username { font-size: 10px; }
+            .nested-reply-text { font-size: 12px; }
+            .comment-input { gap: 8px; }
+            .comment-input input { font-size: 14px; padding: 8px 14px; min-height: 38px; border-radius: 18px; }
+            .comment-input button { font-size: 13px; padding: 6px 14px; min-height: 38px; border-radius: 18px; }
+            .comment-input-avatar { width: 32px; height: 32px; font-size: 14px; }
+            .post-action-btn { font-size: 13px; padding: 6px; }
+            .post-action-btn svg { width: 18px; height: 18px; }
+            .back-header .back-btn { font-size: 20px; }
+            .back-header .back-title { font-size: 16px; }
+            .reply-indicator { font-size: 12px; padding: 4px 12px; }
+            .reply-indicator .reply-avatar-small { width: 20px; height: 20px; font-size: 10px; }
+            .reply-indicator .cancel-reply-btn { font-size: 14px; }
+            .see-replies-btn { font-size: 12px; }
+        }
+        @supports (padding: max(0px)) {
+            .comment-input-wrapper {
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <!-- ===== SCROLLABLE CONTENT ===== -->
+        <div class="main-container" id="mainContainer">
+            <div class="back-header">
+                <button class="back-btn" onclick="window.location.href='home.html'"><i class="fas fa-arrow-left"></i></button>
+                <span class="back-title">Post</span>
+            </div>
+
+            <div class="post-card" id="postContainer">
+                <div id="postContent"><div class="loading-spinner">⏳ Loading post...</div></div>
+            </div>
+
+            <div class="post-card" id="commentsSection">
+                <div class="comments-title">💬 Comments</div>
+                <div id="commentsContainer"><div class="loading-spinner">⏳ Loading comments...</div></div>
+            </div>
+            <div style="height: 20px;"></div>
+        </div>
+
+        <!-- ===== STICKY COMMENT INPUT ===== -->
+        <div class="comment-input-wrapper" id="commentInputWrapper">
+            <div class="reply-indicator" id="replyIndicator">
+                <div class="reply-to">
+                    <span class="reply-avatar-small" id="replyAvatarSmall">U</span>
+                    <span>Replying to <strong id="replyToName">User</strong></span>
+                </div>
+                <button class="cancel-reply-btn" id="cancelReplyBtn" title="Cancel reply">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="comment-input">
+                <div class="comment-input-avatar" id="commentAvatar">U</div>
+                <input type="text" id="commentInput" placeholder="Write a comment..." maxlength="200">
+                <button id="commentBtn">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        // ============================================================
+        // POST.JS - নিজের কমেন্ট সবার আগে দেখাবে
+        // ============================================================
+
+        console.log('🚀 Post page loading...');
+
+        let currentUser = null;
+        let currentPost = null;
+        let allComments = [];
+        let commentPage = 0;
+        const COMMENTS_PER_PAGE = 10;
+        let isLoadingComments = false;
+        let hasMoreComments = true;
+        let replyingTo = null;
+        let currentPostId = null;
+
+        const postContainer = document.getElementById('postContent');
+        const commentsContainer = document.getElementById('commentsContainer');
+        const commentInput = document.getElementById('commentInput');
+        const commentBtn = document.getElementById('commentBtn');
+        const commentAvatar = document.getElementById('commentAvatar');
+
+        const replyIndicator = document.getElementById('replyIndicator');
+        const replyAvatarSmall = document.getElementById('replyAvatarSmall');
+        const replyToName = document.getElementById('replyToName');
+        const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+
+        // ============================================================
+        // API REQUEST
+        // ============================================================
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${window.API_BASE_URL}${endpoint}`;
+            const userId = localStorage.getItem('userId');
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (userId) headers['Authorization'] = `Bearer ${userId}`;
+            try {
+                const response = await fetch(url, { ...options, headers, mode: 'cors', credentials: 'omit' });
+                const data = await response.json();
+                if (!response.ok) {
+                    console.error('API Error:', data);
+                    return null;
+                }
+                return data;
+            } catch (error) {
+                console.error('API Request failed:', error);
+                return null;
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = `custom-alert ${type}`;
+            alert.innerHTML = message + '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function timeAgo(date) {
+            if (!date) return 'Just now';
+            try {
+                const now = new Date();
+                const past = new Date(date);
+                const diffInSeconds = Math.floor((now - past) / 1000);
+                if (diffInSeconds < 5) return 'Just now';
+                if (diffInSeconds < 60) return diffInSeconds + 's ago';
+                const minutes = Math.floor(diffInSeconds / 60);
+                if (minutes < 60) return minutes + 'm ago';
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return hours + 'h ago';
+                const days = Math.floor(hours / 24);
+                if (days < 7) return days + 'd ago';
+                const weeks = Math.floor(days / 7);
+                if (weeks < 4) return weeks + 'w ago';
+                const months = Math.floor(days / 30);
+                if (months < 12) return months + 'mo ago';
+                const years = Math.floor(days / 365);
+                return years + 'y ago';
+            } catch (e) { return 'Just now'; }
+        }
+
+        // ============================================================
+        // SORT COMMENTS - নিজের কমেন্ট সবার আগে
+        // ============================================================
+        function sortComments(comments) {
+            if (!currentUser) return comments;
+            const userId = currentUser.id;
+            return comments.sort((a, b) => {
+                const aOwn = a.user_id === userId;
+                const bOwn = b.user_id === userId;
+                if (aOwn && !bOwn) return -1;
+                if (!aOwn && bOwn) return 1;
+                // both same ownership, sort by created_at DESC (newest first)
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+        }
+
+        // ============================================================
+        // RENDER COMMENTS
+        // ============================================================
+        function renderComments(comments) {
+            if (!comments || comments.length === 0) {
+                commentsContainer.innerHTML = '<div class="no-comments">💬 No comments yet. Be the first!</div>';
+                return;
+            }
+
+            commentsContainer.innerHTML = comments.map(comment => createCommentHTML(comment)).join('');
+        }
+
+        // ============================================================
+        // REPLY INDICATOR
+        // ============================================================
+        function showReplyIndicator(username) {
+            replyAvatarSmall.textContent = username.charAt(0).toUpperCase();
+            replyToName.textContent = username;
+            replyIndicator.classList.add('show');
+            commentInput.placeholder = `Write a reply to @${username}...`;
+            commentInput.focus();
+        }
+
+        function hideReplyIndicator() {
+            replyIndicator.classList.remove('show');
+            commentInput.placeholder = 'Write a comment...';
+            document.querySelectorAll('.comment-reply-btn, .reply-reply-btn').forEach(el => el.classList.remove('replying'));
+            replyingTo = null;
+        }
+
+        // ============================================================
+        // LOAD POST
+        // ============================================================
+        async function loadPost(postId) {
+            const result = await apiRequest(`/posts/${postId}`);
+            if (!result || !result.success) {
+                postContainer.innerHTML = `<div style="text-align:center;padding:30px;color:#e94560;font-size:18px;">❌ Post not found</div>`;
+                return;
+            }
+            currentPost = result.data;
+            renderPost(currentPost);
+        }
+
+        function renderPost(post) {
+            const userId = localStorage.getItem('userId');
+            const timeAgoText = timeAgo(post.created_at);
+            let content = post.content || '';
+            content = content.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
+            const verifiedBadge = post.is_verified ? `<span class="verified-badge"><i class="fas fa-check-circle"></i></span>` : '';
+
+            if (userId) {
+                apiRequest(`/posts/${post.id}/liked?userId=${userId}`).then(res => {
+                    if (res && res.success) {
+                        const btn = document.getElementById('likeBtn');
+                        if (btn && res.data) btn.classList.add('liked');
+                    }
+                });
+            }
+
+            postContainer.innerHTML = `
+                <div class="post-header">
+                    <div class="post-avatar" onclick="window.location.href='userprofile.html?userId=${post.user_id}'">
+                        ${(post.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="post-user-info">
+                        <div class="post-username" onclick="window.location.href='userprofile.html?userId=${post.user_id}'">
+                            ${escapeHtml(post.username || 'User')} ${verifiedBadge}
+                        </div>
+                        <div class="post-time">${timeAgoText} · 🌍</div>
+                    </div>
+                </div>
+                <div class="post-content">${content}</div>
+                <div class="post-stats">
+                    <span>❤️ <span id="likeCount">${post.likes_count || 0}</span></span>
+                    <span>💬 <span id="commentCount">${post.comments_count || 0}</span></span>
+                </div>
+                <div class="post-actions">
+                    <button class="post-action-btn" id="likeBtn" onclick="toggleLike('${post.id}')">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        <span>Like</span>
+                    </button>
+                    <button class="post-action-btn" onclick="document.getElementById('commentInput').focus()">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
+                        <span>Comment</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // TOGGLE LIKE
+        // ============================================================
+        async function toggleLike(postId) {
+            const userId = localStorage.getItem('userId');
+            if (!userId) { showAlert('Please login first!', 'error'); return; }
+
+            const btn = document.getElementById('likeBtn');
+            if (!btn) return;
+            const isLiked = btn.classList.contains('liked');
+            const likeCountSpan = document.getElementById('likeCount');
+            if (!likeCountSpan) return;
+            let currentCount = parseInt(likeCountSpan.textContent) || 0;
+
+            try {
+                if (isLiked) {
+                    const result = await apiRequest(`/posts/${postId}/like`, {
+                        method: 'DELETE',
+                        body: JSON.stringify({ user_id: userId })
+                    });
+                    if (result && result.success) {
+                        btn.classList.remove('liked');
+                        const newCount = Math.max(0, currentCount - 1);
+                        likeCountSpan.textContent = newCount;
+                        if (currentPost) currentPost.likes_count = newCount;
+                    }
+                } else {
+                    const result = await apiRequest(`/posts/${postId}/like`, {
+                        method: 'POST',
+                        body: JSON.stringify({ user_id: userId })
+                    });
+                    if (result && result.success) {
+                        btn.classList.add('liked');
+                        const newCount = currentCount + 1;
+                        likeCountSpan.textContent = newCount;
+                        if (currentPost) currentPost.likes_count = newCount;
+                    } else if (result && result.error === 'Already liked') {
+                        btn.classList.add('liked');
+                        showAlert('You already liked this post!', 'info');
+                    }
+                }
+            } catch (error) {
+                console.error('Toggle like error:', error);
+                showAlert('Something went wrong!', 'error');
+            }
+        }
+
+        // ============================================================
+        // LOAD COMMENTS - with sorting
+        // ============================================================
+        async function loadComments(postId) {
+            const result = await apiRequest(`/posts/${postId}/comments`);
+            if (!result || !result.success) {
+                commentsContainer.innerHTML = '<div class="no-comments">❌ Failed to load comments</div>';
+                return;
+            }
+
+            allComments = result.data || [];
+            // ✅ Sort: own comments first
+            allComments = sortComments(allComments);
+
+            commentPage = 1;
+            hasMoreComments = allComments.length === COMMENTS_PER_PAGE;
+
+            renderComments(allComments);
+
+            if (hasMoreComments) {
+                const moreBtn = document.createElement('div');
+                moreBtn.className = 'view-more-comments';
+                moreBtn.textContent = 'Load more comments';
+                moreBtn.onclick = () => loadMoreComments(postId);
+                commentsContainer.appendChild(moreBtn);
+            }
+        }
+
+        // ============================================================
+        // LOAD MORE COMMENTS - with sorting
+        // ============================================================
+        async function loadMoreComments(postId) {
+            if (isLoadingComments || !hasMoreComments) return;
+            isLoadingComments = true;
+
+            const start = commentPage * COMMENTS_PER_PAGE;
+            const result = await apiRequest(`/posts/${postId}/comments?start=${start}&limit=${COMMENTS_PER_PAGE}`);
+            isLoadingComments = false;
+
+            if (!result || !result.success || result.data.length === 0) {
+                hasMoreComments = false;
+                const moreBtn = commentsContainer.querySelector('.view-more-comments');
+                if (moreBtn) moreBtn.remove();
+                return;
+            }
+
+            const newComments = result.data || [];
+            allComments = [...allComments, ...newComments];
+            // ✅ Sort again to keep own comments on top
+            allComments = sortComments(allComments);
+
+            commentPage++;
+            hasMoreComments = newComments.length === COMMENTS_PER_PAGE;
+
+            // Re-render all comments with new order
+            renderComments(allComments);
+
+            if (hasMoreComments) {
+                const newMoreBtn = document.createElement('div');
+                newMoreBtn.className = 'view-more-comments';
+                newMoreBtn.textContent = 'Load more comments';
+                newMoreBtn.onclick = () => loadMoreComments(postId);
+                commentsContainer.appendChild(newMoreBtn);
+            }
+        }
+
+        // ============================================================
+        // CREATE COMMENT HTML
+        // ============================================================
+        function createCommentHTML(comment) {
+            const userId = localStorage.getItem('userId');
+            const isOwner = userId === comment.user_id;
+            const timeAgoText = timeAgo(comment.created_at);
+            const replyCount = comment.replies_count || 0;
+
+            return `
+                <div class="comment-item" id="comment-${comment.id}">
+                    <div class="comment-avatar" onclick="window.location.href='userprofile.html?userId=${comment.user_id}'">
+                        ${(comment.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="comment-body">
+                        <div class="comment-bubble">
+                            <div class="comment-header">
+                                <span class="comment-username" onclick="window.location.href='userprofile.html?userId=${comment.user_id}'">
+                                    ${escapeHtml(comment.username || 'User')}
+                                </span>
+                                <span class="comment-time">${timeAgoText}</span>
+                            </div>
+                            <div class="comment-text">${escapeHtml(comment.content)}</div>
+                        </div>
+                        <div class="comment-actions">
+                            ${isOwner ? `<button class="comment-action-btn danger" onclick="deleteComment('${comment.id}')">Delete</button>` : ''}
+                            <button class="comment-reply-btn" id="replyCommentBtn-${comment.id}" onclick="setReplyingTo('comment', '${comment.id}', '${escapeHtml(comment.username)}')">Reply</button>
+                        </div>
+                        ${replyCount > 0 ? `<button class="see-replies-btn" id="seeReplies-${comment.id}" onclick="loadReplies('${comment.id}')">View ${replyCount} reply${replyCount > 1 ? 's' : ''}</button>` : ''}
+                        <div class="replies-container hidden" id="replies-${comment.id}"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // LOAD REPLIES (unchanged)
+        // ============================================================
+        async function loadReplies(commentId) {
+            const container = document.getElementById(`replies-${commentId}`);
+            const seeBtn = document.getElementById(`seeReplies-${commentId}`);
+
+            if (!container) {
+                console.error('Container not found for comment:', commentId);
+                return;
+            }
+
+            if (container.classList.contains('loaded')) {
+                container.classList.toggle('hidden');
+                if (seeBtn) {
+                    const count = container.dataset.count || 0;
+                    if (container.classList.contains('hidden')) {
+                        seeBtn.textContent = `View ${count} reply${count > 1 ? 's' : ''}`;
+                    } else {
+                        seeBtn.textContent = 'Hide replies';
+                    }
+                }
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = '<div class="loading-spinner" style="padding:8px 0;font-size:12px;">⏳ Loading...</div>';
+            container.classList.add('loaded');
+
+            const result = await apiRequest(`/comments/${commentId}/replies`);
+
+            if (!result || !result.success) {
+                container.innerHTML = '<div class="no-replies">❌ Failed to load replies</div>';
+                return;
+            }
+
+            const replies = result.data || [];
+            if (replies.length === 0) {
+                container.innerHTML = '<div class="no-replies">No replies yet</div>';
+                return;
+            }
+
+            container.dataset.count = replies.length;
+            container.innerHTML = replies.map(reply => createReplyHTML(reply)).join('');
+            if (seeBtn) seeBtn.textContent = 'Hide replies';
+        }
+
+        // ============================================================
+        // CREATE REPLY HTML (unchanged)
+        // ============================================================
+        function createReplyHTML(reply) {
+            const userId = localStorage.getItem('userId');
+            const isOwner = userId === reply.user_id;
+            const timeAgoText = timeAgo(reply.created_at);
+            const nestedReplyCount = reply.replies_count || 0;
+
+            return `
+                <div class="reply-item" id="reply-${reply.id}">
+                    <div class="reply-avatar" onclick="window.location.href='userprofile.html?userId=${reply.user_id}'">
+                        ${(reply.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="reply-body">
+                        <div class="reply-bubble">
+                            <div class="reply-header">
+                                <span class="reply-username" onclick="window.location.href='userprofile.html?userId=${reply.user_id}'">
+                                    ${escapeHtml(reply.username || 'User')}
+                                </span>
+                                <span class="reply-time">${timeAgoText}</span>
+                            </div>
+                            <div class="reply-text">${escapeHtml(reply.content)}</div>
+                        </div>
+                        <div class="reply-actions">
+                            ${isOwner ? `<button class="reply-action-btn danger" onclick="deleteReply('${reply.id}')">Delete</button>` : ''}
+                            <button class="reply-reply-btn" id="replyReplyBtn-${reply.id}" onclick="setReplyingTo('reply', '${reply.id}', '${escapeHtml(reply.username)}')">Reply</button>
+                        </div>
+                        ${nestedReplyCount > 0 ? `<button class="see-replies-btn nested-see-btn" id="seeNestedReplies-${reply.id}" onclick="loadNestedReplies('${reply.id}')">View ${nestedReplyCount} reply${nestedReplyCount > 1 ? 's' : ''}</button>` : ''}
+                        <div class="nested-replies-container hidden" id="nestedReplies-${reply.id}"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // LOAD NESTED REPLIES (unchanged)
+        // ============================================================
+        async function loadNestedReplies(replyId) {
+            const container = document.getElementById(`nestedReplies-${replyId}`);
+            const seeBtn = document.getElementById(`seeNestedReplies-${replyId}`);
+
+            if (!container) {
+                console.error('Nested container not found for reply:', replyId);
+                return;
+            }
+
+            if (container.classList.contains('loaded')) {
+                container.classList.toggle('hidden');
+                if (seeBtn) {
+                    const count = container.dataset.count || 0;
+                    if (container.classList.contains('hidden')) {
+                        seeBtn.textContent = `View ${count} reply${count > 1 ? 's' : ''}`;
+                    } else {
+                        seeBtn.textContent = 'Hide replies';
+                    }
+                }
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = '<div class="loading-spinner" style="padding:8px 0;font-size:11px;">⏳ Loading...</div>';
+            container.classList.add('loaded');
+
+            const result = await apiRequest(`/comments/${replyId}/replies`);
+
+            if (!result || !result.success) {
+                container.innerHTML = '<div class="no-replies">❌ Failed to load replies</div>';
+                return;
+            }
+
+            const nestedReplies = result.data || [];
+            if (nestedReplies.length === 0) {
+                container.innerHTML = '<div class="no-replies">No replies yet</div>';
+                return;
+            }
+
+            container.dataset.count = nestedReplies.length;
+            container.innerHTML = nestedReplies.map(nested => createNestedReplyHTML(nested)).join('');
+            if (seeBtn) seeBtn.textContent = 'Hide replies';
+        }
+
+        // ============================================================
+        // CREATE NESTED REPLY HTML (unchanged)
+        // ============================================================
+        function createNestedReplyHTML(nestedReply) {
+            const userId = localStorage.getItem('userId');
+            const isOwner = userId === nestedReply.user_id;
+            const timeAgoText = timeAgo(nestedReply.created_at);
+
+            return `
+                <div class="nested-reply-item" id="nestedReply-${nestedReply.id}">
+                    <div class="nested-reply-avatar" onclick="window.location.href='userprofile.html?userId=${nestedReply.user_id}'">
+                        ${(nestedReply.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="nested-reply-body">
+                        <div class="nested-reply-bubble">
+                            <div class="nested-reply-header">
+                                <span class="nested-reply-username" onclick="window.location.href='userprofile.html?userId=${nestedReply.user_id}'">
+                                    ${escapeHtml(nestedReply.username || 'User')}
+                                </span>
+                                <span class="nested-reply-time">${timeAgoText}</span>
+                            </div>
+                            <div class="nested-reply-text">${escapeHtml(nestedReply.content)}</div>
+                        </div>
+                        <div class="reply-actions">
+                            ${isOwner ? `<button class="reply-action-btn danger" onclick="deleteReply('${nestedReply.id}')">Delete</button>` : ''}
+                            <button class="reply-reply-btn" onclick="setReplyingTo('reply', '${nestedReply.id}', '${escapeHtml(nestedReply.username)}')">Reply</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // SET REPLYING TO
+        // ============================================================
+        function setReplyingTo(type, id, username) {
+            if (replyingTo && replyingTo.id === id && replyingTo.type === type) {
+                hideReplyIndicator();
+                return;
+            }
+
+            replyingTo = { type, id, username };
+            showReplyIndicator(username);
+            document.querySelectorAll('.comment-reply-btn, .reply-reply-btn').forEach(el => el.classList.remove('replying'));
+            if (type === 'comment') {
+                const btn = document.getElementById(`replyCommentBtn-${id}`);
+                if (btn) btn.classList.add('replying');
+            } else if (type === 'reply') {
+                const btn = document.getElementById(`replyReplyBtn-${id}`);
+                if (btn) btn.classList.add('replying');
+            }
+        }
+
+        function cancelReply() {
+            hideReplyIndicator();
+            commentInput.value = '';
+            document.querySelectorAll('.comment-reply-btn, .reply-reply-btn').forEach(el => el.classList.remove('replying'));
+        }
+
+        // ============================================================
+        // ADD COMMENT / REPLY
+        // ============================================================
+        async function addComment(postId) {
+            const content = commentInput.value.trim();
+            if (!content) {
+                showAlert('Comment cannot be empty!', 'error');
+                return;
+            }
+            if (content.length > 200) {
+                showAlert('Comment cannot exceed 200 characters!', 'error');
+                return;
+            }
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            const payload = {
+                user_id: userId,
+                username: currentUser?.username || 'User',
+                content: content
+            };
+
+            if (replyingTo) {
+                payload.parent_comment_id = replyingTo.id;
+            }
+
+            commentBtn.disabled = true;
+            commentBtn.textContent = '⏳';
+
+            const result = await apiRequest(`/posts/${postId}/comments`, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            commentBtn.disabled = false;
+            commentBtn.textContent = 'Post';
+
+            if (!result || !result.success) {
+                showAlert('Failed to post comment!', 'error');
+                return;
+            }
+
+            const wasReplying = replyingTo;
+            const replyType = replyingTo?.type;
+            const replyId = replyingTo?.id;
+            
+            hideReplyIndicator();
+            commentInput.value = '';
+
+            const countSpan = document.getElementById('commentCount');
+            if (countSpan) {
+                const current = parseInt(countSpan.textContent) || 0;
+                countSpan.textContent = current + 1;
+            }
+
+            if (wasReplying) {
+                if (replyType === 'comment') {
+                    const container = document.getElementById(`replies-${replyId}`);
+                    if (container) {
+                        container.innerHTML = '';
+                        container.classList.remove('loaded', 'hidden');
+                        await loadReplies(replyId);
+                    }
+                } else if (replyType === 'reply') {
+                    const container = document.getElementById(`nestedReplies-${replyId}`);
+                    if (container) {
+                        container.innerHTML = '';
+                        container.classList.remove('loaded', 'hidden');
+                        await loadNestedReplies(replyId);
+                    } else {
+                        const replyEl = document.getElementById(`reply-${replyId}`);
+                        if (replyEl) {
+                            const parentComment = replyEl.closest('.comment-item');
+                            if (parentComment) {
+                                const commentId = parentComment.id.replace('comment-', '');
+                                const parentContainer = document.getElementById(`replies-${commentId}`);
+                                if (parentContainer) {
+                                    parentContainer.innerHTML = '';
+                                    parentContainer.classList.remove('loaded', 'hidden');
+                                    await loadReplies(commentId);
+                                }
+                            }
+                        }
+                    }
+                }
+                showAlert('✅ Reply posted!', 'success');
+            } else {
+                // Reload all comments, will be sorted
+                allComments = [];
+                commentPage = 0;
+                hasMoreComments = true;
+                await loadComments(postId);
+                showAlert('✅ Comment posted!', 'success');
+            }
+
+            commentInput.focus();
+            const container = document.getElementById('mainContainer');
+            setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+        }
+
+        // ============================================================
+        // DELETE COMMENT / REPLY
+        // ============================================================
+        async function deleteComment(commentId) {
+            if (!confirm('Are you sure you want to delete this comment?')) return;
+            const userId = localStorage.getItem('userId');
+            if (!userId) { showAlert('Please login first!', 'error'); return; }
+
+            const result = await apiRequest(`/comments/${commentId}`, {
+                method: 'DELETE',
+                body: JSON.stringify({ user_id: userId })
+            });
+
+            if (!result || !result.success) {
+                showAlert('Failed to delete comment!', 'error');
+                return;
+            }
+
+            const countSpan = document.getElementById('commentCount');
+            if (countSpan) {
+                const current = parseInt(countSpan.textContent) || 0;
+                countSpan.textContent = Math.max(0, current - 1);
+            }
+
+            const el = document.getElementById(`comment-${commentId}`);
+            if (el) el.remove();
+            showAlert('✅ Comment deleted!', 'success');
+        }
+
+        async function deleteReply(replyId) {
+            if (!confirm('Are you sure you want to delete this reply?')) return;
+            const userId = localStorage.getItem('userId');
+            if (!userId) { showAlert('Please login first!', 'error'); return; }
+
+            const result = await apiRequest(`/comments/${replyId}`, {
+                method: 'DELETE',
+                body: JSON.stringify({ user_id: userId })
+            });
+
+            if (!result || !result.success) {
+                showAlert('Failed to delete reply!', 'error');
+                return;
+            }
+
+            const el = document.getElementById(`reply-${replyId}`);
+            if (el) {
+                el.remove();
+            } else {
+                const nestedEl = document.getElementById(`nestedReply-${replyId}`);
+                if (nestedEl) nestedEl.remove();
+            }
+            showAlert('✅ Reply deleted!', 'success');
+        }
+
+        // ============================================================
+        // PAGE LOAD
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Post page loading...');
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userResult = await apiRequest(`/users/${userId}`);
+            if (userResult && userResult.success) {
+                currentUser = userResult.data;
+                if (commentAvatar) {
+                    commentAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+                }
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            currentPostId = params.get('postId');
+
+            if (!currentPostId) {
+                showAlert('Post ID not found!', 'error');
+                window.location.href = 'home.html';
+                return;
+            }
+
+            await loadPost(currentPostId);
+            await loadComments(currentPostId);
+
+            commentInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    addComment(currentPostId);
+                }
+            });
+
+            commentBtn.addEventListener('click', function() {
+                addComment(currentPostId);
+            });
+
+            cancelReplyBtn.addEventListener('click', cancelReply);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && replyingTo) {
+                    cancelReply();
+                }
+            });
+
+            console.log('✅ Post page loaded with own comments first!');
+        });
+
+        // Make global
+        window.toggleLike = toggleLike;
+        window.deleteComment = deleteComment;
+        window.deleteReply = deleteReply;
+        window.loadReplies = loadReplies;
+        window.loadNestedReplies = loadNestedReplies;
+        window.setReplyingTo = setReplyingTo;
+        window.cancelReply = cancelReply;
+        window.addComment = addComment;
+
+        console.log('🚀 Post page ready with own comments first!');
+    </script>
+</body>
+</html>
