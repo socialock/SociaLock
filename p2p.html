@@ -572,7 +572,6 @@
         // P2P.JS - সম্পূর্ণ ফ্রন্টএন্ড (কাস্টম এলার্ট + মডাল)
         // ============================================================
 
-        console.log('🔒 P2P Chat Frontend loaded');
 
         // ===== গ্লোবাল ভেরিয়েবল =====
         var currentUser = null;
@@ -674,7 +673,7 @@
                         data: data
                     })
                 });
-            } catch (e) { console.error('Signal send error', e); }
+            } catch (e) { }
         }
 
         async function pollSignals() {
@@ -686,7 +685,7 @@
                         handleSignal(signal.from, signal.data);
                     });
                 }
-            } catch (e) { console.error('Poll error', e); }
+            } catch (e) { }
         }
 
         // ===== WebRTC =====
@@ -712,10 +711,10 @@
                         var url = URL.createObjectURL(blob);
                         appendMessage(data.from, '<a href="' + url + '" download="' + data.name + '" class="file">📎 ' + data.name + '</a>', false);
                     }
-                } catch (e) { console.log('DC message parse error', e); }
+                } catch (e) { }
             };
-            dc.onopen = function() { console.log('DC open for', targetUserId); };
-            dc.onclose = function() { console.log('DC close for', targetUserId); };
+            dc.onopen = function() { };
+            dc.onclose = function() { };
 
             if (localStream) {
                 localStream.getTracks().forEach(function(track) { pc.addTrack(track, localStream); });
@@ -821,7 +820,7 @@
                         return '<div class="participant-item"><span>' + escapeHtml(p.user_name) + ' (' + p.status + ')</span><div class="actions">' + actions + '</div></div>';
                     }).join('');
                 }
-            } catch (e) { console.error('Participants load error', e); }
+            } catch (e) { }
         }
 
         async function approveUser(userId) {
@@ -962,7 +961,7 @@
                         return '<div class="room-item"><div class="info"><div class="name">📡 ' + escapeHtml(room.host_name) + '\'s Room</div><div class="meta">👥 ' + (room.members || 1) + ' members · ' + room.room_id.substring(0, 8) + '</div></div><button class="join-btn" onclick="quickJoin(\'' + room.room_id + '\')">Join</button></div>';
                     }).join('');
                 }
-            } catch (e) { console.error('Load rooms error', e); }
+            } catch (e) { }
         }
 
         window.quickJoin = function(id) {
@@ -1063,7 +1062,6 @@
             });
         });
 
-        console.log('🔒 P2P Chat Frontend ready (with custom modals)');
     </script>
 </body>
 </html>

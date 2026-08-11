@@ -199,7 +199,75 @@
             .notif-header h1 { font-size: 1.1rem; }
             .notif-header button { font-size: 0.75rem; padding: 3px 8px; }
         }
+    
+        /* ===== কাস্টম কনফার্ম মডাল ===== */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .custom-modal-overlay.show { display: flex; }
+        .custom-modal {
+            background: #242526;
+            border-radius: 16px;
+            padding: 28px 24px 20px;
+            max-width: 380px;
+            width: 90%;
+            border: 1px solid #3a3b3c;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .custom-modal .modal-icon {
+            font-size: 2.8rem;
+            color: #e94560;
+            margin-bottom: 8px;
+        }
+        .custom-modal h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e4e6eb;
+        }
+        .custom-modal p {
+            font-size: 0.95rem;
+            color: #b0b3b8;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .custom-modal .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .custom-modal .modal-actions button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .custom-modal .modal-actions .btn-cancel {
+            background: #3a3b3c;
+            color: #b0b3b8;
+        }
+        .custom-modal .modal-actions .btn-cancel:hover { background: #4a4b4c; }
+        .custom-modal .modal-actions .btn-danger {
+            background: #e94560;
+            color: white;
+        }
+        .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
     </style>
+
 </head>
 
 <body>
@@ -228,12 +296,51 @@
 
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
+    <!-- ===== কাস্টম কনফার্ম মডাল ===== -->
+    <div class="custom-modal-overlay" id="customModal">
+        <div class="custom-modal">
+            <div class="modal-icon" id="modalIcon">⚠️</div>
+            <h3 id="modalTitle">Are you sure?</h3>
+            <p id="modalMessage">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="modalCancel">Cancel</button>
+                <button class="btn-danger" id="modalConfirm">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ===== কাস্টম কনফার্ম =====
+        let pendingConfirmResolve = null;
+        function customConfirm(title, message, icon = '⚠️') {
+            return new Promise(function(resolve) {
+                document.getElementById('modalIcon').textContent = icon;
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+                document.getElementById('customModal').classList.add('show');
+                pendingConfirmResolve = resolve;
+            });
+        }
+        document.getElementById('modalCancel').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+        });
+        document.getElementById('modalConfirm').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(true); pendingConfirmResolve = null; }
+        });
+        document.getElementById('customModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('customModal').classList.remove('show');
+                if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+            }
+        });
+
+
         // ============================================================
         // NOTIFICATIONS - INDIVIDUAL READ REMOVED
         // ============================================================
 
-        console.log('🔔 Notifications page loading...');
 
         let currentUser = null;
         let allNotifications = [];
@@ -245,7 +352,7 @@
         // ============================================================
         async function deleteNotification(notifId, event) {
             event.stopPropagation();
-            if (!confirm('Delete this notification?')) return;
+            if (!(await customConfirm('Delete Notification', 'Delete this notification?', '🗑️'))) return;
 
             const userId = localStorage.getItem('userId');
             if (!userId) {
@@ -268,7 +375,6 @@
                     showAlert('Failed to delete!', 'error');
                 }
             } catch (err) {
-                console.error('Delete error:', err);
                 showAlert('Failed to delete!', 'error');
             }
         }
@@ -298,7 +404,6 @@
                     showAlert('Failed to mark all as read!', 'error');
                 }
             } catch (err) {
-                console.error('Mark all error:', err);
                 showAlert('Failed to mark all as read!', 'error');
             }
         }
@@ -313,7 +418,7 @@
                 return;
             }
 
-            if (!confirm('⚠️ Delete all notifications? This cannot be undone!')) return;
+            if (!(await customConfirm('Delete All Notifications', 'This will permanently delete all your notifications. This cannot be undone!', '⚠️'))) return;
 
             try {
                 const result = await window.apiRequest('/notifications/delete-all', {
@@ -330,7 +435,6 @@
                     showAlert('Failed to delete all!', 'error');
                 }
             } catch (err) {
-                console.error('Delete all error:', err);
                 showAlert('Failed to delete all!', 'error');
             }
         }
@@ -348,7 +452,6 @@
                     return result.data || [];
                 }
             } catch (err) {
-                console.error('Fetch error:', err);
             }
             return [];
         }
@@ -494,10 +597,8 @@
                     await updateBadge();
                 }, 30000);
 
-                console.log('✅ Notifications page loaded successfully!');
 
             } catch (err) {
-                console.error('Page load error:', err);
                 container.innerHTML = `
                     <div class="no-notifs" style="padding:40px;text-align:center;">
                         <span class="icon" style="font-size:48px;">❌</span>

@@ -330,7 +330,6 @@
         // MESSAGES.JS - Complete
         // ============================================================
 
-        console.log('💬 Messages page loading...');
 
         var currentUser = null;
 
@@ -357,7 +356,6 @@
                     }
                 }
             } catch (e) {
-                console.error('Badge update error:', e);
                 badge.classList.remove('show');
             }
         }
@@ -386,14 +384,12 @@
                 .then(function(result) {
                     if (result && result.success) {
                         currentUser = result.data;
-                        console.log('✅ User loaded:', currentUser.username);
                     } else {
                         localStorage.removeItem('userId');
                         window.location.href = 'login.html';
                     }
                 })
                 .catch(function(err) {
-                    console.error('User load error:', err);
                     localStorage.removeItem('userId');
                     window.location.href = 'login.html';
                 });
@@ -402,10 +398,8 @@
             updateNotifBadge();
             setInterval(updateNotifBadge, 30000);
 
-            console.log('✅ Messages page loaded!');
         });
 
-        console.log('💬 Messages page ready!');
     </script>
 </body>
 </html>

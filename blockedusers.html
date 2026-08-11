@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Blocked Users - SociaLock</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; min-height: 100vh; }
+        .back-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #3a3b3c; position: sticky; top: 0; background: #18191a; z-index: 5; }
+        .back-header .back-btn { background: none; border: none; color: #b0b3b8; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; display: flex; }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; }
+        .main-container { max-width: 560px; margin: 0 auto; padding: 16px 16px 40px; }
+        .sub-hint { color: #8a8d91; font-size: 0.85rem; margin-bottom: 16px; padding: 0 4px; }
+        .blocked-list { background: #242526; border: 1px solid #3a3b3c; border-radius: 12px; overflow: hidden; }
+        .blocked-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #3a3b3c; }
+        .blocked-item:last-child { border-bottom: none; }
+        .blocked-item .avatar { width: 42px; height: 42px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; flex-shrink: 0; }
+        .blocked-item .name { flex: 1; min-width: 0; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
+        .blocked-item .btn-unblock { background: #3a3b3c; color: #e4e6eb; border: none; padding: 7px 14px; border-radius: 18px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .blocked-item .btn-unblock:hover { background: #4a4b4c; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #8a8d91; }
+        .empty-state i { font-size: 2.6rem; margin-bottom: 14px; display: block; color: #3a3b3c; }
+        .custom-alert { position: fixed; top: 20px; right: 20px; left: 20px; padding: 12px 16px; border-radius: 12px; color: white; z-index: 9999; max-width: 440px; margin: 0 auto; font-size: 0.95rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
+        .custom-alert.success { background: #2e7d32; }
+        .custom-alert.error { background: #c62828; }
+        .custom-alert.info { background: #0d47a1; }
+    </style>
+</head>
+<body>
+
+    <div class="back-header">
+        <a href="settings.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <div class="back-title">Blocked Users</div>
+    </div>
+
+    <div class="main-container">
+        <div class="sub-hint">Blocked users can't follow you, comment on your posts, or contact you.</div>
+        <div class="blocked-list" id="blockedList"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        if (!userId) window.location.href = 'login.html';
+
+        const blockedList = document.getElementById('blockedList');
+
+        async function loadBlockedUsers() {
+            blockedList.innerHTML = '';
+            const idsResult = await window.apiRequest(`/users/${userId}/blocked`);
+
+            if (!idsResult || !idsResult.success || !Array.isArray(idsResult.data) || idsResult.data.length === 0) {
+                blockedList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-check"></i>
+                        <div>You haven't blocked anyone.</div>
+                    </div>`;
+                return;
+            }
+
+            const users = await Promise.all(
+                idsResult.data.map(id => window.apiRequest(`/users/${id}`))
+            );
+
+            let html = '';
+            users.forEach((res, i) => {
+                if (!res || !res.success) return;
+                const u = res.data;
+                html += `
+                    <div class="blocked-item">
+                        <div class="avatar">${escapeHtml((u.username || '?').charAt(0).toUpperCase())}</div>
+                        <div class="name">
+                            ${escapeHtml(u.username)}
+                            ${u.is_verified ? '<i class="fas fa-check-circle" style="color:#1877f2;font-size:13px;"></i>' : ''}
+                        </div>
+                        <button class="btn-unblock" data-id="${u.id}"><i class="fas fa-unlock"></i> Unblock</button>
+                    </div>`;
+            });
+
+            blockedList.innerHTML = html || `
+                <div class="empty-state">
+                    <i class="fas fa-user-check"></i>
+                    <div>You haven't blocked anyone.</div>
+                </div>`;
+
+            blockedList.querySelectorAll('.btn-unblock').forEach(btn => {
+                btn.addEventListener('click', () => unblockUser(btn.dataset.id, btn));
+            });
+        }
+
+        async function unblockUser(targetId, btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            try {
+                const result = await window.apiRequest('/users/block', {
+                    method: 'POST',
+                    body: JSON.stringify({ user_id: userId, blocked_user_id: targetId })
+                });
+                if (result && result.success && result.action === 'unblocked') {
+                    showAlert('User unblocked.', 'success');
+                    loadBlockedUsers();
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-unlock"></i> Unblock';
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-unlock"></i> Unblock';
+            }
+        }
+
+        loadBlockedUsers();
+    </script>
+</body>
+</html>

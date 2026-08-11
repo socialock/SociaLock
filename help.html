@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Help &amp; Support - SociaLock</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            min-height: 100vh;
+        }
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #3a3b3c;
+            position: sticky;
+            top: 0;
+            background: #18191a;
+            z-index: 5;
+        }
+        .back-header .back-btn { background: none; border: none; color: #b0b3b8; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; text-decoration: none; display: flex; }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; }
+
+        .main-container { max-width: 600px; margin: 0 auto; padding: 16px 16px 40px; }
+
+        .help-hero { text-align: center; padding: 20px 12px 26px; }
+        .help-hero .icon { font-size: 2.6rem; color: #e94560; margin-bottom: 10px; }
+        .help-hero h2 { font-size: 1.2rem; margin-bottom: 6px; }
+        .help-hero p { color: #b0b3b8; font-size: 0.9rem; }
+
+        .search-box { position: relative; margin-bottom: 22px; }
+        .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #8a8d91; font-size: 14px; }
+        .search-box input {
+            width: 100%; padding: 12px 14px 12px 38px; border-radius: 24px; border: 1px solid #3a3b3c;
+            background: #242526; color: #e4e6eb; font-size: 0.9rem; outline: none;
+        }
+        .search-box input:focus { border-color: #1877f2; }
+
+        .section-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.6px; color: #8a8d91; padding: 0 4px 8px; font-weight: 600; }
+
+        .quick-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+        .quick-link {
+            background: #242526; border: 1px solid #3a3b3c; border-radius: 12px; padding: 16px 12px;
+            text-align: center; cursor: pointer; transition: 0.2s; text-decoration: none; color: #e4e6eb;
+        }
+        .quick-link:hover { background: #2a2b2c; }
+        .quick-link i { font-size: 1.4rem; color: #1877f2; margin-bottom: 8px; display: block; }
+        .quick-link span { font-size: 0.85rem; }
+
+        .faq-card { background: #242526; border-radius: 12px; border: 1px solid #3a3b3c; overflow: hidden; margin-bottom: 24px; }
+        .faq-item { border-bottom: 1px solid #3a3b3c; }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-question {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            padding: 14px 16px; cursor: pointer; font-size: 0.92rem; font-weight: 500;
+        }
+        .faq-question:hover { background: #2a2b2c; }
+        .faq-question i { color: #8a8d91; transition: transform 0.2s; flex-shrink: 0; }
+        .faq-item.open .faq-question i { transform: rotate(180deg); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+        .faq-item.open .faq-answer { max-height: 240px; }
+        .faq-answer p { padding: 0 16px 16px; color: #b0b3b8; font-size: 0.86rem; line-height: 1.5; }
+
+        .contact-cta {
+            background: #242526; border: 1px solid #3a3b3c; border-radius: 12px; padding: 18px 16px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .contact-cta .icon { width: 40px; height: 40px; border-radius: 10px; background: #e94560; display: flex; align-items: center; justify-content: center; font-size: 17px; color: white; flex-shrink: 0; }
+        .contact-cta .text { flex: 1; }
+        .contact-cta .text h4 { font-size: 0.95rem; margin-bottom: 2px; }
+        .contact-cta .text p { font-size: 0.8rem; color: #8a8d91; }
+        .contact-cta a { color: #1877f2; font-size: 0.85rem; font-weight: 600; text-decoration: none; flex-shrink: 0; }
+
+        @media (max-width: 480px) {
+            .main-container { padding: 12px 12px 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-header">
+        <a href="home.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <div class="back-title">Help &amp; Support</div>
+    </div>
+
+    <div class="main-container">
+
+        <div class="help-hero">
+            <div class="icon"><i class="fas fa-life-ring"></i></div>
+            <h2>How can we help?</h2>
+            <p>Search our FAQs or reach out to the SociaLock team.</p>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search help topics..." id="faqSearch">
+        </div>
+
+        <div class="quick-links">
+            <a href="contact.html" class="quick-link">
+                <i class="fas fa-envelope"></i>
+                <span>Contact Us</span>
+            </a>
+            <a href="#" class="quick-link" onclick="comingSoon(event, 'Report a Problem')">
+                <i class="fas fa-flag"></i>
+                <span>Report a Problem</span>
+            </a>
+        </div>
+
+        <div class="section-title">Frequently Asked Questions</div>
+        <div class="faq-card" id="faqList">
+            <div class="faq-item">
+                <div class="faq-question"><span>How do I create a post?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer"><p>Tap "What's on your mind?" at the top of your Home feed, write up to 300 characters, then tap Post.</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question"><span>How do I follow or block someone?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer"><p>Open their profile from any post or search result. You'll find Follow and Block options right there.</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question"><span>Why don't I see new posts right away?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer"><p>Your Home feed stays exactly as you left it — like Facebook — so scrolling back doesn't lose your place. Tap the Home icon again, or pull to refresh, to load new posts.</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question"><span>How do I delete a post or comment?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer"><p>Tap the ••• menu on your own post, or the delete icon on your comment, and confirm the removal.</p></div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question"><span>How do I reset my password?</span><i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer"><p>On the login screen, tap "Forgot password?" and follow the instructions sent to your email.</p></div>
+            </div>
+        </div>
+
+        <div class="contact-cta">
+            <div class="icon"><i class="fas fa-headset"></i></div>
+            <div class="text">
+                <h4>Still need help?</h4>
+                <p>Our team typically replies within 24 hours.</p>
+            </div>
+            <a href="contact.html">Contact →</a>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('userId')) {
+            window.location.href = 'login.html';
+        }
+
+        document.querySelectorAll('.faq-question').forEach(function(q) {
+            q.addEventListener('click', function() {
+                q.parentElement.classList.toggle('open');
+            });
+        });
+
+        document.getElementById('faqSearch').addEventListener('input', function() {
+            const term = this.value.trim().toLowerCase();
+            document.querySelectorAll('#faqList .faq-item').forEach(function(item) {
+                const text = item.textContent.toLowerCase();
+                item.style.display = !term || text.includes(term) ? '' : 'none';
+            });
+        });
+
+        function comingSoon(e, feature) {
+            e.preventDefault();
+            const div = document.createElement('div');
+            div.textContent = '🚧 ' + feature + ' is coming soon!';
+            div.style.cssText = 'position:fixed;top:20px;left:20px;right:20px;max-width:440px;margin:0 auto;background:#0d47a1;color:white;padding:12px 16px;border-radius:12px;font-size:0.95rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.3);text-align:center;';
+            document.body.appendChild(div);
+            setTimeout(function() { div.remove(); }, 3000);
+        }
+    </script>
+</body>
+</html>

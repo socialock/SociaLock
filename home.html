@@ -404,7 +404,7 @@
     <!-- NAVBAR BOTTOM -->
     <nav class="navbar-bottom">
         <div class="nav-bottom-container">
-            <a href="home.html" class="nav-icon-bottom active"><i class="fas fa-home"></i><span class="label">Home</span></a>
+            <a href="home.html" class="nav-icon-bottom active" onclick="event.preventDefault(); window.refreshHomeFeed();"><i class="fas fa-home"></i><span class="label">Home</span></a>
             <a href="messages.html" class="nav-icon-bottom"><i class="fas fa-comment-dots"></i><span class="label">Messages</span></a>
             <a href="tools.html" class="nav-icon-bottom"><i class="fas fa-tools"></i><span class="label">Tools</span></a>
             <a href="notifications.html" class="nav-icon-bottom"><i class="fas fa-bell"></i><span class="label">Notifications</span><span class="notif-badge" id="notifBadge">0</span></a>
@@ -433,9 +433,9 @@
         </div>
         <div class="sidemenu-body">
             <a href="tools.html" class="menu-item"><span class="icon"><i class="fas fa-tools"></i></span> Tools</a>
-            <a href="#" class="menu-item" id="sideMenuSettings"><span class="icon"><i class="fas fa-cog"></i></span> Settings</a>
-            <a href="#" class="menu-item" id="sideMenuContact"><span class="icon"><i class="fas fa-envelope"></i></span> Contact</a>
-            <a href="#" class="menu-item" id="sideMenuHelp"><span class="icon"><i class="fas fa-question-circle"></i></span> Help & Support</a>
+            <a href="settings.html" class="menu-item" id="sideMenuSettings"><span class="icon"><i class="fas fa-cog"></i></span> Settings</a>
+            <a href="contact.html" class="menu-item" id="sideMenuContact"><span class="icon"><i class="fas fa-envelope"></i></span> Contact</a>
+            <a href="help.html" class="menu-item" id="sideMenuHelp"><span class="icon"><i class="fas fa-question-circle"></i></span> Help & Support</a>
             <div class="menu-divider"></div>
             <a href="#" class="menu-item danger" id="sideMenuLogout"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Logout</a>
         </div>
@@ -474,7 +474,6 @@
         // HOME.JS - COMPLETE FIXED (কাস্টম কনফর্ম + অ্যাড ফিল্টার)
         // ============================================================
 
-        console.log('🔵 0. Home.js script started');
 
         let currentUser = null;
         let allPosts = [];
@@ -591,20 +590,17 @@
         // GET BLOCKED USERS
         // ============================================================
         async function getBlockedUsers() {
-            console.log('🔵 5. getBlockedUsers() called');
             if (!currentUser) {
                 blockedUsers = [];
                 return [];
             }
             try {
                 const result = await window.apiRequest(`/users/${currentUser.id}/blocked`);
-                console.log('🔵 5a. Blocked users response:', result);
                 if (result && result.success && Array.isArray(result.data)) {
                     blockedUsers = result.data;
                     return blockedUsers;
                 }
             } catch (err) {
-                console.error('Error fetching blocked users:', err);
             }
             blockedUsers = [];
             return [];
@@ -619,17 +615,14 @@
         // GET FOLLOWING USERS
         // ============================================================
         async function getFollowingUsers() {
-            console.log('🔵 6. getFollowingUsers() called');
             if (!currentUser) return [];
             try {
                 const result = await window.apiRequest(`/users/${currentUser.id}/following`);
-                console.log('🔵 6a. Following users response:', result);
                 if (result && result.success && Array.isArray(result.data)) {
                     followingUsers = result.data.map(u => u.id);
                     return followingUsers;
                 }
             } catch (err) {
-                console.error('Error fetching following:', err);
             }
             followingUsers = [];
             return [];
@@ -644,16 +637,13 @@
         // GET VERIFIED USERS
         // ============================================================
         async function getVerifiedUsers() {
-            console.log('🔵 7. getVerifiedUsers() called');
             try {
                 const result = await window.apiRequest('/users/verified');
-                console.log('🔵 7a. Verified users response:', result);
                 if (result && result.success && Array.isArray(result.data)) {
                     verifiedUsers = result.data;
                     return verifiedUsers;
                 }
             } catch (err) {
-                console.error('Error fetching verified:', err);
             }
             verifiedUsers = [];
             return [];
@@ -716,7 +706,6 @@
                 });
 
             } catch (err) {
-                console.error('Follow error:', err);
                 showAlert('Something went wrong!', 'error');
             }
         }
@@ -737,16 +726,65 @@
                 userLikedPosts[postId] = liked;
                 return liked;
             } catch (e) {
-                console.error('Check liked error:', e);
                 return false;
             }
         }
 
         // ============================================================
+        // LOCAL FEED CACHE (Facebook-style: no reload on back navigation)
+        // ============================================================
+        const HOME_CACHE_KEY = 'homeFeedCache_v1';
+        const HOME_SCROLL_KEY = 'homeScrollY_v1';
+
+        function saveHomeCache() {
+            try {
+                const container = document.getElementById('postsContainer');
+                if (!container) return;
+                const cache = {
+                    html: container.innerHTML,
+                    allPosts: allPosts,
+                    currentPage: currentPage,
+                    hasMorePosts: hasMorePosts,
+                    userLikedPosts: userLikedPosts,
+                    savedAt: Date.now()
+                };
+                sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify(cache));
+            } catch (e) {
+            }
+        }
+
+        function clearHomeCache() {
+            sessionStorage.removeItem(HOME_CACHE_KEY);
+            sessionStorage.removeItem(HOME_SCROLL_KEY);
+        }
+
+        function saveHomeScrollPosition() {
+            sessionStorage.setItem(HOME_SCROLL_KEY, String(window.scrollY || window.pageYOffset || 0));
+        }
+
+        function restoreHomeScrollPosition() {
+            const saved = parseInt(sessionStorage.getItem(HOME_SCROLL_KEY) || '0', 10);
+            if (!saved) return;
+            // Wait for layout/images to settle before jumping to the saved position
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, saved);
+                });
+            });
+        }
+
+        // Manual refresh: clears cache, re-shuffles, scrolls to top
+        window.refreshHomeFeed = async function() {
+            clearHomeCache();
+            window.scrollTo(0, 0);
+            await loadPosts();
+            saveHomeCache();
+        };
+
+        // ============================================================
         // LOAD POSTS
         // ============================================================
         async function loadPosts() {
-            console.log('🔵 8. loadPosts() called');
             const container = document.getElementById('postsContainer');
             container.innerHTML = '<div class="loading-spinner">⏳ Loading posts...</div>';
 
@@ -757,12 +795,9 @@
 
                 userLikedPosts = {};
 
-                console.log('🔵 8a. Calling /posts API...');
                 const result = await window.apiRequest('/posts');
-                console.log('🔵 8b. Posts API Response:', result);
 
                 if (!result || !result.success) {
-                    console.log('🔴 8c. Posts API failed! Showing error.');
                     container.innerHTML = '<div class="no-posts">❌ Failed to load posts</div>';
                     return;
                 }
@@ -770,12 +805,10 @@
                 let posts = result.data || [];
 
                 if (posts.length === 0) {
-                    console.log('🔵 8d. No posts found.');
                     container.innerHTML = '<div class="no-posts">📝 No posts yet. Create one!</div>';
                     return;
                 }
 
-                console.log('🔵 8e. Posts loaded:', posts.length);
                 posts = posts.filter(p => !isUserBlocked(p.user_id));
 
                 for (const post of posts) {
@@ -794,10 +827,9 @@
 
                 container.innerHTML = '';
                 await displayPostsWithAds(allPosts.slice(0, POSTS_PER_PAGE));
-                console.log('🔵 8f. Posts displayed successfully!');
+                saveHomeCache();
 
             } catch (error) {
-                console.error('🔴 8g. Load posts error:', error);
                 container.innerHTML = '<div class="no-posts">❌ Failed to load posts: ' + error.message + '</div>';
             }
         }
@@ -859,6 +891,7 @@
                 currentDisplayPosts = [...currentDisplayPosts, ...newPosts];
                 currentPage++;
                 await displayPostsWithAds(currentDisplayPosts);
+                saveHomeCache();
             } else {
                 hasMorePosts = false;
             }
@@ -1011,7 +1044,7 @@
                             post.likes_count = newCount;
                             post.user_liked = false;
                         }
-                        console.log('✅ Unliked post:', postId);
+                        saveHomeCache();
                     } else {
                         showAlert('Failed to unlike!', 'error');
                     }
@@ -1035,7 +1068,7 @@
                             post.likes_count = newCount;
                             post.user_liked = true;
                         }
-                        console.log('✅ Liked post:', postId);
+                        saveHomeCache();
                     } else if (result && result.error === 'Already liked') {
                         btnElement.classList.add('liked');
                         showAlert('You already liked this post!', 'info');
@@ -1044,7 +1077,6 @@
                     }
                 }
             } catch (error) {
-                console.error('Toggle like error:', error);
                 showAlert('Something went wrong!', 'error');
             }
         };
@@ -1068,9 +1100,9 @@
                     if (postEl) postEl.remove();
                     allPosts = allPosts.filter(p => p.id !== postId);
                     delete userLikedPosts[postId];
+                    saveHomeCache();
                 }
             } catch (error) {
-                console.error('Delete post error:', error);
                 showAlert('Failed to delete post!', 'error');
             }
         };
@@ -1087,7 +1119,7 @@
                     const ads = result.data;
                     return ads[Math.floor(Math.random() * ads.length)];
                 }
-            } catch (e) { console.error('Ad load error:', e); }
+            } catch (e) { }
             return null;
         }
 
@@ -1115,7 +1147,7 @@
                 if (result && result.success) {
                     return result.data || [];
                 }
-            } catch (e) { console.error('Search error:', e); }
+            } catch (e) { }
             return [];
         }
 
@@ -1144,7 +1176,6 @@
                     }
                 }
             } catch (e) {
-                console.error('Badge update error:', e);
                 badge.classList.remove('show');
             }
         }
@@ -1153,63 +1184,49 @@
         // PAGE LOAD
         // ============================================================
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🔵 1. DOMContentLoaded fired');
 
             const userId = localStorage.getItem('userId');
-            console.log('🔵 2. userId from localStorage:', userId);
             
             if (!userId) {
-                console.log('🔴 3. No userId found, redirecting to login');
                 window.location.href = 'login.html';
                 return;
             }
 
             if (typeof window.apiRequest !== 'function') {
-                console.error('🔴 4. apiRequest not available!');
                 document.getElementById('postsContainer').innerHTML = 
                     '<div class="no-posts" style="color:#e94560;">❌ Configuration error! Please refresh the page.</div>';
                 return;
             }
-            console.log('🔵 5. apiRequest is available');
 
             // ===== Check cache first =====
             const cachedUser = localStorage.getItem('cachedUser');
-            console.log('🔵 6. cachedUser from localStorage:', cachedUser ? 'YES' : 'NO');
             if (cachedUser) {
                 try {
                     currentUser = JSON.parse(cachedUser);
-                    console.log('🔵 7. User loaded from cache:', currentUser.username);
                     
                     document.getElementById('createPostAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
                     document.getElementById('sideMenuAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
                     document.getElementById('sideMenuName').textContent = currentUser.username;
                     document.getElementById('sideMenuEmail').textContent = currentUser.email || '';
                 } catch (e) {
-                    console.warn('⚠️ Cache parse error:', e);
                     localStorage.removeItem('cachedUser');
                 }
             }
 
             // ===== Always try to refresh from API =====
             try {
-                console.log('🔵 8. Fetching fresh user data from API:', userId);
                 const result = await window.apiRequest(`/users/${userId}`);
-                console.log('🔵 9. API Response type:', typeof result);
-                console.log('🔵 10. API Response:', result);
                 
                 if (result && result.success && result.data) {
                     currentUser = result.data;
                     localStorage.setItem('cachedUser', JSON.stringify(currentUser));
-                    console.log('🔵 11. User loaded from API and cached:', currentUser.username);
 
                     document.getElementById('createPostAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
                     document.getElementById('sideMenuAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
                     document.getElementById('sideMenuName').textContent = currentUser.username;
                     document.getElementById('sideMenuEmail').textContent = currentUser.email || '';
                 } else {
-                    console.warn('🔴 12. API returned no user data. Error:', result?.error);
                     if (!currentUser) {
-                        console.warn('🔴 13. No cache and no API data. Redirecting.');
                         showAlert('Session expired. Please login again.', 'error');
                         localStorage.removeItem('userId');
                         localStorage.removeItem('cachedUser');
@@ -1220,7 +1237,6 @@
                     }
                 }
             } catch (error) {
-                console.error('🔴 14. API user fetch error:', error);
                 if (!currentUser) {
                     showAlert('Failed to load user data. Please refresh.', 'error');
                     setTimeout(() => {
@@ -1231,15 +1247,42 @@
             }
 
             if (!currentUser) {
-                console.error('🔴 15. No user data available. Redirecting.');
                 localStorage.removeItem('userId');
                 localStorage.removeItem('cachedUser');
                 window.location.href = 'login.html';
                 return;
             }
 
-            console.log('🔵 16. About to load posts...');
-            await loadPosts();
+
+            // ===== Restore feed from local cache instead of reloading =====
+            let restoredFromCache = false;
+            const cachedFeed = sessionStorage.getItem(HOME_CACHE_KEY);
+            if (cachedFeed) {
+                try {
+                    const cache = JSON.parse(cachedFeed);
+                    if (cache && cache.html) {
+                        document.getElementById('postsContainer').innerHTML = cache.html;
+                        allPosts = cache.allPosts || [];
+                        currentPage = cache.currentPage || 1;
+                        hasMorePosts = cache.hasMorePosts !== undefined ? cache.hasMorePosts : true;
+                        userLikedPosts = cache.userLikedPosts || {};
+                        restoredFromCache = true;
+                    }
+                } catch (e) {
+                }
+            }
+
+            if (restoredFromCache) {
+                // Refresh blocked/following/verified lists quietly in the background
+                // (used for future like/follow actions) without touching the displayed feed
+                getBlockedUsers();
+                getFollowingUsers();
+                getVerifiedUsers();
+                restoreHomeScrollPosition();
+            } else {
+                await loadPosts();
+            }
+
             await updateNotifBadge();
 
             // Side menu
@@ -1269,13 +1312,24 @@
                 window.location.href = 'login.html';
             });
 
+            let scrollSaveTimeout = null;
             window.addEventListener('scroll', async function() {
                 if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
                     if (!isLoading && hasMorePosts) {
                         await loadMorePosts();
                     }
                 }
+                // Continuously remember scroll position so a later back-navigation
+                // can return to exactly where the user was
+                if (scrollSaveTimeout) clearTimeout(scrollSaveTimeout);
+                scrollSaveTimeout = setTimeout(saveHomeScrollPosition, 150);
+            }, { passive: true });
+
+            // Save scroll position right before the page is navigated away from
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') saveHomeScrollPosition();
             });
+            window.addEventListener('pagehide', saveHomeScrollPosition);
 
             // Search
             const searchInput = document.getElementById('searchInput');
@@ -1324,7 +1378,6 @@
 
             setInterval(updateNotifBadge, 30000);
 
-            console.log('🟢 17. Home page loaded successfully!');
         });
 
         // Make functions global
@@ -1335,7 +1388,6 @@
         window.reportPost = reportPost;
         window.toggleFollowFromPost = toggleFollowFromPost;
 
-        console.log('🟢 Home.js loaded with custom confirm & ads filter!');
     </script>
 </body>
 </html>

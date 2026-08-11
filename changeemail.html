@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Change Email - SociaLock</title>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; min-height: 100vh; }
+        .back-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #3a3b3c; position: sticky; top: 0; background: #18191a; z-index: 5; }
+        .back-header .back-btn { background: none; border: none; color: #b0b3b8; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; display: flex; }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; }
+        .main-container { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; }
+        .current-email { background: #242526; border: 1px solid #3a3b3c; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+        .current-email .icon { width: 36px; height: 36px; border-radius: 9px; background: #4caf50; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+        .current-email .label { font-size: 0.75rem; color: #8a8d91; }
+        .current-email .value { font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+        .form-card { background: #242526; border: 1px solid #3a3b3c; border-radius: 14px; padding: 20px 18px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #b0b3b8; margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid #3a3b3c; background: #18191a; color: #e4e6eb; font-size: 0.95rem; outline: none; }
+        .form-group input:focus { border-color: #1877f2; }
+        .hint { font-size: 0.75rem; color: #8a8d91; margin-top: 4px; }
+        .btn-save { width: 100%; margin-top: 22px; padding: 12px; background: #1877f2; border: none; border-radius: 10px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save:hover:not(:disabled) { background: #166fe5; }
+        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .custom-alert { position: fixed; top: 20px; right: 20px; left: 20px; padding: 12px 16px; border-radius: 12px; color: white; z-index: 9999; max-width: 440px; margin: 0 auto; font-size: 0.95rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
+        .custom-alert.success { background: #2e7d32; }
+        .custom-alert.error { background: #c62828; }
+        .custom-alert.info { background: #0d47a1; }
+    </style>
+</head>
+<body>
+
+    <div class="back-header">
+        <a href="settings.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <div class="back-title">Email &amp; Phone</div>
+    </div>
+
+    <div class="main-container">
+        <div class="current-email">
+            <div class="icon"><i class="fas fa-envelope"></i></div>
+            <div>
+                <div class="label">Current email</div>
+                <div class="value" id="currentEmail">Loading...</div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-group">
+                <label for="newEmail">New Email Address</label>
+                <input type="email" id="newEmail" placeholder="new@email.com" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Current Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm with your password" autocomplete="current-password">
+                <div class="hint">Required to confirm this change is really you</div>
+            </div>
+        </div>
+
+        <button class="btn-save" id="saveBtn"><i class="fas fa-check"></i> Update Email</button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        if (!userId) window.location.href = 'login.html';
+
+        const currentEmailEl = document.getElementById('currentEmail');
+        const newEmailInput = document.getElementById('newEmail');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const saveBtn = document.getElementById('saveBtn');
+        let currentEmail = '';
+
+        async function loadEmail() {
+            const result = await window.apiRequest(`/users/${userId}`);
+            if (result && result.success) {
+                currentEmail = result.data.email || '';
+                currentEmailEl.textContent = currentEmail || 'Unknown';
+            }
+        }
+
+        saveBtn.addEventListener('click', async () => {
+            const newEmail = newEmailInput.value.trim();
+            const password = confirmPasswordInput.value;
+
+            if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+                showAlert('Please enter a valid email address.', 'error');
+                return;
+            }
+            if (newEmail === currentEmail) {
+                showAlert('That is already your current email.', 'error');
+                return;
+            }
+            if (!password) {
+                showAlert('Please enter your current password to confirm.', 'error');
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner"></span> Updating...';
+
+            try {
+                const result = await window.apiRequest(`/users/${userId}/email`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ email: newEmail, password })
+                });
+
+                if (!result || !result.success) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Update Email';
+                    return;
+                }
+
+                // Also update Firebase Auth's email (reauthenticate first).
+                try {
+                    const currentUser = firebase.auth().currentUser;
+                    if (currentUser && currentEmail) {
+                        const credential = firebase.auth.EmailAuthProvider.credential(currentEmail, password);
+                        await currentUser.reauthenticateWithCredential(credential);
+                        await currentUser.updateEmail(newEmail);
+                    }
+                } catch (fbErr) {
+                    console.warn('Firebase email sync failed:', fbErr);
+                }
+
+                showAlert('Email updated successfully!', 'success');
+                currentEmail = newEmail;
+                setTimeout(() => { window.location.href = 'settings.html'; }, 1200);
+            } catch (err) {
+                showAlert('Something went wrong. Please try again.', 'error');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Update Email';
+            }
+        });
+
+        loadEmail();
+    </script>
+</body>
+</html>

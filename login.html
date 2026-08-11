@@ -8,7 +8,8 @@
     <!-- ===== 1. FIREBASE CDN (সবার আগে) ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <style>
         /* ===== রুট ভেরিয়েবল (ডার্ক থিম) ===== */
@@ -429,8 +430,8 @@
             <p class="subtitle">Login or create your account</p>
 
             <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">🔑 Login</button>
-                <button class="auth-tab" data-tab="register">📝 Register</button>
+                <button class="auth-tab active" data-tab="login"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                <button class="auth-tab" data-tab="register"><i class="fa-solid fa-user-plus"></i> Register</button>
             </div>
 
             <!-- ===== LOGIN FORM ===== -->
@@ -441,9 +442,9 @@
                 <div class="form-group">
                     <input type="password" id="loginPassword" placeholder="Password" required />
                 </div>
-                <button id="loginBtn" class="btn-primary">🔑 Login</button>
+                <button id="loginBtn" class="btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
                 <div class="forgot-password">
-                    <a href="resetpassword.html">🔒 Forgot password?</a>
+                    <a href="resetpassword.html"><i class="fa-solid fa-lock"></i> Forgot password?</a>
                 </div>
 
                 <div class="divider"><span>or</span></div>
@@ -468,15 +469,15 @@
                     <input type="password" id="regPassword" placeholder="Password (6+ characters) *" minlength="6" required />
                 </div>
                 <div class="form-group">
-                    <input type="text" id="regUsername" placeholder="Username (A-z, 0-9, max 10) *"
-                           maxlength="10" pattern="[A-Za-z0-9]+" autocomplete="off" />
+                    <input type="text" id="regUsername" placeholder="Username (A-z, 0-9, _, max 20) *"
+                           maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="off" />
                     <div id="regUsernameStatus" class="username-availability"></div>
-                    <div class="username-hint">💡 Only English letters and numbers (A-z, 0-9)</div>
+                    <div class="username-hint"><i class="fa-solid fa-circle-info"></i> Only English letters, numbers and underscore (A-z, 0-9, _) — max 20 characters</div>
                 </div>
 
                 <!-- ===== কাস্টম দেশ নির্বাচন (সার্চ + লিস্ট) ===== -->
                 <div class="form-group">
-                    <label for="regCountryInput">🌍 Country</label>
+                    <label for="regCountryInput"><i class="fa-solid fa-earth-americas"></i> Country</label>
                     <div class="custom-select-wrapper">
                         <input type="text" id="regCountryInput" placeholder="Type to search country..." autocomplete="off" />
                         <div class="dropdown-list" id="countryDropdown"></div>
@@ -490,7 +491,7 @@
                         <div class="captcha-display" id="regCaptchaDisplay"></div>
                         <div class="captcha-input-group">
                             <input type="text" id="regCaptchaInput" placeholder="Enter captcha code *" autocomplete="off" />
-                            <button type="button" id="regRefreshCaptcha" class="btn-refresh">⟳</button>
+                            <button type="button" id="regRefreshCaptcha" class="btn-refresh"><i class="fa-solid fa-rotate"></i></button>
                         </div>
                     </div>
                 </div>
@@ -501,10 +502,13 @@
                     <a href="policy.html">Policy</a>
                 </div>
 
-                <button id="registerBtn" class="btn-primary" disabled>✅ Create Account</button>
+                <button id="registerBtn" class="btn-primary" disabled><i class="fa-solid fa-user-check"></i> Create Account</button>
             </div>
 
-            <div class="auth-footer">🔒 Secure Login • SociaLock</div>
+            <div class="auth-footer"><i class="fa-solid fa-shield-halved"></i> Secure Login • SociaLock</div>
+            <div class="auth-footer" style="margin-top:8px;">
+                <a href="contact.html" style="color: var(--accent); text-decoration:none;"><i class="fa-solid fa-headset"></i> Contact Us</a>
+            </div>
         </div>
     </div>
 
@@ -598,7 +602,7 @@
                 filtered = countryList.filter(c => c.toLowerCase().includes(q));
             }
             if (filtered.length === 0) {
-                countryDropdown.innerHTML = `<div class="no-result">🔍 No country found</div>`;
+                countryDropdown.innerHTML = `<div class="no-result"><i class="fa-solid fa-magnifying-glass"></i> No country found</div>`;
                 return;
             }
             let html = '';
@@ -720,9 +724,17 @@
                 return;
             }
 
-            const validPattern = /^[A-Za-z0-9]+$/;
+            const validPattern = /^[A-Za-z0-9_]+$/;
             if (!validPattern.test(username)) {
-                regUsernameStatus.innerHTML = '❌ Only English letters and numbers allowed';
+                regUsernameStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Only English letters, numbers and underscore allowed';
+                regUsernameStatus.className = 'username-availability username-unavailable';
+                isUsernameAvailable = false;
+                registerBtn.disabled = true;
+                return;
+            }
+
+            if (username.length > 20) {
+                regUsernameStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Username cannot exceed 20 characters';
                 regUsernameStatus.className = 'username-availability username-unavailable';
                 isUsernameAvailable = false;
                 registerBtn.disabled = true;
@@ -734,20 +746,19 @@
                 if (result && result.success && result.data) {
                     const exists = result.data.some(u => u.username.toLowerCase() === username.toLowerCase());
                     if (exists) {
-                        regUsernameStatus.innerHTML = '❌ Username already taken!';
+                        regUsernameStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Username already taken!';
                         regUsernameStatus.className = 'username-availability username-unavailable';
                         isUsernameAvailable = false;
                         registerBtn.disabled = true;
                     } else {
-                        regUsernameStatus.innerHTML = '✅ Username available!';
+                        regUsernameStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i> Username available!';
                         regUsernameStatus.className = 'username-availability username-available';
                         isUsernameAvailable = true;
                         checkRegFormValidity();
                     }
                 }
             } catch (err) {
-                console.error('Username check error:', err);
-                regUsernameStatus.innerHTML = '⚠️ Error checking';
+                regUsernameStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error checking';
                 isUsernameAvailable = false;
                 registerBtn.disabled = true;
             }
@@ -755,7 +766,7 @@
 
         regUsername.addEventListener('input', () => {
             const val = regUsername.value.trim();
-            regUsername.value = val.replace(/[^A-Za-z0-9]/g, '');
+            regUsername.value = val.replace(/[^A-Za-z0-9_]/g, '').slice(0, 20);
             checkRegUsernameAvailability(regUsername.value);
         });
 
@@ -797,22 +808,36 @@
                 const firebaseUser = await firebase.auth().signInWithEmailAndPassword(email, password);
                 const userId = firebaseUser.user.uid;
 
+                // Firebase already verified this user's identity; exchange the known
+                // user id for a signed app-level JWT used to authorize sensitive
+                // settings actions (change password/email/username, block, privacy).
+                localStorage.setItem('userId', userId);
                 const result = await window.apiRequest(`/users/${userId}`);
+
                 if (result && result.success) {
-                    localStorage.setItem('userId', userId);
-                    showAlert('✅ Login successful!', 'success');
+                    try {
+                        const idToken = await firebaseUser.user.getIdToken();
+                        const tokenResult = await window.apiRequest('/auth/token', {
+                            method: 'POST',
+                            body: JSON.stringify({ id: userId, idToken })
+                        });
+                        if (tokenResult && tokenResult.success && tokenResult.data && tokenResult.data.token) {
+                            localStorage.setItem('token', tokenResult.data.token);
+                        }
+                    } catch (tokenErr) { /* non-fatal - user can still browse read-only */ }
+
+                    showAlert('Login successful!', 'success');
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 800);
                 } else {
                     showAlert('User data not found!', 'error');
-                    loginBtn.innerHTML = '🔑 Login';
+                    loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
                     loginBtn.disabled = false;
                 }
             } catch (error) {
-                console.error('Login error:', error);
                 showAlert('Login failed: ' + (error.message || 'Invalid credentials'), 'error');
-                loginBtn.innerHTML = '🔑 Login';
+                loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
                 loginBtn.disabled = false;
             }
         });
@@ -838,7 +863,7 @@
             }
 
             if (captcha.toUpperCase() !== currentCaptcha.toUpperCase()) {
-                showAlert('❌ Incorrect captcha!', 'error');
+                showAlert('Incorrect captcha!', 'error');
                 updateRegCaptcha();
                 regCaptchaInput.value = '';
                 return;
@@ -864,20 +889,22 @@
 
                 if (result && result.success) {
                     localStorage.setItem('userId', userId);
-                    showAlert('✅ Account created successfully!', 'success');
+                    if (result.data && result.data.token) {
+                        localStorage.setItem('token', result.data.token);
+                    }
+                    showAlert('Account created successfully!', 'success');
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 800);
                 } else {
                     await firebaseUser.user.delete();
                     showAlert('Failed to save account data!', 'error');
-                    registerBtn.innerHTML = '✅ Create Account';
+                    registerBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Create Account';
                     registerBtn.disabled = false;
                 }
             } catch (error) {
-                console.error('Registration error:', error);
                 showAlert('Registration failed: ' + (error.message || 'Unknown error'), 'error');
-                registerBtn.innerHTML = '✅ Create Account';
+                registerBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Create Account';
                 registerBtn.disabled = false;
             }
         });
@@ -902,7 +929,17 @@
                 const result = await window.apiRequest(`/users/${userId}`);
                 if (result && result.success) {
                     localStorage.setItem('userId', userId);
-                    showAlert('✅ Login successful!', 'success');
+                    try {
+                        const idToken = await user.getIdToken();
+                        const tokenResult = await window.apiRequest('/auth/token', {
+                            method: 'POST',
+                            body: JSON.stringify({ id: userId, idToken })
+                        });
+                        if (tokenResult && tokenResult.success && tokenResult.data && tokenResult.data.token) {
+                            localStorage.setItem('token', tokenResult.data.token);
+                        }
+                    } catch (tokenErr) { /* non-fatal */ }
+                    showAlert('Login successful!', 'success');
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 800);
@@ -911,12 +948,11 @@
                     regEmail.value = user.email;
                     regEmail.disabled = true;
                     regUsername.focus();
-                    showAlert('📝 Please complete registration!', 'info');
+                    showAlert('Please complete registration!', 'info');
                     googleSignInBtn.innerHTML = '<span>Sign in with Google</span>';
                     googleSignInBtn.disabled = false;
                 }
             } catch (error) {
-                console.error('Google Sign-In Error:', error);
                 showAlert('Google login failed: ' + (error.message || 'Unknown error'), 'error');
                 googleSignInBtn.innerHTML = '<span>Sign in with Google</span>';
                 googleSignInBtn.disabled = false;
@@ -928,9 +964,7 @@
         // ============================================================
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                console.log('✅ Firebase user signed in:', user.email);
             } else {
-                console.log('❌ Firebase user signed out');
             }
         });
 
@@ -938,7 +972,6 @@
         // 🚀 PAGE LOAD
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔧 Login page loaded - SociaLock');
             localStorage.clear();
             sessionStorage.clear();
             updateRegCaptcha();
@@ -964,17 +997,27 @@
             const existing = document.querySelector('.custom-alert');
             if (existing) existing.remove();
 
+            const icons = {
+                success: 'fa-solid fa-circle-check',
+                error: 'fa-solid fa-circle-exclamation',
+                info: 'fa-solid fa-circle-info'
+            };
+            const iconClass = icons[type] || icons.info;
+
             const alert = document.createElement('div');
             alert.className = `custom-alert ${type}`;
+            alert.style.display = 'flex';
+            alert.style.alignItems = 'center';
+            alert.style.gap = '10px';
             alert.innerHTML = `
-                <span>${message}</span>
-                <button onclick="this.parentElement.remove()">✕</button>
+                <i class="${iconClass}"></i>
+                <span style="flex:1;">${message}</span>
+                <button onclick="this.parentElement.remove()" style="display:flex;"><i class="fa-solid fa-xmark"></i></button>
             `;
             document.body.appendChild(alert);
             setTimeout(() => alert.remove(), 4000);
         }
 
-        console.log('🚀 SociaLock login page ready!');
     </script>
 </body>
 </html>

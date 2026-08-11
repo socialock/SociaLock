@@ -503,7 +503,6 @@
         // LIVE.JS - সম্পূর্ণ (ভিউয়ার কাউন্ট সহ)
         // ============================================================
 
-        console.log('📡 Live Frontend loaded');
 
         // ===== গ্লোবাল =====
         var currentUser = null;
@@ -598,7 +597,7 @@
                         data: data
                     })
                 });
-            } catch (e) { console.error('Signal send error', e); }
+            } catch (e) { }
         }
 
         async function pollSignals() {
@@ -610,7 +609,7 @@
                         handleSignal(signal.from, signal.data);
                     });
                 }
-            } catch (e) { console.error('Poll error', e); }
+            } catch (e) { }
         }
 
         // ===== WebRTC =====
@@ -634,9 +633,9 @@
                     } else if (data.type === 'system') {
                         appendSystemMessage(data.text);
                     }
-                } catch (e) { console.log('DC parse error', e); }
+                } catch (e) { }
             };
-            dc.onopen = function() { console.log('DC open for', targetUserId); };
+            dc.onopen = function() { };
 
             if (localStream && isHost) {
                 localStream.getTracks().forEach(function(t) { pc.addTrack(t, localStream); });
@@ -830,7 +829,7 @@
                     participantList = newList;
                     updateParticipantsUI();
                 }
-            } catch (e) { console.error('Load participants error', e); }
+            } catch (e) { }
         }
 
         // ===== ব্যান =====
@@ -942,7 +941,7 @@
                             room.room_id + '\')">Join</button></div>';
                     }).join('');
                 }
-            } catch (e) { console.error('Load public rooms error', e); }
+            } catch (e) { }
         }
 
         window.quickJoin = function(id) {
@@ -971,7 +970,6 @@
             });
         });
 
-        console.log('📡 Live Frontend ready with viewer count');
     </script>
 </body>
 </html>

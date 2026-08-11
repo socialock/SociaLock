@@ -259,7 +259,75 @@
                 padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
         }
+    
+        /* ===== কাস্টম কনফার্ম মডাল ===== */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .custom-modal-overlay.show { display: flex; }
+        .custom-modal {
+            background: #242526;
+            border-radius: 16px;
+            padding: 28px 24px 20px;
+            max-width: 380px;
+            width: 90%;
+            border: 1px solid #3a3b3c;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .custom-modal .modal-icon {
+            font-size: 2.8rem;
+            color: #e94560;
+            margin-bottom: 8px;
+        }
+        .custom-modal h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e4e6eb;
+        }
+        .custom-modal p {
+            font-size: 0.95rem;
+            color: #b0b3b8;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .custom-modal .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .custom-modal .modal-actions button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .custom-modal .modal-actions .btn-cancel {
+            background: #3a3b3c;
+            color: #b0b3b8;
+        }
+        .custom-modal .modal-actions .btn-cancel:hover { background: #4a4b4c; }
+        .custom-modal .modal-actions .btn-danger {
+            background: #e94560;
+            color: white;
+        }
+        .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
     </style>
+
 </head>
 
 <body>
@@ -303,12 +371,51 @@
 
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
+    <!-- ===== কাস্টম কনফার্ম মডাল ===== -->
+    <div class="custom-modal-overlay" id="customModal">
+        <div class="custom-modal">
+            <div class="modal-icon" id="modalIcon">⚠️</div>
+            <h3 id="modalTitle">Are you sure?</h3>
+            <p id="modalMessage">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="modalCancel">Cancel</button>
+                <button class="btn-danger" id="modalConfirm">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ===== কাস্টম কনফার্ম =====
+        let pendingConfirmResolve = null;
+        function customConfirm(title, message, icon = '⚠️') {
+            return new Promise(function(resolve) {
+                document.getElementById('modalIcon').textContent = icon;
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+                document.getElementById('customModal').classList.add('show');
+                pendingConfirmResolve = resolve;
+            });
+        }
+        document.getElementById('modalCancel').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+        });
+        document.getElementById('modalConfirm').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(true); pendingConfirmResolve = null; }
+        });
+        document.getElementById('customModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('customModal').classList.remove('show');
+                if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+            }
+        });
+
+
         // ============================================================
         // POST.JS - নিজের কমেন্ট সবার আগে দেখাবে
         // ============================================================
 
-        console.log('🚀 Post page loading...');
 
         let currentUser = null;
         let currentPost = null;
@@ -343,12 +450,10 @@
                 const response = await fetch(url, { ...options, headers, mode: 'cors', credentials: 'omit' });
                 const data = await response.json();
                 if (!response.ok) {
-                    console.error('API Error:', data);
                     return null;
                 }
                 return data;
             } catch (error) {
-                console.error('API Request failed:', error);
                 return null;
             }
         }
@@ -541,7 +646,6 @@
                     }
                 }
             } catch (error) {
-                console.error('Toggle like error:', error);
                 showAlert('Something went wrong!', 'error');
             }
         }
@@ -655,7 +759,6 @@
             const seeBtn = document.getElementById(`seeReplies-${commentId}`);
 
             if (!container) {
-                console.error('Container not found for comment:', commentId);
                 return;
             }
 
@@ -737,7 +840,6 @@
             const seeBtn = document.getElementById(`seeNestedReplies-${replyId}`);
 
             if (!container) {
-                console.error('Nested container not found for reply:', replyId);
                 return;
             }
 
@@ -943,7 +1045,7 @@
         // DELETE COMMENT / REPLY
         // ============================================================
         async function deleteComment(commentId) {
-            if (!confirm('Are you sure you want to delete this comment?')) return;
+            if (!(await customConfirm('Delete Comment', 'Are you sure you want to delete this comment?', '🗑️'))) return;
             const userId = localStorage.getItem('userId');
             if (!userId) { showAlert('Please login first!', 'error'); return; }
 
@@ -969,7 +1071,7 @@
         }
 
         async function deleteReply(replyId) {
-            if (!confirm('Are you sure you want to delete this reply?')) return;
+            if (!(await customConfirm('Delete Reply', 'Are you sure you want to delete this reply?', '🗑️'))) return;
             const userId = localStorage.getItem('userId');
             if (!userId) { showAlert('Please login first!', 'error'); return; }
 
@@ -997,7 +1099,6 @@
         // PAGE LOAD
         // ============================================================
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Post page loading...');
 
             const userId = localStorage.getItem('userId');
             if (!userId) {
@@ -1044,7 +1145,6 @@
                 }
             });
 
-            console.log('✅ Post page loaded with own comments first!');
         });
 
         // Make global
@@ -1057,7 +1157,6 @@
         window.cancelReply = cancelReply;
         window.addComment = addComment;
 
-        console.log('🚀 Post page ready with own comments first!');
     </script>
 </body>
 </html>

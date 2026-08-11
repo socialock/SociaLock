@@ -328,6 +328,10 @@
 
                 if (result && result.success) {
                     showAlert('✅ Post created!', 'success');
+                    // Invalidate the cached home feed so the new post shows up
+                    // immediately instead of the stale cached list
+                    sessionStorage.removeItem('homeFeedCache_v1');
+                    sessionStorage.removeItem('homeScrollY_v1');
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 1000);

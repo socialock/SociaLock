@@ -341,7 +341,75 @@
             .tools-ad-card img { width: 40px; height: 40px; }
             .my-tools-section .tools-list { padding: 0.3rem; }
         }
+    
+        /* ===== কাস্টম কনফার্ম মডাল ===== */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .custom-modal-overlay.show { display: flex; }
+        .custom-modal {
+            background: #242526;
+            border-radius: 16px;
+            padding: 28px 24px 20px;
+            max-width: 380px;
+            width: 90%;
+            border: 1px solid #3a3b3c;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .custom-modal .modal-icon {
+            font-size: 2.8rem;
+            color: #e94560;
+            margin-bottom: 8px;
+        }
+        .custom-modal h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #e4e6eb;
+        }
+        .custom-modal p {
+            font-size: 0.95rem;
+            color: #b0b3b8;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .custom-modal .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .custom-modal .modal-actions button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .custom-modal .modal-actions .btn-cancel {
+            background: #3a3b3c;
+            color: #b0b3b8;
+        }
+        .custom-modal .modal-actions .btn-cancel:hover { background: #4a4b4c; }
+        .custom-modal .modal-actions .btn-danger {
+            background: #e94560;
+            color: white;
+        }
+        .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
     </style>
+
 </head>
 
 <body>
@@ -425,12 +493,51 @@
     <!-- ===== SCRIPTS ===== -->
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
+    <!-- ===== কাস্টম কনফার্ম মডাল ===== -->
+    <div class="custom-modal-overlay" id="customModal">
+        <div class="custom-modal">
+            <div class="modal-icon" id="modalIcon">⚠️</div>
+            <h3 id="modalTitle">Are you sure?</h3>
+            <p id="modalMessage">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="modalCancel">Cancel</button>
+                <button class="btn-danger" id="modalConfirm">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ===== কাস্টম কনফার্ম =====
+        let pendingConfirmResolve = null;
+        function customConfirm(title, message, icon = '⚠️') {
+            return new Promise(function(resolve) {
+                document.getElementById('modalIcon').textContent = icon;
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+                document.getElementById('customModal').classList.add('show');
+                pendingConfirmResolve = resolve;
+            });
+        }
+        document.getElementById('modalCancel').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+        });
+        document.getElementById('modalConfirm').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(true); pendingConfirmResolve = null; }
+        });
+        document.getElementById('customModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('customModal').classList.remove('show');
+                if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+            }
+        });
+
+
         // ============================================================
         // TOOLS.JS - COMPLETE (FIXED)
         // ============================================================
 
-        console.log('🔧 Tools page loading...');
 
         let currentUser = null;
         let allTools = [];
@@ -472,12 +579,10 @@
                 const response = await fetch(url, { ...options, headers });
                 const data = await response.json();
                 if (!response.ok) {
-                    console.error('API Error:', data);
                     return null;
                 }
                 return data;
             } catch (error) {
-                console.error('API Request failed:', error);
                 return null;
             }
         }
@@ -534,7 +639,6 @@
                     }
                 }
             } catch (err) {
-                console.error('Badge update error:', err);
                 badge.classList.remove('show');
             }
         }
@@ -546,7 +650,7 @@
             try {
                 const result = await apiRequest(`/tools_ads?country=${country}`);
                 if (result && result.success) return result.data || [];
-            } catch (err) { console.error('Fetch tools ads error:', err); }
+            } catch (err) { }
             return [];
         }
 
@@ -554,7 +658,7 @@
             try {
                 const result = await apiRequest('/tools');
                 if (result && result.success) return result.data || [];
-            } catch (err) { console.error('Fetch tools error:', err); }
+            } catch (err) { }
             return [];
         }
 
@@ -567,7 +671,6 @@
                 }
                 return [];
             } catch (err) {
-                console.error('Fetch my tools error:', err);
                 return [];
             }
         }
@@ -596,7 +699,6 @@
                     showAlert(result.errors.join(', '), 'error');
                 }
             } catch (err) {
-                console.error('Publish error:', err);
                 showAlert('Failed to publish tool!', 'error');
             }
             return false;
@@ -611,7 +713,6 @@
                 });
                 if (result && result.success) return true;
             } catch (err) {
-                console.error('Delete error:', err);
                 showAlert('Failed to delete tool!', 'error');
             }
             return false;
@@ -705,7 +806,7 @@
                     deleteBtn.addEventListener('click', async (e) => {
                         e.stopPropagation();
                         const id = deleteBtn.getAttribute('data-id');
-                        if (confirm('Delete this tool?')) {
+                        if (await customConfirm('Delete Tool', 'Delete this tool? This cannot be undone.', '🗑️')) {
                             const success = await deleteTool(id);
                             if (success) {
                                 showAlert('✅ Tool deleted!', 'success');
@@ -752,7 +853,7 @@
             try {
                 const country = currentUser?.country || 'Bangladesh';
                 allToolsAds = await fetchToolsAds(country);
-            } catch (err) { console.error('Tools ads load error:', err); }
+            } catch (err) { }
         }
 
         // ============================================================
@@ -797,7 +898,6 @@
                 await loadToolsAdsRandomly();
                 applyFilters();
             } catch (err) {
-                console.error('Refresh error:', err);
                 toolsListEl.innerHTML = `<div class="no-tools">❌ Failed to load tools</div>`;
             } finally {
                 isLoading = false;
@@ -936,7 +1036,6 @@
         // PAGE LOAD
         // ============================================================
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🔧 Tools page loading...');
 
             const userId = localStorage.getItem('userId');
             if (!userId) {
@@ -948,7 +1047,6 @@
                 const userResult = await apiRequest(`/users/${userId}`);
                 if (userResult && userResult.success) {
                     currentUser = userResult.data;
-                    console.log('✅ User loaded:', currentUser.username);
                 } else {
                     localStorage.removeItem('userId');
                     window.location.href = 'login.html';
@@ -960,13 +1058,11 @@
                 setInterval(updateNotifBadge, 30000);
 
             } catch (err) {
-                console.error('Page load error:', err);
                 showAlert('Failed to load page!', 'error');
                 toolsListEl.innerHTML = `<div class="no-tools">❌ Load failed</div>`;
             }
         });
 
-        console.log('🔧 Tools page loaded with Worker API!');
     </script>
 </body>
 </html>

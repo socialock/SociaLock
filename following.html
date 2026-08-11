@@ -240,7 +240,6 @@
                 });
 
             } catch (err) {
-                console.error('Load following error:', err);
                 container.innerHTML = '<div class="no-users">❌ Something went wrong</div>';
             }
         }
@@ -300,7 +299,6 @@
                 }
 
             } catch (err) {
-                console.error('Follow error:', err);
                 showAlert('Something went wrong!', 'error');
             }
         }
@@ -333,7 +331,6 @@
             loadFollowing();
         });
 
-        console.log('🚀 Following page loaded with Worker API!');
     </script>
 </body>
 </html>
