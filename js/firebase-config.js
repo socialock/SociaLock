@@ -15,9 +15,7 @@ const firebaseConfig = {
 // Firebase Initialize
 try {
     firebase.initializeApp(firebaseConfig);
-    console.log('🔥 Firebase initialized successfully!');
 } catch (error) {
-    console.error('❌ Firebase init error:', error);
 }
 
 // Google Provider
@@ -32,7 +30,6 @@ async function signInWithGoogle() {
         const result = await firebase.auth().signInWithPopup(provider);
         return result.user;
     } catch (error) {
-        console.error('Google Sign-In Error:', error);
         throw error;
     }
 }
@@ -43,9 +40,7 @@ async function signOutUser() {
         await firebase.auth().signOut();
         localStorage.removeItem('userId');
         localStorage.removeItem('token');
-        console.log('✅ User signed out');
     } catch (error) {
-        console.error('Sign-out Error:', error);
     }
 }
 
@@ -53,9 +48,7 @@ async function signOutUser() {
 function onAuthStateChanged(callback) {
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            console.log('✅ Firebase user signed in:', user.email);
         } else {
-            console.log('❌ Firebase user signed out');
         }
         callback(user);
     });
@@ -67,4 +60,3 @@ window.signOutUser = signOutUser;
 window.onAuthStateChanged = onAuthStateChanged;
 window.auth = firebase.auth();
 
-console.log('🔥 Firebase config loaded!');

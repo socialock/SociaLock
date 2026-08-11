@@ -11,18 +11,22 @@ const API_BASE_URL = 'https://bitter-lab-e0e4.socialockapi.workers.dev/api';
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   const userId = localStorage.getItem('userId');
-  
+  const token = localStorage.getItem('token');
+
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers
   };
 
-  if (userId) {
+  // Prefer the signed JWT (issued on login/register) for authenticated
+  // requests; fall back to the raw userId for back-compat.
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  } else if (userId) {
     headers['Authorization'] = `Bearer ${userId}`;
   }
 
   try {
-    console.log('📤 API Request:', url, options.method || 'GET');
     
     const response = await fetch(url, {
       ...options,
@@ -34,7 +38,6 @@ async function apiRequest(endpoint, options = {}) {
     // Check if response is ok
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ API Error:', response.status, errorText);
       
       // Try to parse as JSON
       try {
@@ -49,19 +52,12 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     const data = await response.json();
-    console.log('📥 API Response:', data);
     return data;
     
   } catch (error) {
-    console.error('❌ API Request failed:', error);
     
     if (error.message === 'Failed to fetch') {
-      showAlert('⚠️ Cannot connect to server. Please check your internet connection.', 'error');
-      console.error('🔍 Possible reasons:');
-      console.error('1. Worker is not deployed');
-      console.error('2. CORS not configured');
-      console.error('3. URL is incorrect:', API_BASE_URL);
-      console.error('4. Internet connection issue');
+      showAlert('Cannot connect to server. Please check your internet connection.', 'error');
     } else {
       showAlert('Network error. Please try again.', 'error');
     }
@@ -75,13 +71,27 @@ async function apiRequest(endpoint, options = {}) {
 function showAlert(message, type = 'info') {
   const existing = document.querySelector('.custom-alert');
   if (existing) existing.remove();
-  
+
+  // Strip any leading keyboard emoji from the message; use FontAwesome icons instead.
+  // eslint-disable-next-line no-control-regex
+  const cleanMessage = String(message).replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}]\s*/gu, '').trim();
+  const icons = {
+    success: 'fa-solid fa-circle-check',
+    error: 'fa-solid fa-circle-exclamation',
+    info: 'fa-solid fa-circle-info'
+  };
+  const iconClass = icons[type] || icons.info;
+
   const alert = document.createElement('div');
   alert.className = `custom-alert ${type}`;
   alert.innerHTML = `
-    <span>${message}</span>
-    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>
+    <i class="${iconClass}" style="flex-shrink:0;"></i>
+    <span>${cleanMessage}</span>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:16px;display:flex;"><i class="fa-solid fa-xmark"></i></button>
   `;
+  alert.style.display = 'flex';
+  alert.style.alignItems = 'center';
+  alert.style.gap = '10px';
   document.body.appendChild(alert);
   setTimeout(() => alert.remove(), 4000);
 }
@@ -126,20 +136,14 @@ function timeAgo(date) {
 // ============================================================
 async function testAPIConnection() {
   try {
-    console.log('🔍 Testing API connection...');
-    console.log('📍 URL:', API_BASE_URL);
     
     const result = await apiRequest('/posts');
     if (result && result.success) {
-      console.log('✅ API connection successful!');
-      console.log('📊 Posts count:', result.data?.length || 0);
       return true;
     } else {
-      console.error('❌ API connection failed!');
       return false;
     }
   } catch (error) {
-    console.error('❌ API test failed:', error);
     return false;
   }
 }
@@ -152,13 +156,10 @@ function checkAuth() {
   const token = localStorage.getItem('token');
   
   if (userId && token) {
-    console.log('✅ User authenticated:', userId);
     return true;
   } else if (userId) {
-    console.log('⚠️ User ID found but no token');
     return true;
   } else {
-    console.log('❌ No user authenticated');
     return false;
   }
 }
@@ -197,8 +198,6 @@ window.testAPIConnection = testAPIConnection;
 window.checkAuth = checkAuth;
 window.getAuthHeaders = getAuthHeaders;
 
-console.log('✅ API Config loaded!', API_BASE_URL);
-console.log('🔍 API Base URL:', API_BASE_URL);
 
 // Auto test connection on load
 setTimeout(async () => {
