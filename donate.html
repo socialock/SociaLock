@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Donate - SociaLock</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; min-height: 100vh; }
+        .back-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #3a3b3c; position: sticky; top: 0; background: #18191a; z-index: 5; }
+        .back-header .back-btn { background: none; border: none; color: #b0b3b8; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; text-decoration: none; display: flex; }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; }
+
+        .main-container { max-width: 560px; margin: 0 auto; padding: 16px 16px 40px; }
+
+        .donate-hero { text-align: center; padding: 20px 12px 26px; }
+        .donate-hero .icon { font-size: 2.6rem; color: #e94560; margin-bottom: 10px; }
+        .donate-hero h2 { font-size: 1.2rem; margin-bottom: 6px; }
+        .donate-hero p { color: #b0b3b8; font-size: 0.9rem; line-height: 1.5; }
+
+        .method-card { background: #242526; border: 1px solid #3a3b3c; border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; }
+        .method-card .icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; flex-shrink: 0; }
+        .method-card .icon img { width: 24px; height: 24px; object-fit: contain; }
+        .method-card .info { flex: 1; min-width: 0; }
+        .method-card .name { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .method-card .name .badge { background: #2d88ff; color: white; font-size: 0.6rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.3px; }
+        .method-card .detail { font-size: 0.82rem; color: #b0b3b8; margin-top: 4px; word-break: break-all; font-family: monospace; }
+        .method-card .network-hint { font-size: 0.72rem; color: #8a8d91; margin-top: 2px; }
+        .copy-btn { background: #3a3b3c; border: none; color: #e4e6eb; padding: 8px 14px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; flex-shrink: 0; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .copy-btn:hover { background: #4a4b4c; }
+        .copy-btn i { font-size: 0.8rem; }
+
+        .note-card { background: rgba(24,119,242,0.1); border: 1px solid rgba(24,119,242,0.3); border-radius: 12px; padding: 12px 14px; margin-top: 16px; font-size: 0.83rem; color: #b0b3b8; display: flex; gap: 10px; align-items: flex-start; }
+        .note-card i { color: #1877f2; margin-top: 2px; }
+
+        .custom-alert { position: fixed; top: 20px; right: 20px; left: 20px; padding: 12px 16px; border-radius: 12px; color: white; z-index: 9999; max-width: 400px; margin: 0 auto; font-size: 0.95rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
+        .custom-alert.success { background: #2e7d32; }
+        .custom-alert.info { background: #0d47a1; }
+    </style>
+</head>
+<body>
+
+    <div class="back-header">
+        <a href="home.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <div class="back-title">Donate</div>
+    </div>
+
+    <div class="main-container">
+        <div class="donate-hero">
+            <div class="icon"><i class="fas fa-heart"></i></div>
+            <h2>Support SociaLock</h2>
+            <p>SociaLock is built and maintained independently. If you enjoy using the app, a small donation helps cover hosting and keeps development going.</p>
+        </div>
+
+        <!-- Bitcoin (BTC) - Segwit -->
+        <div class="method-card">
+            <div class="icon" style="background:#f7931a;">
+                <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="Bitcoin">
+            </div>
+            <div class="info">
+                <div class="name">Bitcoin (BTC) <span class="badge">Segwit</span></div>
+                <div class="detail" id="btcAddress">bc1qn9qarudffqratmknncxce88dh8la66vj0tvp95</div>
+                <div class="network-hint"><i class="fas fa-circle-info"></i> Network: Bitcoin (BTC)</div>
+            </div>
+            <button class="copy-btn" data-copy="bc1qn9qarudffqratmknncxce88dh8la66vj0tvp95"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+
+        <!-- Tron (USDT - TRC20) -->
+        <div class="method-card">
+            <div class="icon" style="background:#ef0027;">
+                <img src="https://cryptologos.cc/logos/tron-trx-logo.svg" alt="Tron">
+            </div>
+            <div class="info">
+                <div class="name">USDT (TRC-20) <span class="badge">Tron</span></div>
+                <div class="detail" id="trc20Address">TC7RiLZyYmYqzNJEZMyStjQKdJHthGeNyb</div>
+                <div class="network-hint"><i class="fas fa-circle-info"></i> Network: TRON (TRC-20)</div>
+            </div>
+            <button class="copy-btn" data-copy="TC7RiLZyYmYqzNJEZMyStjQKdJHthGeNyb"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+
+        <!-- Ethereum / Arbitrum (ETH, USDC, etc.) -->
+        <div class="method-card">
+            <div class="icon" style="background:#627eea;">
+                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="Ethereum">
+            </div>
+            <div class="info">
+                <div class="name">Ethereum (ETH / USDC) <span class="badge">ERC-20</span></div>
+                <div class="detail" id="ethAddress">0x177E30C23521ECe61D1AD7303Ec721b7647BeA8a</div>
+                <div class="network-hint"><i class="fas fa-circle-info"></i> Networks: Ethereum (ERC-20) • Arbitrum (ARB-ERC20)</div>
+            </div>
+            <button class="copy-btn" data-copy="0x177E30C23521ECe61D1AD7303Ec721b7647BeA8a"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+
+        <div class="note-card">
+            <i class="fas fa-circle-info"></i>
+            <span><strong>Important:</strong> Always send using the correct network shown above. Sending on the wrong network may result in permanent loss of funds. Donations are voluntary, non-refundable, and do not unlock any features.</span>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const text = btn.getAttribute('data-copy');
+                try {
+                    await navigator.clipboard.writeText(text);
+                    showToast('Address copied to clipboard ✅');
+                } catch (e) {
+                    // Fallback for older browsers
+                    const input = document.createElement('input');
+                    input.value = text;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    showToast('Address copied ✅');
+                }
+            });
+        });
+
+        function showToast(message) {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+            const alert = document.createElement('div');
+            alert.className = 'custom-alert success';
+            alert.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>${message}</span>`;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 2600);
+        }
+    </script>
+</body>
+</html>
