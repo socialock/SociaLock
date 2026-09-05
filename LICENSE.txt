@@ -1,0 +1,62 @@
+SociaLock
+Copyright © 2026 SociaLock. All Rights Reserved.
+
+PROPRIETARY SOFTWARE LICENSE
+
+This software, website, source code, design, graphics, user interface,
+and related materials are proprietary and are protected by applicable
+copyright laws.
+
+All rights are reserved by the copyright owner.
+
+PERMISSION
+
+No permission is granted to any person or organization to copy, reproduce,
+publish, redistribute, modify, sell, sublicense, or reuse this software
+or its source code, in whole or in substantial part, without prior written
+permission from the copyright owner.
+
+PROHIBITED USE
+
+Without prior written permission, you may not:
+
+- Copy or reproduce the source code or substantial portions of it.
+- Publish or upload the source code to another website, repository,
+  GitHub repository, or other public/private platform.
+- Redistribute the software or modified versions of it.
+- Sell, sublicense, or commercially distribute the software or source code.
+- Reuse substantial portions of the code, design, UI, graphics, or
+  functionality in another project.
+- Remove or modify copyright, license, or ownership notices.
+- Claim this software or substantial portions of its source code as
+  your own work.
+
+OWNERSHIP
+
+All intellectual property rights, including copyright and ownership of
+the original source code, design, graphics, user interface, and other
+original materials, remain with the copyright owner.
+
+NO TRANSFER OF RIGHTS
+
+Access to or possession of this source code does not transfer ownership
+or grant any license or other rights to the recipient.
+
+PERMISSION REQUESTS
+
+If you wish to copy, modify, distribute, publish, reuse, or commercially
+use any part of this software, you must obtain written permission from
+the copyright owner before doing so.
+
+UNAUTHORIZED USE
+
+Any unauthorized copying, reproduction, modification, distribution,
+publication, or reuse may constitute copyright infringement and may
+result in legal action or other remedies available under applicable law.
+
+DISCLAIMER
+
+This license does not grant any rights beyond those expressly stated above.
+All rights not expressly granted are reserved.
+
+© 2026 SociaLock. All Rights Reserved.

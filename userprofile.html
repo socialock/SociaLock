@@ -1,11 +1,54 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Profile - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="View developer and cybersecurity profiles on SociaLock — posts, followers, and shared tools." />
+    <meta name="keywords" content="SociaLock profile, developer profile, cybersecurity profile" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/userprofile.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Profile - SociaLock" />
+    <meta property="og:description" content="View developer and cybersecurity profiles on SociaLock — posts, followers, and shared tools." />
+    <meta property="og:url" content="https://socialock.pages.dev/userprofile.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Profile - SociaLock" />
+    <meta name="twitter:description" content="View developer and cybersecurity profiles on SociaLock — posts, followers, and shared tools." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "url": "https://socialock.pages.dev/userprofile.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "SociaLock",
+            "url": "https://socialock.pages.dev"
+        }
+    }
+    </script>
+    <!-- ===== SEO END ===== -->
     
-    <!-- ===== FIREBASE CDN (সবার আগে) ===== -->
+    <!-- ===== FIREBASE CDN (load first) ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     
@@ -49,7 +92,7 @@
         .btn-danger:hover { background: #c0392b; }
         .btn-more { background: #3a3b3c; color: #e4e6eb; padding: 7px 12px; border-radius: 50%; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 36px; }
         .btn-more:hover { background: #4a4b4c; }
-        .more-dropdown { display: none; position: absolute; right: 50%; transform: translateX(50%); top: 100%; background: #242526; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.3); min-width: 200px; z-index: 100; border: 1px solid #3a3b3c; padding: 6px 0; margin-top: 6px; }
+        .more-dropdown { display: none; position: flex; right: 0; left: auto; transform: none; top: 100%; background: #242526; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.3); min-width: 200px; max-width: calc(100vw - 24px); z-index: 100; border: 1px solid #3a3b3c; padding: 6px 0; margin-top: 6px; }
         .more-dropdown.show { display: block; }
         .more-dropdown .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 10px 18px; color: #e4e6eb; cursor: pointer; transition: 0.2s; border: none; background: none; width: 100%; text-align: left; font-size: 14px; white-space: nowrap; }
         .more-dropdown .dropdown-item:hover { background: #3a3b3c; }
@@ -122,7 +165,7 @@
             .post-card { padding: 12px; }
             .post-avatar { width: 32px; height: 32px; font-size: 14px; }
             .post-username { font-size: 13px; }
-            .post-content { font-size: 13px; }
+            .post-content { font-size: 15px; }
             .post-action-btn { font-size: 12px; padding: 5px; }
             .post-action-btn svg { width: 16px; height: 16px; }
             .back-header .back-btn { font-size: 20px; }
@@ -131,12 +174,12 @@
             .profile-meta { font-size: 12px; gap: 8px; }
             .modal-box { padding: 1rem; max-width: 320px; }
             .modal-box textarea { font-size: 13px; min-height: 60px; }
-            .more-dropdown { min-width: 180px; right: 50%; transform: translateX(50%); }
+            .more-dropdown { min-width: 180px; right: 0; left: auto; transform: none; max-width: calc(100vw - 16px); }
             .more-dropdown .dropdown-item { font-size: 13px; padding: 8px 14px; }
             .post-more-menu { min-width: 120px; }
         }
     
-        /* ===== কাস্টম কনফার্ম মডাল ===== */
+        /* ===== Custom confirm modal ===== */
         .custom-modal-overlay {
             display: none;
             position: fixed;
@@ -202,6 +245,312 @@
             color: white;
         }
         .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
+
+        /* ===== SKELETON LOADER STYLES ===== */
+        .skeleton-profile {
+            background: #242526;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #3a3b3c;
+        }
+        .skeleton-profile-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .skeleton-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-avatar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-name-block {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .skeleton-line {
+            height: 14px;
+            border-radius: 6px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-line.short { width: 50%; }
+        .skeleton-line.medium { width: 70%; }
+        .skeleton-line.long { width: 90%; }
+        .skeleton-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 6px;
+        }
+        .skeleton-stats span {
+            height: 14px;
+            width: 60px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-stats span::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .skeleton-btn {
+            height: 36px;
+            width: 80px;
+            border-radius: 20px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-btn.circle { width: 36px; border-radius: 50%; }
+        .skeleton-post {
+            background: #242526;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #3a3b3c;
+        }
+        .skeleton-post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .skeleton-post-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-post-avatar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-post-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .skeleton-post-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .skeleton-post-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-top: 1px solid #3a3b3c;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 6px;
+        }
+        .skeleton-post-stats span {
+            height: 12px;
+            width: 50px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-post-stats span::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-post-actions {
+            display: flex;
+            gap: 6px;
+            padding: 4px 0;
+        }
+        .skeleton-post-action {
+            flex: 1;
+            height: 32px;
+            border-radius: 6px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-post-action::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-title {
+            height: 20px;
+            width: 120px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            margin: 16px 0 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-title::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* ===== TOOLS DROPDOWN (above post list) ===== */
+        .tools-toggle-section { margin-bottom: 12px; }
+        .tools-toggle-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #242526;
+            border: 1px solid #3a3b3c;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            color: #e4e6eb;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tools-toggle-btn:hover { background: #2a2b2c; border-color: #4a4b4c; }
+        .tools-toggle-btn .left { display: flex; align-items: center; gap: 8px; }
+        .tools-toggle-btn .left i.fa-wrench { color: #1877f2; }
+        .tools-count-badge {
+            background: #3a3b3c;
+            color: #b0b3b8;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem;
+            border-radius: 10px;
+        }
+        .toggle-chevron { transition: transform 0.25s; color: #b0b3b8; }
+        .toggle-chevron.open { transform: rotate(180deg); }
+        .tools-dropdown-list {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            animation: toolsDropIn 0.2s ease;
+        }
+        @keyframes toolsDropIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tools-loading { text-align: center; padding: 1.2rem; color: #b0b3b8; font-size: 0.85rem; }
+        .tool-item {
+            background: #242526;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #3a3b3c;
+        }
+        .tool-item:hover { background: #2a2b2c; border-color: #4a4b4c; }
+        .tool-info { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }
+        .tool-name { font-weight: bold; font-size: 0.95rem; word-break: break-word; color: #e4e6eb; }
+        .tool-type {
+            font-size: 0.7rem;
+            color: #b0b3b8;
+            background: #3a3b3c;
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            width: fit-content;
+        }
+        .tool-views-badge { font-size: 0.65rem; color: #8b98a8; display: inline-flex; align-items: center; gap: 4px; }
+        .tool-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; margin-left: 0.5rem; }
+        .tool-share-btn, .tool-report-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            cursor: pointer;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .tool-share-btn { font-size: 1.1rem; }
+        .tool-report-btn { font-size: 1rem; }
+        .tool-share-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .tool-report-btn:hover { background: rgba(233,69,96,0.15); color: #e94560; }
+        .no-tools { text-align: center; padding: 2rem; color: #b0b3b8; }
+        .no-tools i { font-size: 2rem; display: block; margin-bottom: 0.5rem; color: #b0b3b8; }
     </style>
 
 </head>
@@ -215,9 +564,93 @@
                 </button>
                 <span class="back-title" id="pageTitle">Profile</span>
             </div>
-            <div id="profileContainer"><div class="loading-spinner">⏳ Loading profile...</div></div>
-            <div class="profile-posts-title">📝 Posts</div>
-            <div id="postsContainer"><div class="loading-spinner">⏳ Loading posts...</div></div>
+            
+            <!-- SKELETON PROFILE -->
+            <div id="skeletonProfile">
+                <div class="skeleton-profile">
+                    <div class="skeleton-profile-row">
+                        <div class="skeleton-avatar"></div>
+                        <div class="skeleton-name-block">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line medium"></div>
+                            <div class="skeleton-line long"></div>
+                            <div class="skeleton-stats">
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-actions">
+                        <div class="skeleton-btn"></div>
+                        <div class="skeleton-btn"></div>
+                        <div class="skeleton-btn circle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REAL PROFILE CONTAINER (hidden initially) -->
+            <div id="profileContainer" style="display:none;"></div>
+
+            <!-- TOOLS DROPDOWN (above post list) -->
+            <div class="tools-toggle-section" id="toolsToggleSection" style="display:none;">
+                <button class="tools-toggle-btn" id="toolsToggleBtn" type="button">
+                    <span class="left"><i class="fas fa-wrench"></i> Tools <span class="tools-count-badge" id="toolsCountBadge" style="display:none;"></span></span>
+                    <i class="fas fa-chevron-down toggle-chevron" id="toolsToggleChevron"></i>
+                </button>
+                <div class="tools-dropdown-list" id="toolsDropdownList" style="display:none;"></div>
+            </div>
+
+            <!-- SKELETON POSTS TITLE & POSTS -->
+            <div id="skeletonPostsSection">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-post">
+                    <div class="skeleton-post-header">
+                        <div class="skeleton-post-avatar"></div>
+                        <div class="skeleton-post-info">
+                            <div class="skeleton-line short" style="height:12px;"></div>
+                            <div class="skeleton-line medium" style="height:10px;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-post-content">
+                        <div class="skeleton-line long" style="height:12px;"></div>
+                        <div class="skeleton-line long" style="height:12px;"></div>
+                        <div class="skeleton-line medium" style="height:12px;"></div>
+                    </div>
+                    <div class="skeleton-post-stats">
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="skeleton-post-actions">
+                        <div class="skeleton-post-action"></div>
+                        <div class="skeleton-post-action"></div>
+                    </div>
+                </div>
+                <div class="skeleton-post">
+                    <div class="skeleton-post-header">
+                        <div class="skeleton-post-avatar"></div>
+                        <div class="skeleton-post-info">
+                            <div class="skeleton-line short" style="height:12px;"></div>
+                            <div class="skeleton-line medium" style="height:10px;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-post-content">
+                        <div class="skeleton-line long" style="height:12px;"></div>
+                        <div class="skeleton-line long" style="height:12px;"></div>
+                        <div class="skeleton-line medium" style="height:12px;"></div>
+                    </div>
+                    <div class="skeleton-post-stats">
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="skeleton-post-actions">
+                        <div class="skeleton-post-action"></div>
+                        <div class="skeleton-post-action"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REAL POSTS CONTAINER (hidden initially) -->
+            <div id="postsContainer" style="display:none;"></div>
         </div>
     </div>
 
@@ -237,7 +670,7 @@
     <!-- ===== SCRIPTS ===== -->
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
-    <!-- ===== কাস্টম কনফার্ম মডাল ===== -->
+    <!-- ===== Custom confirm modal ===== -->
     <div class="custom-modal-overlay" id="customModal">
         <div class="custom-modal">
             <div class="modal-icon" id="modalIcon">⚠️</div>
@@ -251,7 +684,7 @@
     </div>
 
     <script>
-        // ===== কাস্টম কনফার্ম =====
+        // ===== Custom confirm =====
         let pendingConfirmResolve = null;
         function customConfirm(title, message, icon = '⚠️') {
             return new Promise(function(resolve) {
@@ -277,6 +710,20 @@
             }
         });
 
+        // ===== SKELETON CONTROLS =====
+        function showSkeleton() {
+            document.getElementById('skeletonProfile').style.display = 'block';
+            document.getElementById('skeletonPostsSection').style.display = 'block';
+            document.getElementById('profileContainer').style.display = 'none';
+            document.getElementById('postsContainer').style.display = 'none';
+        }
+
+        function hideSkeletonAndShowReal() {
+            document.getElementById('skeletonProfile').style.display = 'none';
+            document.getElementById('skeletonPostsSection').style.display = 'none';
+            document.getElementById('profileContainer').style.display = 'block';
+            document.getElementById('postsContainer').style.display = 'block';
+        }
 
         // ============================================================
         // USERPROFILE.JS - FIXED (blockedUsers array handling)
@@ -287,6 +734,8 @@
         let isOwnProfile = false;
         let isFollowing = false;
         let blockedUsers = []; // ✅ Always initialize as empty array
+        let profileTools = [];
+        let profileToolsLoaded = false;
 
         const profileContainer = document.getElementById('profileContainer');
         const postsContainer = document.getElementById('postsContainer');
@@ -294,6 +743,11 @@
         const bioTextarea = document.getElementById('bioTextarea');
         const bioCharCount = document.getElementById('bioCharCount');
         const saveBioBtn = document.getElementById('saveBioBtn');
+        const toolsToggleSection = document.getElementById('toolsToggleSection');
+        const toolsToggleBtn = document.getElementById('toolsToggleBtn');
+        const toolsToggleChevron = document.getElementById('toolsToggleChevron');
+        const toolsDropdownList = document.getElementById('toolsDropdownList');
+        const toolsCountBadge = document.getElementById('toolsCountBadge');
 
         bioTextarea.addEventListener('input', function() {
             bioCharCount.textContent = this.value.length;
@@ -425,10 +879,14 @@
         }
 
         async function loadProfile(profileUserId) {
+            // Show skeleton initially
+            showSkeleton();
+
             try {
                 const result = await window.apiRequest(`/users/${profileUserId}`);
                 if (!result || !result.success) {
                     profileContainer.innerHTML = '<div style="text-align:center;padding:40px;color:#e94560;">❌ User not found</div>';
+                    hideSkeletonAndShowReal();
                     return;
                 }
 
@@ -448,15 +906,190 @@
                         </div>
                     `;
                     postsContainer.innerHTML = '';
+                    toolsToggleSection.style.display = 'none';
+                    hideSkeletonAndShowReal();
                     return;
                 }
+
+                // Reset tools dropdown state for this profile and show the toggle.
+                profileTools = [];
+                profileToolsLoaded = false;
+                toolsDropdownList.style.display = 'none';
+                toolsDropdownList.innerHTML = '';
+                toolsToggleChevron.classList.remove('open');
+                toolsCountBadge.style.display = 'none';
+                toolsToggleSection.style.display = 'block';
 
                 await checkFollowStatus();
                 renderProfile();
                 await loadUserPosts(profileUserId);
+                hideSkeletonAndShowReal();
             } catch (err) {
                 profileContainer.innerHTML = `<div style="text-align:center;padding:40px;color:#e94560;">❌ Error loading profile</div>`;
+                hideSkeletonAndShowReal();
             }
+        }
+
+        // ============================================================
+        // TOOLS DROPDOWN (above post list)
+        // ============================================================
+
+        toolsToggleBtn.addEventListener('click', async () => {
+            const isOpen = toolsDropdownList.style.display !== 'none';
+            if (isOpen) {
+                toolsDropdownList.style.display = 'none';
+                toolsToggleChevron.classList.remove('open');
+                return;
+            }
+            toolsDropdownList.style.display = 'flex';
+            toolsToggleChevron.classList.add('open');
+            if (!profileToolsLoaded) {
+                await loadProfileTools();
+            }
+        });
+
+        async function loadProfileTools() {
+            toolsDropdownList.innerHTML = '<div class="tools-loading"><i class="fas fa-spinner fa-spin"></i> Loading tools...</div>';
+            try {
+                const result = await window.apiRequest(`/users/${profileUser.id}/tools`);
+                profileToolsLoaded = true;
+
+                if (!result || !result.success || !Array.isArray(result.data) || result.data.length === 0) {
+                    profileTools = [];
+                    toolsCountBadge.style.display = 'none';
+                    toolsDropdownList.innerHTML = '<div class="no-tools"><i class="fas fa-inbox"></i> No tools published yet</div>';
+                    return;
+                }
+
+                profileTools = result.data;
+                toolsCountBadge.textContent = profileTools.length;
+                toolsCountBadge.style.display = 'inline-block';
+                renderProfileTools(profileTools);
+            } catch (err) {
+                toolsDropdownList.innerHTML = '<div class="no-tools"><i class="fas fa-triangle-exclamation"></i> Failed to load tools</div>';
+            }
+        }
+
+        function getToolViewerKey() {
+            let key = localStorage.getItem('viewerKey');
+            if (!key) {
+                key = `v_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`;
+                localStorage.setItem('viewerKey', key);
+            }
+            return key;
+        }
+
+        async function recordProfileToolView(toolId) {
+            if (toolId == null || String(toolId).trim() === '') return;
+            try {
+                const result = await window.apiRequest(`/tools/${encodeURIComponent(toolId)}/view`, {
+                    method: 'POST',
+                    body: JSON.stringify({ viewer_key: getToolViewerKey() })
+                });
+                if (result && result.success && typeof result.views_count === 'number') {
+                    const t = profileTools.find(t => String(t.id) === String(toolId));
+                    if (t) t.views_count = result.views_count;
+                    const badge = toolsDropdownList.querySelector(`.tool-item[data-id="${CSS.escape(String(toolId))}"] .tool-views-count`);
+                    if (badge) badge.textContent = result.views_count;
+                }
+            } catch (err) {}
+        }
+
+        function getProfileToolShareUrl(tool) {
+            const path = window.location.pathname;
+            const directory = path.substring(0, path.lastIndexOf('/') + 1);
+            const baseUrl = `${window.location.origin}${directory}tool.html`;
+            const id = tool && tool.id != null ? String(tool.id).trim() : '';
+            if (id && id.toLowerCase() !== 'null' && id.toLowerCase() !== 'undefined') {
+                return `${baseUrl}?id=${encodeURIComponent(id)}`;
+            }
+            return tool && tool.name ? `${baseUrl}?name=${encodeURIComponent(tool.name)}` : '';
+        }
+
+        function shareProfileTool(tool) {
+            if (!tool || !tool.name || !tool.link) {
+                showAlert('Unable to create share link: Tool information is missing.', 'error');
+                return;
+            }
+            const shareUrl = getProfileToolShareUrl(tool);
+            const shareData = {
+                title: tool.name,
+                text: `🔧 ${tool.name} - ${tool.type || 'Tool'}`,
+                url: shareUrl
+            };
+            if (typeof window.openShareSheet === 'function') {
+                window.openShareSheet(shareData);
+                return;
+            }
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+                return;
+            }
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareUrl)
+                    .then(() => showAlert('✅ Tool link copied!', 'success'))
+                    .catch(() => window.prompt('Copy this tool link:', shareUrl));
+            } else {
+                window.prompt('Copy this tool link:', shareUrl);
+            }
+        }
+
+        function renderProfileTools(tools) {
+            toolsDropdownList.innerHTML = '';
+
+            tools.forEach(tool => {
+                const item = document.createElement('div');
+                item.className = 'tool-item';
+                item.setAttribute('data-id', tool.id);
+
+                let domain = '';
+                try { if (tool.link) domain = new URL(tool.link).hostname; } catch (e) {}
+                const viewsCount = Number(tool.views_count) || 0;
+
+                item.innerHTML = `
+                    <div class="tool-info">
+                        <div class="tool-name">${escapeHtml(tool.name)}</div>
+                        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                            <span class="tool-type">${escapeHtml(tool.type || 'Tool')}</span>
+                            ${domain ? `<span style="font-size:0.6rem;color:#b0b3b8;">${escapeHtml(domain)}</span>` : ''}
+                            <span class="tool-views-badge"><i class="fas fa-eye"></i> <span class="tool-views-count">${viewsCount}</span></span>
+                        </div>
+                    </div>
+                    <div class="tool-actions">
+                        <button class="tool-share-btn" title="Share"><i class="fas fa-share-alt"></i></button>
+                        <button class="tool-report-btn" title="Report"><i class="fas fa-flag"></i></button>
+                    </div>
+                `;
+
+                // VIEW - open the tool link and record a view
+                item.addEventListener('click', (e) => {
+                    if (e.target.closest('.tool-share-btn') || e.target.closest('.tool-report-btn')) return;
+                    if (tool.link) {
+                        window.open(tool.link, '_blank');
+                        recordProfileToolView(tool.id);
+                    } else {
+                        showAlert('No link available!', 'error');
+                    }
+                });
+
+                // SHARE
+                item.querySelector('.tool-share-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    shareProfileTool(tool);
+                });
+
+                // REPORT
+                item.querySelector('.tool-report-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!currentUser) {
+                        showAlert('Please login first!', 'error');
+                        return;
+                    }
+                    window.openReportModal({ targetType: 'tool', targetId: tool.id, itemLabel: 'tool' });
+                });
+
+                toolsDropdownList.appendChild(item);
+            });
         }
 
         function renderProfile() {
@@ -474,7 +1107,7 @@
                             </div>
                             <div class="profile-bio" id="profileBio">
                                 ${user.bio ? escapeHtml(user.bio) : '<span style="color:#b0b3b8;">No bio yet</span>'}
-                                ${isOwnProfile ? `<button class="bio-edit-btn" onclick="openBioModal()">✏️ Edit</button>` : ''}
+                                ${isOwnProfile ? `<button class="bio-edit-btn" onclick="openBioModal()">Edit BIO</button>` : ''}
                             </div>
                             <div class="profile-meta">
                                 ${user.country ? `<span class="country"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(user.country)}</span>` : ''}
@@ -519,23 +1152,16 @@
         });
 
         function shareProfileLink() {
-            const url = window.location.href;
-            if (navigator.share) {
-                navigator.share({ title: `${profileUser.username}'s Profile`, url: url });
-            } else {
-                navigator.clipboard.writeText(url).then(() => {
-                    showAlert('✅ Profile link copied!', 'success');
-                }).catch(() => {
-                    prompt('Copy this link:', url);
-                });
-            }
+            const url = window.location.origin + window.location.pathname + '?userId=' + profileUser.id;
+            window.openShareSheet({ title: `${profileUser.username}'s Profile`, text: `Check out ${profileUser.username}'s profile`, url: url });
         }
 
-        function reportUser() {
-            const reason = prompt(`Report ${profileUser.username}? Enter reason:`, 'Spam or abuse');
-            if (reason && reason.trim()) {
-                showAlert(`✅ Report sent against ${profileUser.username}`, 'success');
+        async function reportUser() {
+            if (!currentUser) {
+                showAlert('Please login first!', 'error');
+                return;
             }
+            window.openReportModal({ targetType: 'user', targetId: profileUser.id, itemLabel: `${profileUser.username}` });
         }
 
         function openBioModal() {
@@ -635,7 +1261,7 @@
                     <div style="position:relative;">
                         <button class="post-more-btn" onclick="togglePostMenu('${post.id}')"><i class="fas fa-ellipsis-v"></i></button>
                         <div class="post-more-menu" id="postMenu-${post.id}">
-                            <button class="menu-item danger" onclick="deletePost('${post.id}')">🗑️ Delete</button>
+                            <button class="menu-item danger" onclick="deletePost('${post.id}')"> Delete</button>
                         </div>
                     </div>
                     ` : ''}
@@ -654,10 +1280,24 @@
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
                         <span>Comment</span>
                     </button>
+                    <button class="post-action-btn" onclick="sharePost('${post.id}', event)">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L7.04 9.81C6.5 9.31 5.79 9 5 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                        <span>Share</span>
+                    </button>
                 </div>
             `;
             return postDiv;
         }
+
+        // ============================================================
+        // SHARE POST (custom share sheet: copy link + social apps)
+        // ============================================================
+        function sharePost(postId, event) {
+            if (event) event.stopPropagation();
+            const url = window.location.origin + '/post.html?postId=' + postId;
+            window.openShareSheet({ title: 'SociaLock', text: 'Check out this post', url });
+        }
+        window.sharePost = sharePost;
 
         window.toggleLike = async function(postId) {
             if (!currentUser) return;
@@ -694,7 +1334,7 @@
         };
 
         window.deletePost = async function(postId) {
-            if (!(await customConfirm('Delete Post', 'Are you sure you want to delete this post? This action cannot be undone.', '🗑️'))) return;
+            if (!(await customConfirm('Delete Post', 'Are you sure you want to delete this post? This action cannot be undone.', ''))) return;
 
             try {
                 const result = await window.apiRequest(`/posts/${postId}`, {
@@ -751,6 +1391,57 @@
             const profileUserId = urlParams.get('userId') || userId;
             await loadProfile(profileUserId);
         });
+
+        // ===== UTILITY FUNCTIONS =====
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function timeAgo(date) {
+            if (!date) return 'Just now';
+            try {
+                const now = new Date();
+                const past = new Date(date);
+                const diffInSeconds = Math.floor((now - past) / 1000);
+                if (diffInSeconds < 5) return 'Just now';
+                if (diffInSeconds < 60) return diffInSeconds + 's ago';
+                const minutes = Math.floor(diffInSeconds / 60);
+                if (minutes < 60) return minutes + 'm ago';
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return hours + 'h ago';
+                const days = Math.floor(hours / 24);
+                if (days < 7) return days + 'd ago';
+                const weeks = Math.floor(days / 7);
+                if (weeks < 4) return weeks + 'w ago';
+                const months = Math.floor(days / 30);
+                if (months < 12) return months + 'mo ago';
+                const years = Math.floor(days / 365);
+                return years + 'y ago';
+            } catch (e) {
+                return 'Just now';
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `custom-alert ${type}`;
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        window.showAlert = showAlert;
+        window.escapeHtml = escapeHtml;
+        window.timeAgo = timeAgo;
 
     </script>
 </body>

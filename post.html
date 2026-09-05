@@ -1,9 +1,52 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Post - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Read this post on SociaLock, the social network for developers and cybersecurity professionals." />
+    <meta name="keywords" content="SociaLock post, developer post, cybersecurity discussion" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/post.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Post - SociaLock" />
+    <meta property="og:description" content="Read this post on SociaLock, the social network for developers and cybersecurity professionals." />
+    <meta property="og:url" content="https://socialock.pages.dev/post.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Post - SociaLock" />
+    <meta name="twitter:description" content="Read this post on SociaLock, the social network for developers and cybersecurity professionals." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SocialMediaPosting",
+        "url": "https://socialock.pages.dev/post.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "SociaLock",
+            "url": "https://socialock.pages.dev"
+        }
+    }
+    </script>
+    <!-- ===== SEO END ===== -->
     
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -85,6 +128,7 @@
         .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; flex-wrap: wrap; }
         .comment-username { font-weight: 700; font-size: 13px; cursor: pointer; color: #e4e6eb; }
         .comment-username:hover { text-decoration: underline; }
+        .comment-username .verified-badge, .reply-username .verified-badge, .nested-reply-username .verified-badge { color: #1877f2; font-size: 12px; margin-left: 4px; display: inline-flex; align-items: center; vertical-align: middle; }
         .comment-time { font-size: 11px; color: #b0b3b8; font-weight: 400; }
         .comment-text { font-size: 15px; line-height: 1.4; word-wrap: break-word; color: #e4e6eb; }
         
@@ -260,7 +304,7 @@
             }
         }
     
-        /* ===== কাস্টম কনফার্ম মডাল ===== */
+        /* ===== Custom confirm modal ===== */
         .custom-modal-overlay {
             display: none;
             position: fixed;
@@ -326,6 +370,212 @@
             color: white;
         }
         .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
+
+        /* ===== SKELETON LOADER STYLES ===== */
+        .skeleton-post {
+            background: #242526;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #3a3b3c;
+        }
+        .skeleton-post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .skeleton-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-avatar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-user-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .skeleton-line {
+            height: 14px;
+            border-radius: 6px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-line.short { width: 40%; }
+        .skeleton-line.medium { width: 60%; }
+        .skeleton-line.long { width: 100%; }
+        .skeleton-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .skeleton-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-top: 1px solid #3a3b3c;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 4px;
+        }
+        .skeleton-stats span {
+            height: 14px;
+            width: 50px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-stats span::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-actions {
+            display: flex;
+            gap: 8px;
+            padding: 4px 0 8px;
+        }
+        .skeleton-btn {
+            flex: 1;
+            height: 40px;
+            border-radius: 8px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-comments-title {
+            height: 20px;
+            width: 120px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-comments-title::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-comment {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #3a3b3c;
+        }
+        .skeleton-comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-comment-avatar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-comment-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .skeleton-comment-bubble {
+            background: #3a3b3c;
+            border-radius: 18px;
+            padding: 8px 14px;
+            display: inline-block;
+            max-width: 85%;
+        }
+        .skeleton-comment-bubble .skeleton-line {
+            height: 12px;
+            margin-bottom: 4px;
+        }
+        .skeleton-comment-bubble .skeleton-line:last-child {
+            margin-bottom: 0;
+        }
+        .skeleton-comment-actions {
+            display: flex;
+            gap: 14px;
+            margin-top: 4px;
+        }
+        .skeleton-comment-actions span {
+            height: 12px;
+            width: 40px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-comment-actions span::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
     </style>
 
 </head>
@@ -339,13 +589,87 @@
                 <span class="back-title">Post</span>
             </div>
 
-            <div class="post-card" id="postContainer">
-                <div id="postContent"><div class="loading-spinner">⏳ Loading post...</div></div>
+            <!-- ===== SKELETON POST ===== -->
+            <div id="skeletonPost">
+                <div class="skeleton-post">
+                    <div class="skeleton-post-header">
+                        <div class="skeleton-avatar"></div>
+                        <div class="skeleton-user-info">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line medium"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line medium"></div>
+                    </div>
+                    <div class="skeleton-stats">
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="skeleton-actions">
+                        <div class="skeleton-btn"></div>
+                        <div class="skeleton-btn"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="post-card" id="commentsSection">
+            <!-- ===== REAL POST CONTAINER ===== -->
+            <div class="post-card" id="postContainer" style="display:none;">
+                <div id="postContent"></div>
+            </div>
+
+            <!-- ===== SKELETON COMMENTS ===== -->
+            <div id="skeletonComments">
+                <div class="post-card" style="padding:16px;">
+                    <div class="skeleton-comments-title"></div>
+                    <div class="skeleton-comment">
+                        <div class="skeleton-comment-avatar"></div>
+                        <div class="skeleton-comment-body">
+                            <div class="skeleton-comment-bubble">
+                                <div class="skeleton-line short" style="height:12px;"></div>
+                                <div class="skeleton-line medium" style="height:12px;"></div>
+                            </div>
+                            <div class="skeleton-comment-actions">
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-comment">
+                        <div class="skeleton-comment-avatar"></div>
+                        <div class="skeleton-comment-body">
+                            <div class="skeleton-comment-bubble">
+                                <div class="skeleton-line short" style="height:12px;"></div>
+                                <div class="skeleton-line medium" style="height:12px;"></div>
+                            </div>
+                            <div class="skeleton-comment-actions">
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skeleton-comment">
+                        <div class="skeleton-comment-avatar"></div>
+                        <div class="skeleton-comment-body">
+                            <div class="skeleton-comment-bubble">
+                                <div class="skeleton-line short" style="height:12px;"></div>
+                                <div class="skeleton-line medium" style="height:12px;"></div>
+                            </div>
+                            <div class="skeleton-comment-actions">
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== REAL COMMENTS SECTION ===== -->
+            <div class="post-card" id="commentsSection" style="display:none;">
                 <div class="comments-title">💬 Comments</div>
-                <div id="commentsContainer"><div class="loading-spinner">⏳ Loading comments...</div></div>
+                <div id="commentsContainer"></div>
             </div>
             <div style="height: 20px;"></div>
         </div>
@@ -371,7 +695,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
-    <!-- ===== কাস্টম কনফার্ম মডাল ===== -->
+    <!-- ===== Custom confirm modal ===== -->
     <div class="custom-modal-overlay" id="customModal">
         <div class="custom-modal">
             <div class="modal-icon" id="modalIcon">⚠️</div>
@@ -385,7 +709,7 @@
     </div>
 
     <script>
-        // ===== কাস্টম কনফার্ম =====
+        // ===== Custom confirm =====
         let pendingConfirmResolve = null;
         function customConfirm(title, message, icon = '⚠️') {
             return new Promise(function(resolve) {
@@ -413,7 +737,7 @@
 
 
         // ============================================================
-        // POST.JS - নিজের কমেন্ট সবার আগে দেখাবে
+        // POST.JS - WITH SKELETON LOADING
         // ============================================================
 
 
@@ -426,6 +750,7 @@
         let hasMoreComments = true;
         let replyingTo = null;
         let currentPostId = null;
+        let verifiedUsers = [];
 
         const postContainer = document.getElementById('postContent');
         const commentsContainer = document.getElementById('commentsContainer');
@@ -438,14 +763,34 @@
         const replyToName = document.getElementById('replyToName');
         const cancelReplyBtn = document.getElementById('cancelReplyBtn');
 
+        // ===== SKELETON CONTROLS =====
+        function showSkeleton() {
+            document.getElementById('skeletonPost').style.display = 'block';
+            document.getElementById('skeletonComments').style.display = 'block';
+            document.getElementById('postContainer').style.display = 'none';
+            document.getElementById('commentsSection').style.display = 'none';
+        }
+
+        function hideSkeletonAndShowReal() {
+            document.getElementById('skeletonPost').style.display = 'none';
+            document.getElementById('skeletonComments').style.display = 'none';
+            document.getElementById('postContainer').style.display = 'block';
+            document.getElementById('commentsSection').style.display = 'block';
+        }
+
         // ============================================================
         // API REQUEST
         // ============================================================
         async function apiRequest(endpoint, options = {}) {
             const url = `${window.API_BASE_URL}${endpoint}`;
             const userId = localStorage.getItem('userId');
+            const token = localStorage.getItem('token');
             const headers = { 'Content-Type': 'application/json', ...options.headers };
-            if (userId) headers['Authorization'] = `Bearer ${userId}`;
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            } else if (userId) {
+                headers['Authorization'] = `Bearer ${userId}`;
+            }
             try {
                 const response = await fetch(url, { ...options, headers, mode: 'cors', credentials: 'omit' });
                 const data = await response.json();
@@ -456,6 +801,32 @@
             } catch (error) {
                 return null;
             }
+        }
+
+        // ===== VERIFIED USERS =====
+        // Comments/replies do not always include is_verified, so load the
+        // verified-user list once and use it for every comment/reply renderer.
+        async function loadVerifiedUsers() {
+            try {
+                const result = await apiRequest('/users/verified');
+                if (result && result.success && Array.isArray(result.data)) {
+                    verifiedUsers = result.data;
+                    return verifiedUsers;
+                }
+            } catch (e) {}
+            verifiedUsers = [];
+            return [];
+        }
+
+        function isUserVerified(userId, item = null) {
+            if (item && (item.is_verified === true || item.is_verified === 1 || item.is_verified === '1')) return true;
+            return Array.isArray(verifiedUsers) && verifiedUsers.some(id => String(id) === String(userId));
+        }
+
+        function verifiedBadge(userId, item = null) {
+            return isUserVerified(userId, item)
+                ? '<span class="verified-badge" title="Verified"><i class="fas fa-check-circle"></i></span>'
+                : '';
         }
 
         function showAlert(message, type = 'info') {
@@ -499,7 +870,7 @@
         }
 
         // ============================================================
-        // SORT COMMENTS - নিজের কমেন্ট সবার আগে
+        // SORT COMMENTS - own comment first
         // ============================================================
         function sortComments(comments) {
             if (!currentUser) return comments;
@@ -509,7 +880,6 @@
                 const bOwn = b.user_id === userId;
                 if (aOwn && !bOwn) return -1;
                 if (!aOwn && bOwn) return 1;
-                // both same ownership, sort by created_at DESC (newest first)
                 return new Date(b.created_at) - new Date(a.created_at);
             });
         }
@@ -551,6 +921,7 @@
             const result = await apiRequest(`/posts/${postId}`);
             if (!result || !result.success) {
                 postContainer.innerHTML = `<div style="text-align:center;padding:30px;color:#e94560;font-size:18px;">❌ Post not found</div>`;
+                hideSkeletonAndShowReal();
                 return;
             }
             currentPost = result.data;
@@ -600,9 +971,22 @@
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
                         <span>Comment</span>
                     </button>
+                    <button class="post-action-btn" onclick="sharePost('${post.id}')">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L7.04 9.81C6.5 9.31 5.79 9 5 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                        <span>Share</span>
+                    </button>
                 </div>
             `;
         }
+
+        // ============================================================
+        // SHARE POST (custom share sheet: copy link + social apps)
+        // ============================================================
+        function sharePost(postId) {
+            const url = window.location.origin + '/post.html?postId=' + postId;
+            window.openShareSheet({ title: 'SociaLock', text: 'Check out this post', url });
+        }
+        window.sharePost = sharePost;
 
         // ============================================================
         // TOGGLE LIKE
@@ -657,11 +1041,11 @@
             const result = await apiRequest(`/posts/${postId}/comments`);
             if (!result || !result.success) {
                 commentsContainer.innerHTML = '<div class="no-comments">❌ Failed to load comments</div>';
+                hideSkeletonAndShowReal();
                 return;
             }
 
             allComments = result.data || [];
-            // ✅ Sort: own comments first
             allComments = sortComments(allComments);
 
             commentPage = 1;
@@ -676,6 +1060,9 @@
                 moreBtn.onclick = () => loadMoreComments(postId);
                 commentsContainer.appendChild(moreBtn);
             }
+
+            // Hide skeleton after everything is loaded
+            hideSkeletonAndShowReal();
         }
 
         // ============================================================
@@ -698,13 +1085,11 @@
 
             const newComments = result.data || [];
             allComments = [...allComments, ...newComments];
-            // ✅ Sort again to keep own comments on top
             allComments = sortComments(allComments);
 
             commentPage++;
             hasMoreComments = newComments.length === COMMENTS_PER_PAGE;
 
-            // Re-render all comments with new order
             renderComments(allComments);
 
             if (hasMoreComments) {
@@ -734,7 +1119,7 @@
                         <div class="comment-bubble">
                             <div class="comment-header">
                                 <span class="comment-username" onclick="window.location.href='userprofile.html?userId=${comment.user_id}'">
-                                    ${escapeHtml(comment.username || 'User')}
+                                    ${escapeHtml(comment.username || 'User')}${verifiedBadge(comment.user_id, comment)}
                                 </span>
                                 <span class="comment-time">${timeAgoText}</span>
                             </div>
@@ -815,7 +1200,7 @@
                         <div class="reply-bubble">
                             <div class="reply-header">
                                 <span class="reply-username" onclick="window.location.href='userprofile.html?userId=${reply.user_id}'">
-                                    ${escapeHtml(reply.username || 'User')}
+                                    ${escapeHtml(reply.username || 'User')}${verifiedBadge(reply.user_id, reply)}
                                 </span>
                                 <span class="reply-time">${timeAgoText}</span>
                             </div>
@@ -895,7 +1280,7 @@
                         <div class="nested-reply-bubble">
                             <div class="nested-reply-header">
                                 <span class="nested-reply-username" onclick="window.location.href='userprofile.html?userId=${nestedReply.user_id}'">
-                                    ${escapeHtml(nestedReply.username || 'User')}
+                                    ${escapeHtml(nestedReply.username || 'User')}${verifiedBadge(nestedReply.user_id, nestedReply)}
                                 </span>
                                 <span class="nested-reply-time">${timeAgoText}</span>
                             </div>
@@ -979,7 +1364,8 @@
             commentBtn.textContent = 'Post';
 
             if (!result || !result.success) {
-                showAlert('Failed to post comment!', 'error');
+                // apiRequest() already showed the specific error (e.g. a ban
+                // message) for any failed request - don't overwrite it here.
                 return;
             }
 
@@ -1028,7 +1414,6 @@
                 }
                 showAlert('✅ Reply posted!', 'success');
             } else {
-                // Reload all comments, will be sorted
                 allComments = [];
                 commentPage = 0;
                 hasMoreComments = true;
@@ -1106,6 +1491,9 @@
                 return;
             }
 
+            // Show skeleton immediately
+            showSkeleton();
+
             const userResult = await apiRequest(`/users/${userId}`);
             if (userResult && userResult.success) {
                 currentUser = userResult.data;
@@ -1123,6 +1511,7 @@
                 return;
             }
 
+            await loadVerifiedUsers();
             await loadPost(currentPostId);
             await loadComments(currentPostId);
 

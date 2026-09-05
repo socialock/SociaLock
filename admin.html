@@ -1,0 +1,226 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin - SociaLock</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; min-height: 100vh; }
+        a { color: inherit; text-decoration: none; }
+        .back-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #3a3b3c; position: sticky; top: 0; background: #18191a; z-index: 5; }
+        .back-header .back-btn { background: none; border: none; color: #b0b3b8; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; display: flex; }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; }
+        .main-container { max-width: 640px; margin: 0 auto; padding: 16px 16px 40px; }
+        .sub-hint { color: #8a8d91; font-size: 0.85rem; margin-bottom: 16px; padding: 0 4px; }
+
+        .card { background: #242526; border: 1px solid #3a3b3c; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+        .card h3 { font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .search-row { display: flex; gap: 8px; }
+        .search-row input { flex: 1; background: #3a3b3c; border: 1px solid #4a4b4c; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 0.9rem; }
+        .search-row input:focus { outline: none; border-color: #1877f2; }
+        .search-row button { background: #1877f2; border: none; color: white; padding: 0 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .search-row button:hover { background: #166fe0; }
+
+        .user-result { display: flex; align-items: center; gap: 12px; padding: 12px 4px; margin-top: 10px; border-top: 1px solid #3a3b3c; }
+        .user-result .avatar { width: 40px; height: 40px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; flex-shrink: 0; }
+        .user-result .info { flex: 1; min-width: 0; }
+        .user-result .info .uname { font-weight: 600; font-size: 0.92rem; }
+        .user-result .info .uemail { font-size: 0.78rem; color: #8a8d91; }
+        .user-result .status { font-size: 0.72rem; padding: 3px 8px; border-radius: 10px; font-weight: 700; margin-right: 8px; }
+        .status.banned { background: rgba(233,69,96,0.15); color: #e94560; }
+        .status.active { background: rgba(76,175,80,0.15); color: #4caf50; }
+
+        textarea#banReason { width: 100%; background: #3a3b3c; border: 1px solid #4a4b4c; border-radius: 8px; padding: 10px 12px; color: #e4e6eb; font-size: 0.88rem; margin-top: 10px; resize: vertical; min-height: 60px; font-family: inherit; }
+        .btn-row { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-ban { background: #e94560; color: white; border: none; padding: 8px 16px; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .btn-ban:hover { background: #d13a53; }
+        .btn-unban { background: #3a3b3c; color: #e4e6eb; border: none; padding: 8px 16px; border-radius: 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .btn-unban:hover { background: #4a4b4c; }
+
+        .banned-list-item { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid #3a3b3c; }
+        .banned-list-item:last-child { border-bottom: none; }
+        .banned-list-item .info { flex: 1; min-width: 0; }
+        .banned-list-item .info .uname { font-weight: 600; font-size: 0.9rem; }
+        .banned-list-item .info .reason { font-size: 0.78rem; color: #8a8d91; margin-top: 2px; }
+
+        .empty-state { text-align: center; padding: 30px 20px; color: #8a8d91; font-size: 0.85rem; }
+        .denied-state { text-align: center; padding: 80px 20px; color: #8a8d91; }
+        .denied-state i { font-size: 2.6rem; margin-bottom: 14px; display: block; color: #3a3b3c; }
+
+        .custom-alert { position: fixed; top: 20px; right: 20px; left: 20px; padding: 12px 16px; border-radius: 12px; color: white; z-index: 9999; max-width: 440px; margin: 0 auto; font-size: 0.95rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
+        .custom-alert.success { background: #2e7d32; }
+        .custom-alert.error { background: #c62828; }
+        .custom-alert.info { background: #0d47a1; }
+    </style>
+</head>
+<body>
+
+    <div class="back-header">
+        <a href="settings.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <div class="back-title">Admin - User Bans</div>
+    </div>
+
+    <div class="main-container" id="appRoot">
+        <div class="sub-hint">Search a user by username to ban or unban their account. A banned user cannot log in, post, comment, like, follow, or change settings.</div>
+
+        <div class="card">
+            <h3><i class="fas fa-magnifying-glass"></i> Find a user</h3>
+            <div class="search-row">
+                <input type="text" id="searchInput" placeholder="Search by username..." autocomplete="off">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+            <div id="searchResults"></div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-user-slash"></i> Currently banned</h3>
+            <div id="bannedList"><div class="empty-state">Loading...</div></div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        if (!userId) window.location.href = 'login.html';
+
+        const appRoot = document.getElementById('appRoot');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchResults = document.getElementById('searchResults');
+        const bannedList = document.getElementById('bannedList');
+
+        function denyAccess() {
+            appRoot.innerHTML = `
+                <div class="denied-state">
+                    <i class="fas fa-lock"></i>
+                    <div>You don't have access to this page.</div>
+                </div>`;
+        }
+
+        function renderUserResult(u) {
+            const isBanned = !!u.is_banned;
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <div class="user-result">
+                    <div class="avatar">${escapeHtml((u.username || '?').charAt(0).toUpperCase())}</div>
+                    <div class="info">
+                        <div class="uname">${escapeHtml(u.username)}</div>
+                        <div class="uemail">${escapeHtml(u.email || '')}</div>
+                    </div>
+                    <span class="status ${isBanned ? 'banned' : 'active'}">${isBanned ? 'BANNED' : 'ACTIVE'}</span>
+                </div>
+                ${isBanned
+                    ? `<div class="btn-row"><button class="btn-unban" data-action="unban" data-id="${u.id}">Unban</button></div>`
+                    : `<textarea id="banReason-${u.id}" placeholder="Reason (optional)"></textarea>
+                       <div class="btn-row"><button class="btn-ban" data-action="ban" data-id="${u.id}">Ban user</button></div>`
+                }`;
+            div.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.action === 'ban') {
+                        const reason = document.getElementById(`banReason-${btn.dataset.id}`).value.trim();
+                        performBan(btn.dataset.id, reason, btn);
+                    } else {
+                        performUnban(btn.dataset.id, btn);
+                    }
+                });
+            });
+            return div;
+        }
+
+        async function doSearch() {
+            const q = searchInput.value.trim();
+            if (!q) return;
+            searchResults.innerHTML = '<div class="empty-state">Searching...</div>';
+            const result = await window.apiRequest(`/users/search?q=${encodeURIComponent(q)}`);
+            if (!result || !result.success || !Array.isArray(result.data) || result.data.length === 0) {
+                searchResults.innerHTML = '<div class="empty-state">No users found.</div>';
+                return;
+            }
+            searchResults.innerHTML = '';
+            result.data.forEach(u => searchResults.appendChild(renderUserResult(u)));
+        }
+
+        async function performBan(targetId, reason, btn) {
+            btn.disabled = true;
+            btn.textContent = 'Banning...';
+            const result = await window.apiRequest(`/admin/users/${targetId}/ban`, {
+                method: 'POST',
+                body: JSON.stringify({ reason })
+            });
+            if (result && result.success) {
+                showAlert('User banned.', 'success');
+                doSearch();
+                loadBannedList();
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Ban user';
+            }
+        }
+
+        async function performUnban(targetId, btn) {
+            btn.disabled = true;
+            btn.textContent = 'Unbanning...';
+            const result = await window.apiRequest(`/admin/users/${targetId}/unban`, {
+                method: 'POST'
+            });
+            if (result && result.success) {
+                showAlert('User unbanned.', 'success');
+                doSearch();
+                loadBannedList();
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Unban';
+            }
+        }
+
+        async function loadBannedList() {
+            const result = await window.apiRequest('/admin/banned-users');
+            if (!result || !result.success) {
+                // requireAdmin already 403'd - apiRequest already showed the alert.
+                denyAccess();
+                return;
+            }
+            if (!Array.isArray(result.data) || result.data.length === 0) {
+                bannedList.innerHTML = '<div class="empty-state">No banned users.</div>';
+                return;
+            }
+            bannedList.innerHTML = '';
+            result.data.forEach(u => {
+                const item = document.createElement('div');
+                item.className = 'banned-list-item';
+                item.innerHTML = `
+                    <div class="info">
+                        <div class="uname">${escapeHtml(u.username)}</div>
+                        <div class="reason">${u.ban_reason ? escapeHtml(u.ban_reason) : 'No reason given'}</div>
+                    </div>
+                    <button class="btn-unban" data-id="${u.id}">Unban</button>`;
+                item.querySelector('button').addEventListener('click', (e) => performUnban(u.id, e.target));
+                bannedList.appendChild(item);
+            });
+        }
+
+        searchBtn.addEventListener('click', doSearch);
+        searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+
+        loadBannedList();
+    </script>
+</body>
+</html>

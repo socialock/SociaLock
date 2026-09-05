@@ -1,1067 +1,3100 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>P2P Chat - SociaLock</title>
-    
-    <!-- ===== FIREBASE CDN ===== -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <style>
-        /* ===== রিসেট ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #18191a;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #e4e6eb;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>p2p · Real-Time Chat</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Real-time peer-to-peer chat on SociaLock, built for developers and cybersecurity professionals." />
+    <meta name="keywords" content="p2p chat, real-time chat, developer chat, secure chat" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/p2p.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="p2p · Real-Time Chat" />
+    <meta property="og:description" content="Real-time peer-to-peer chat on SociaLock, built for developers and cybersecurity professionals." />
+    <meta property="og:url" content="https://socialock.pages.dev/p2p.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="p2p · Real-Time Chat" />
+    <meta name="twitter:description" content="Real-time peer-to-peer chat on SociaLock, built for developers and cybersecurity professionals." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <!-- ===== SEO END ===== -->
 
-        /* ===== হেডার ===== */
-        .app-header {
-            background: #242526;
-            padding: 12px 20px;
-            border-bottom: 1px solid #3a3b3c;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        .app-header .back-btn {
-            background: none;
-            border: none;
-            color: #b0b3b8;
-            font-size: 1.4rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 50%;
-            transition: 0.2s;
-        }
-        .app-header .back-btn:hover { background: #3a3b3c; color: #fff; }
-        .app-header h1 { font-size: 1.2rem; font-weight: 600; flex: 1; }
-        .app-header .user-badge {
-            background: #3a3b3c;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: #b0b3b8;
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        /* ===== লবি ===== */
-        .lobby-container {
-            flex: 1;
-            padding: 20px 16px;
-            overflow-y: auto;
-            max-width: 720px;
-            width: 100%;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .action-card {
-            background: #242526;
-            border-radius: 14px;
-            padding: 20px;
-            border: 1px solid #3a3b3c;
-        }
-        .action-card h3 { font-size: 1rem; margin-bottom: 12px; color: #e4e6eb; }
-        .action-row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .action-row input {
-            flex: 1;
-            padding: 10px 14px;
-            background: #3a3b3c;
-            border: 1px solid #3a3b3c;
-            border-radius: 10px;
-            color: #e4e6eb;
-            outline: none;
-            font-size: 0.95rem;
-            min-width: 150px;
-        }
-        .action-row input:focus { border-color: #1877f2; }
-        .btn-primary {
-            background: #1877f2;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-        .btn-primary:hover { background: #166fe5; }
-        .btn-success { background: #4caf50; }
-        .btn-success:hover { background: #43a047; }
-        .btn-danger { background: #e94560; }
-        .btn-danger:hover { background: #c62828; }
+<style>
+/* ============================================================
+   RESET
+============================================================ */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        .room-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 4px;
-        }
-        .room-item {
-            background: #242526;
-            border: 1px solid #3a3b3c;
-            border-radius: 12px;
-            padding: 14px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.2s;
-        }
-        .room-item:hover { border-color: #4a4b4c; }
-        .room-item .info .name { font-weight: 600; font-size: 0.95rem; }
-        .room-item .info .meta { font-size: 0.75rem; color: #b0b3b8; }
-        .room-item .join-btn {
-            background: #1877f2;
-            border: none;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: 0.2s;
-        }
-        .room-item .join-btn:hover { background: #166fe5; }
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
 
-        /* ===== চ্যাট রুম ===== */
-        .chat-room {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            max-width: 720px;
-            width: 100%;
-            margin: 0 auto;
-            height: 100%;
-            overflow: hidden;
-            padding-bottom: 0;
-        }
-        .chat-room.active { display: flex; }
+body{
+    background:#07090d;
+    color:#e9edf3;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+                 "Helvetica Neue",Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
 
-        .chat-room .room-header {
-            background: #242526;
-            padding: 10px 16px;
-            border-bottom: 1px solid #3a3b3c;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .chat-room .room-header .title { font-weight: 600; }
-        .chat-room .room-header .actions button {
-            background: none;
-            border: none;
-            color: #b0b3b8;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 50%;
-            transition: 0.2s;
-        }
-        .chat-room .room-header .actions button:hover { background: #3a3b3c; color: #fff; }
+/* ============================================================
+   APP
+============================================================ */
+.app{
+    width:min(760px,100%);
+    height:100dvh;
+    max-height:100dvh;
+    min-height:0;
 
-        #videoContainer {
-            display: flex;
-            gap: 8px;
-            padding: 8px;
-            background: #121212;
-            flex-wrap: wrap;
-            flex-shrink: 0;
-        }
-        #localVideo, #remoteVideo {
-            flex: 1;
-            min-width: 120px;
-            max-height: 150px;
-            background: #000;
-            border-radius: 8px;
-            object-fit: cover;
-            display: none;
-        }
+    display:flex;
+    flex-direction:column;
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background: #18191a;
-        }
-        .chat-messages .msg {
-            max-width: 75%;
-            padding: 8px 14px;
-            border-radius: 18px;
-            font-size: 0.9rem;
-            word-wrap: break-word;
-            background: #3a3b3c;
-            align-self: flex-start;
-        }
-        .chat-messages .msg.own { background: #1877f2; align-self: flex-end; }
-        .chat-messages .msg .sender { font-size: 0.65rem; font-weight: 600; color: #b0b3b8; margin-bottom: 2px; }
-        .chat-messages .msg .file { color: #4caf50; text-decoration: underline; cursor: pointer; }
+    overflow:hidden;
 
-        .chat-input-area {
-            background: #242526;
-            padding: 10px 16px;
-            border-top: 1px solid #3a3b3c;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-        }
-        .chat-input-area input[type="text"] {
-            flex: 1;
-            padding: 10px 14px;
-            background: #3a3b3c;
-            border: none;
-            border-radius: 20px;
-            color: #e4e6eb;
-            outline: none;
-            font-size: 0.9rem;
-            min-width: 120px;
-        }
-        .chat-input-area input[type="text"]:focus { border: 1px solid #1877f2; }
-        .chat-input-area .action-btn {
-            background: none;
-            border: none;
-            color: #b0b3b8;
-            font-size: 1.3rem;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            transition: 0.2s;
-        }
-        .chat-input-area .action-btn:hover { background: #3a3b3c; color: #fff; }
-        .chat-input-area .send-btn {
-            background: #1877f2;
-            border: none;
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .chat-input-area .send-btn:hover { background: #166fe5; }
+    background:#080b10;
+    border:1px solid rgba(255,255,255,.07);
 
-        .file-input-hidden { display: none; }
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.55);
 
-        /* ===== হোস্ট সাইড মেনু (ঠিক করা) ===== */
-        #hostControls {
-            display: none;
-            position: fixed;
-            right: 0;
-            top: 0;
-            width: 280px;
-            height: 100%;
-            background: #242526;
-            border-left: 1px solid #3a3b3c;
-            padding: 16px;
-            overflow-y: auto;
-            z-index: 50;
-            transition: 0.3s;
-            transform: translateX(100%);
-        }
-        #hostControls.show {
-            transform: translateX(0);
-            display: block !important;
-        }
-        #hostControls h3 { margin-bottom: 12px; }
-        .token-box {
-            background: #3a3b3c;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-        .token-box strong { display: block; margin-bottom: 4px; }
-        .token-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 4px;
-        }
-        .token-row input {
-            flex: 1;
-            background: #18191a;
-            border: 1px solid #3a3b3c;
-            color: #e4e6eb;
-            padding: 6px 10px;
-            border-radius: 6px;
-            outline: none;
-        }
-        .token-row button {
-            background: #1877f2;
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .participant-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #3a3b3c;
-            padding: 6px 10px;
-            border-radius: 6px;
-            margin-bottom: 4px;
-            font-size: 0.85rem;
-        }
-        .participant-item .actions button {
-            border: none;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            margin-left: 4px;
-        }
-        .btn-approve { background: #4caf50; }
-        .btn-approve:hover { background: #43a047; }
-        .btn-kick { background: #e94560; }
-        .btn-kick:hover { background: #c62828; }
+    position:relative;
+}
 
-        /* ===== ফ্লোটিং কগ বাটন (ঠিক করা) ===== */
-        #hostMenuToggle {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            right: 16px;
-            background: #1877f2;
-            border: none;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.4rem;
-            cursor: pointer;
-            z-index: 45;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: 0.2s;
-            align-items: center;
-            justify-content: center;
-            display: none;
-        }
-        #hostMenuToggle:hover {
-            background: #166fe5;
-            transform: scale(1.05);
-        }
+/* ============================================================
+   HEADER
+============================================================ */
+.header{
+    flex:0 0 64px;
+    height:64px;
+    min-height:64px;
 
-        /* ===== কাস্টম কনফর্ম ডায়ালগ ===== */
-        .custom-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-        }
-        .custom-modal-overlay.show { display: flex; }
-        .custom-modal {
-            background: #242526;
-            border-radius: 16px;
-            padding: 28px 24px 20px;
-            max-width: 380px;
-            width: 90%;
-            border: 1px solid #3a3b3c;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-            text-align: center;
-        }
-        .custom-modal .modal-icon {
-            font-size: 2.8rem;
-            color: #e94560;
-            margin-bottom: 8px;
-        }
-        .custom-modal h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #e4e6eb;
-        }
-        .custom-modal p {
-            font-size: 0.95rem;
-            color: #b0b3b8;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-        .custom-modal .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .custom-modal .modal-actions button {
-            padding: 8px 24px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .custom-modal .modal-actions .btn-cancel {
-            background: #3a3b3c;
-            color: #b0b3b8;
-        }
-        .custom-modal .modal-actions .btn-cancel:hover { background: #4a4b4c; }
-        .custom-modal .modal-actions .btn-danger {
-            background: #e94560;
-            color: white;
-        }
-        .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 
-        /* ===== অ্যালার্ট ===== */
-        .custom-alert {
-            position: fixed;
-            top: 70px;
-            right: 10px;
-            left: 10px;
-            padding: 12px 18px;
-            border-radius: 10px;
-            color: white;
-            z-index: 10000;
-            max-width: 400px;
-            margin: 0 auto;
-            animation: slideIn 0.3s ease;
-            text-align: center;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .custom-alert.success { background: #4caf50; }
-        .custom-alert.error { background: #e94560; }
-        .custom-alert.info { background: #1877f2; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+    padding:0 14px;
 
-        @media (max-width: 480px) {
-            .action-row { flex-direction: column; }
-            .room-item { flex-direction: column; align-items: stretch; gap: 8px; }
-            .room-item .join-btn { align-self: flex-end; }
-            #hostControls { width: 100%; }
-            #hostMenuToggle { bottom: 70px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; }
-            .custom-modal { padding: 20px 16px; }
-        }
-    </style>
+    background:rgba(13,17,24,.97);
+
+    border-bottom:1px solid rgba(255,255,255,.07);
+
+    position:relative;
+    z-index:20;
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+}
+
+.back-btn{
+    width:38px;
+    height:38px;
+
+    border:none;
+    background:transparent;
+
+    color:#8793a5;
+    font-size:16px;
+
+    border-radius:50%;
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:.2s;
+}
+
+.back-btn:hover{
+    background:rgba(255,255,255,.06);
+    color:#fff;
+}
+
+.header-title{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.header-title .name{
+    color:#edf1f7;
+    font-size:15px;
+    font-weight:650;
+    line-height:20px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.header-title .status{
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+    color:#687588;
+    font-size:10px;
+    line-height:14px;
+}
+
+.status .dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    display:inline-block;
+}
+
+.status .dot.online{
+    background:#42d392;
+    box-shadow:0 0 7px rgba(66,211,146,.6);
+}
+
+.status .dot.offline{
+    background:#687588;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+}
+
+.header-right button{
+    width:38px;
+    height:38px;
+
+    border:0;
+    background:transparent;
+
+    color:#7f8a9b;
+    font-size:16px;
+
+    border-radius:50%;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.header-right button:hover{
+    background:rgba(255,255,255,.06);
+    color:#fff;
+}
+
+/* ============================================================
+   TABS
+============================================================ */
+.tabs-container{
+    flex:0 0 auto;
+
+    display:flex;
+
+    margin:10px 12px 0;
+    padding:4px;
+
+    border-radius:13px;
+
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.06);
+}
+
+.tab-btn{
+    flex:1;
+
+    height:38px;
+
+    border:0;
+    background:transparent;
+
+    color:#697588;
+
+    font-family:inherit;
+    font-size:12px;
+    font-weight:600;
+
+    border-radius:9px;
+
+    cursor:pointer;
+
+    position:relative;
+
+    transition:.2s;
+}
+
+.tab-btn:hover{
+    color:#cbd3df;
+}
+
+.tab-btn.active{
+    color:#fff;
+    background:#151b25;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.tab-btn.active::after{
+    display:none;
+}
+
+/* ============================================================
+   TAB CONTENT
+============================================================ */
+.tab-content{
+    display:none;
+
+    flex:0 0 auto;
+
+    padding:14px 16px 18px;
+
+    background:#080b10;
+}
+
+.tab-content.active{
+    display:block;
+}
+
+/* ============================================================
+   AUTH
+============================================================ */
+.auth-form .form-group{
+    margin-bottom:9px;
+}
+
+.auth-form .form-group input{
+    width:100%;
+    height:44px;
+
+    padding:0 14px;
+
+    border-radius:11px;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    background:#10151d;
+
+    color:#edf1f7;
+
+    font-family:inherit;
+    font-size:13px;
+
+    outline:none;
+
+    transition:.2s;
+}
+
+.auth-form .form-group input:focus{
+    border-color:rgba(79,156,255,.45);
+    background:#121a25;
+
+    box-shadow:0 0 0 3px rgba(79,156,255,.06);
+}
+
+.auth-form .form-group input::placeholder{
+    color:#566174;
+}
+
+.auth-form .btn-auth{
+    width:100%;
+    height:44px;
+
+    border:0;
+    border-radius:11px;
+
+    background:linear-gradient(135deg,#4c97ff,#635de7);
+
+    color:#fff;
+
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 7px 20px rgba(65,120,220,.18),
+        inset 0 1px 0 rgba(255,255,255,.15);
+
+    transition:.2s;
+}
+
+.auth-form .btn-auth:hover{
+    filter:brightness(1.08);
+    transform:translateY(-1px);
+}
+
+.auth-form .btn-auth:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.auth-form .hint{
+    color:#4f5a6b;
+    font-size:9px;
+
+    text-align:center;
+
+    margin-top:8px;
+}
+
+/* ============================================================
+   MESSENGER
+   IMPORTANT:
+   ONLY MESSAGE AREA SCROLLS
+============================================================ */
+.messenger{
+    display:none;
+
+    flex:1 1 auto;
+
+    width:100%;
+
+    height:0;
+    min-height:0;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(79,156,255,.035),
+            transparent 48%
+        ),
+        #080b10;
+}
+
+.messenger.visible{
+    display:flex;
+}
+
+/* ============================================================
+   MESSAGE AREA
+============================================================ */
+.messages-area{
+    flex:1 1 auto;
+
+    width:100%;
+    height:0;
+    min-height:0;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding:15px 16px 12px;
+
+    scroll-behavior:smooth;
+
+    overscroll-behavior:contain;
+
+    -webkit-overflow-scrolling:touch;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(79,156,255,.025),
+            transparent 50%
+        );
+}
+
+.messages-area::-webkit-scrollbar{
+    width:4px;
+}
+
+.messages-area::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.messages-area::-webkit-scrollbar-thumb{
+    background:rgba(130,145,170,.24);
+    border-radius:20px;
+}
+
+/* ============================================================
+   EMPTY
+============================================================ */
+.empty-state{
+    width:100%;
+    min-height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+    padding:20px;
+}
+
+.empty-state .greeting-icon{
+    width:64px;
+    height:64px;
+
+    border-radius:20px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#263344;
+
+    background:rgba(255,255,255,.025);
+
+    border:1px solid rgba(255,255,255,.04);
+
+    font-size:27px;
+
+    margin-bottom:15px;
+}
+
+.empty-state .greeting-title{
+    color:#8490a2;
+
+    font-size:13px;
+    font-weight:500;
+
+    margin-bottom:5px;
+}
+
+.empty-state .greeting-sub{
+    max-width:280px;
+
+    color:#4f5a6b;
+
+    font-size:10px;
+    line-height:1.6;
+}
+
+.empty-state .highlight{
+    color:#589bff;
+    cursor:pointer;
+}
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+.msg{
+    display:flex;
+    align-items:flex-end;
+
+    gap:8px;
+
+    margin-bottom:9px;
+
+    animation:fadeIn .18s ease;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(5px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.msg .avatar{
+    width:32px;
+    height:32px;
+
+    flex:0 0 32px;
+
+    border-radius:11px;
+
+    background:#151c27;
+
+    border:1px solid rgba(255,255,255,.05);
+
+    color:#7d8ba0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:12px;
+    font-weight:700;
+
+    text-transform:uppercase;
+}
+
+.msg .bubble{
+    max-width:min(78%,520px);
+
+    padding:7px 12px 7px;
+
+    border-radius:17px 17px 17px 5px;
+
+    background:#111722;
+
+    border:1px solid rgba(255,255,255,.06);
+
+    color:#e7ebf1;
+
+    line-height:1.45;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.13);
+}
+
+.msg .bubble .sender{
+    display:block;
+
+    color:#5d9cff;
+
+    font-size:10px;
+    font-weight:600;
+
+    margin-bottom:2px;
+}
+
+.msg .bubble .text{
+    display:block;
+
+    word-break:break-word;
+
+    font-size:13px;
+}
+
+.msg .bubble .time{
+    display:block;
+
+    color:#566173;
+
+    font-size:7px;
+
+    margin-top:3px;
+
+    text-align:right;
+}
+
+.msg.self{
+    flex-direction:row-reverse;
+}
+
+.msg.self .bubble{
+    border-radius:17px 17px 5px 17px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #29496f,
+            #263b57
+        );
+
+    border-color:rgba(110,165,230,.15);
+}
+
+.msg.self .bubble .sender{
+    color:#8ab9ef;
+}
+
+/* ============================================================
+   FILE
+============================================================ */
+.msg .bubble .file-attachment{
+    display:block;
+
+    margin:5px 0 2px;
+
+    padding:8px 10px;
+
+    background:#0c1118;
+
+    border-radius:9px;
+
+    border:1px solid rgba(255,255,255,.06);
+
+    color:#aab5c5;
+
+    text-decoration:none;
+
+    font-size:11px;
+
+    transition:.15s;
+
+    word-break:break-word;
+}
+
+.msg .bubble .file-attachment:hover{
+    border-color:rgba(79,156,255,.4);
+}
+
+.msg .bubble .file-attachment i{
+    margin-right:5px;
+}
+
+.msg .bubble .file-size{
+    color:#586476;
+    font-size:8px;
+}
+
+.msg .bubble .file-preview{
+    display:block;
+
+    max-width:100%;
+    max-height:240px;
+
+    border-radius:10px;
+
+    margin-top:5px;
+
+    border:1px solid rgba(255,255,255,.06);
+}
+
+.msg.self .bubble .file-attachment{
+    background:#1b2b40;
+    border-color:rgba(110,165,230,.13);
+}
+
+/* ============================================================
+   INPUT ROW
+   THIS NEVER SCROLLS
+============================================================ */
+.input-row{
+    flex:0 0 auto;
+
+    width:100%;
+
+    min-height:64px;
+
+    display:flex;
+    align-items:center;
+
+    gap:6px;
+
+    padding:
+        8px
+        12px
+        calc(8px + env(safe-area-inset-bottom));
+
+    background:rgba(8,11,16,.98);
+
+    border-top:1px solid rgba(255,255,255,.06);
+
+    position:relative;
+    z-index:30;
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+
+.input-row input[type="text"]{
+    flex:1 1 auto;
+
+    min-width:0;
+
+    height:44px;
+
+    padding:0 16px;
+
+    border-radius:22px;
+
+    border:1px solid rgba(255,255,255,.075);
+
+    background:#111722;
+
+    color:#edf2f8;
+
+    font-family:inherit;
+    font-size:14px;
+
+    outline:none;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025);
+
+    transition:.2s;
+}
+
+.input-row input[type="text"]:focus{
+    border-color:rgba(79,156,255,.42);
+
+    background:#131b28;
+
+    box-shadow:
+        0 0 0 3px rgba(79,156,255,.06);
+}
+
+.input-row input[type="text"]::placeholder{
+    color:#667286;
+}
+
+.input-row input[type="text"]:disabled{
+    opacity:.4;
+}
+
+.input-row .file-btn{
+    flex:0 0 40px;
+
+    width:40px;
+    height:40px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:transparent;
+
+    color:#718096;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.input-row .file-btn:hover{
+    background:rgba(255,255,255,.06);
+    color:#b4bfce;
+}
+
+.input-row .file-btn input[type="file"]{
+    display:none;
+}
+
+.input-row button{
+    flex:0 0 42px;
+
+    width:42px;
+    height:42px;
+
+    padding:0;
+
+    border:0;
+    border-radius:50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4d98ff,
+            #6559e8
+        );
+
+    color:#fff;
+
+    font-size:14px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 5px 18px rgba(67,130,230,.25),
+        inset 0 1px 0 rgba(255,255,255,.18);
+
+    transition:.2s;
+}
+
+.input-row button:hover{
+    transform:scale(1.04);
+}
+
+.input-row button:active{
+    transform:scale(.96);
+}
+
+.input-row button:disabled{
+    opacity:.4;
+    transform:none;
+}
+
+/* ============================================================
+   SIDE MENU
+============================================================ */
+.sidemenu-overlay{
+    display:none;
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.62);
+
+    z-index:2000;
+
+    backdrop-filter:blur(2px);
+}
+
+.sidemenu-overlay.show{
+    display:block;
+}
+
+.sidemenu{
+    position:fixed;
+
+    top:0;
+    right:-280px;
+
+    width:260px;
+    height:100dvh;
+
+    background:#11151c;
+
+    z-index:2001;
+
+    border-left:1px solid rgba(255,255,255,.07);
+
+    box-shadow:-12px 0 40px rgba(0,0,0,.5);
+
+    display:flex;
+    flex-direction:column;
+
+    transition:right .28s cubic-bezier(.4,0,.2,1);
+}
+
+.sidemenu.open{
+    right:0;
+}
+
+.sidemenu-header{
+    height:64px;
+
+    flex:0 0 64px;
+
+    padding:0 16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.sidemenu-header .title{
+    color:#8994a5;
+
+    font-size:11px;
+    font-weight:700;
+
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.sidemenu-close{
+    width:36px;
+    height:36px;
+
+    border:0;
+    border-radius:50%;
+
+    background:transparent;
+
+    color:#7d8999;
+
+    cursor:pointer;
+}
+
+.sidemenu-close:hover{
+    background:rgba(255,255,255,.06);
+    color:#fff;
+}
+
+.sidemenu-body{
+    flex:1;
+
+    padding:8px 0;
+
+    overflow-y:auto;
+}
+
+.sidemenu-body .menu-item{
+    width:100%;
+
+    min-height:46px;
+
+    display:flex;
+    align-items:center;
+
+    gap:13px;
+
+    padding:0 17px;
+
+    border:0;
+    background:transparent;
+
+    color:#dce2ea;
+
+    font-family:inherit;
+    font-size:13px;
+
+    text-align:left;
+
+    cursor:pointer;
+
+    transition:.15s;
+}
+
+.sidemenu-body .menu-item:hover{
+    background:rgba(255,255,255,.05);
+}
+
+.sidemenu-body .menu-item .icon{
+    width:24px;
+
+    text-align:center;
+
+    color:#7d8a9d;
+
+    font-size:14px;
+}
+
+.sidemenu-body .menu-item .badge-count{
+    margin-left:auto;
+
+    min-width:22px;
+
+    padding:2px 7px;
+
+    border-radius:12px;
+
+    background:#3c80d0;
+
+    color:#fff;
+
+    font-size:9px;
+    font-weight:700;
+
+    text-align:center;
+}
+
+.sidemenu-body .menu-divider{
+    height:1px;
+
+    background:rgba(255,255,255,.06);
+
+    margin:7px 14px;
+}
+
+.sidemenu-body .menu-item.danger{
+    color:#ed667b;
+}
+
+.sidemenu-body .menu-item.danger .icon{
+    color:#ed667b;
+}
+
+.sidemenu-footer{
+    flex:0 0 auto;
+
+    padding:
+        12px
+        16px
+        calc(12px + env(safe-area-inset-bottom));
+
+    border-top:1px solid rgba(255,255,255,.06);
+
+    color:#4f5a6b;
+
+    font-size:9px;
+
+    text-align:center;
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast{
+    position:fixed;
+
+    left:50%;
+    bottom:30px;
+
+    transform:translate(-50%,12px);
+
+    max-width:90%;
+
+    padding:9px 18px;
+
+    border-radius:12px;
+
+    background:#151a22;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:#e6ebf2;
+
+    font-size:11px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+
+    z-index:9999;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:.25s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+@media(max-width:600px){
+
+    html,
+    body{
+        width:100%;
+        height:100%;
+
+        overflow:hidden;
+    }
+
+    body{
+        display:block;
+        padding:0;
+
+        background:#080b10;
+    }
+
+    .app{
+        width:100%;
+        height:100dvh;
+
+        min-height:0;
+        max-height:none;
+
+        border:0;
+        border-radius:0;
+
+        overflow:hidden;
+    }
+
+    .header{
+        flex:0 0 60px;
+
+        height:60px;
+        min-height:60px;
+
+        padding:0 9px;
+    }
+
+    .header-title .name{
+        font-size:14px;
+    }
+
+    .tabs-container{
+        margin:9px 10px 0;
+    }
+
+    .tab-btn{
+        height:36px;
+        font-size:11px;
+    }
+
+    .tab-content{
+        padding:12px 12px 15px;
+    }
+
+    .messenger{
+        flex:1 1 auto;
+
+        width:100%;
+        height:0;
+        min-height:0;
+
+        overflow:hidden;
+    }
+
+    .messages-area{
+        flex:1 1 auto;
+
+        height:0;
+        min-height:0;
+
+        padding:
+            11px
+            9px
+            8px;
+
+        overflow-y:auto;
+        overflow-x:hidden;
+
+        -webkit-overflow-scrolling:touch;
+
+        overscroll-behavior-y:contain;
+    }
+
+    .input-row{
+        flex:0 0 auto;
+
+        min-height:60px;
+
+        padding:
+            7px
+            8px
+            calc(7px + env(safe-area-inset-bottom));
+
+        gap:4px;
+    }
+
+    .input-row input[type="text"]{
+        height:42px;
+
+        border-radius:21px;
+
+        padding:0 14px;
+
+        font-size:13px;
+    }
+
+    .input-row .file-btn{
+        width:38px;
+        height:38px;
+
+        flex-basis:38px;
+
+        font-size:15px;
+    }
+
+    .input-row button{
+        width:41px;
+        height:41px;
+
+        flex-basis:41px;
+    }
+
+    .msg{
+        gap:6px;
+        margin-bottom:8px;
+    }
+
+    .msg .avatar{
+        width:30px;
+        height:30px;
+
+        flex-basis:30px;
+
+        border-radius:10px;
+
+        font-size:11px;
+    }
+
+    .msg .bubble{
+        max-width:84%;
+
+        padding:7px 10px;
+
+        border-radius:15px 15px 15px 4px;
+    }
+
+    .msg.self .bubble{
+        border-radius:15px 15px 4px 15px;
+    }
+
+    .msg .bubble .sender{
+        font-size:9px;
+    }
+
+    .msg .bubble .text{
+        font-size:13px;
+    }
+
+    .msg .bubble .time{
+        font-size:7px;
+    }
+
+    .msg .bubble .file-preview{
+        max-height:220px;
+    }
+
+    .sidemenu{
+        width:250px;
+        right:-250px;
+    }
+}
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+@media(max-width:380px){
+
+    .header{
+        flex-basis:58px;
+        height:58px;
+        min-height:58px;
+    }
+
+    .input-row{
+        min-height:58px;
+    }
+
+    .input-row input[type="text"]{
+        height:40px;
+    }
+
+    .input-row button{
+        width:39px;
+        height:39px;
+        flex-basis:39px;
+    }
+
+    .input-row .file-btn{
+        width:35px;
+        height:35px;
+        flex-basis:35px;
+    }
+
+    .msg .bubble{
+        max-width:88%;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <!-- ===== হেডার ===== -->
-    <div class="app-header">
-        <button class="back-btn" onclick="window.location.href='messages.html'"><i class="fas fa-arrow-left"></i></button>
-        <h1>🔒 P2P Chat</h1>
-        <span class="user-badge" id="userBadge">Loading...</span>
+<div class="app">
+
+    <!-- HEADER -->
+    <div class="header">
+
+        <div class="header-left">
+
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div class="header-title">
+
+                <span class="name" id="chatTitle">
+                    p2p
+                </span>
+
+                <span class="status" id="chatStatus">
+                    <span class="dot offline" id="statusDot"></span>
+                    <span id="statusText">Ready</span>
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="header-right">
+
+            <button id="menuDotsBtn">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+
+        </div>
+
     </div>
 
-    <!-- ===== লবি ===== -->
-    <div class="lobby-container" id="lobbyContainer">
-        <div class="action-card">
-            <h3>🚀 Create Room</h3>
-            <div class="action-row">
-                <input type="text" id="roomNameInput" placeholder="Room Name (optional)" maxlength="30">
-                <button class="btn-primary" id="createRoomBtn"><i class="fas fa-plus"></i> Create</button>
-            </div>
-            <div style="margin-top:8px; font-size:0.8rem; color:#b0b3b8;" id="createdRoomInfo"></div>
-        </div>
 
-        <div class="action-card">
-            <h3>🔑 Join Room</h3>
-            <div class="action-row">
-                <input type="text" id="joinRoomIdInput" placeholder="Enter Room ID / Token">
-                <button class="btn-primary btn-success" id="joinRoomBtn"><i class="fas fa-sign-in-alt"></i> Join</button>
-            </div>
-            <div style="margin-top:8px; font-size:0.8rem; color:#b0b3b8;" id="joinStatus"></div>
-        </div>
+    <!-- CREATE / JOIN TABS -->
+    <div class="tabs-container" id="tabsContainer">
 
-        <div class="action-card">
-            <h3>📡 Active Rooms</h3>
-            <div id="roomListContainer" class="room-list">
-                <div style="text-align:center; color:#b0b3b8; padding:20px;">Loading rooms...</div>
-            </div>
-        </div>
+        <button class="tab-btn active" data-tab="create">
+            <i class="fas fa-plus"></i>
+            Create
+        </button>
+
+        <button class="tab-btn" data-tab="join">
+            <i class="fas fa-sign-in-alt"></i>
+            Join
+        </button>
+
     </div>
 
-    <!-- ===== চ্যাট রুম ===== -->
-    <div class="chat-room" id="chatRoom">
-        <div class="room-header">
-            <span class="title" id="chatRoomTitle">Room</span>
-            <div class="actions">
-                <button id="toggleVideoBtn" title="Toggle Video"><i class="fas fa-video"></i></button>
-                <button id="toggleAudioBtn" title="Toggle Audio"><i class="fas fa-microphone"></i></button>
-                <button id="leaveRoomBtn" title="Leave Room"><i class="fas fa-sign-out-alt" style="color:#e94560;"></i></button>
+
+    <!-- CREATE -->
+    <div class="tab-content active" id="tabCreate">
+
+        <div class="auth-form">
+
+            <div class="form-group">
+                <input
+                    type="text"
+                    id="createUsername"
+                    placeholder="Your name"
+                >
             </div>
+
+            <button class="btn-auth" id="createRoomBtn">
+                <i class="fas fa-rocket"></i>
+                Create Room
+            </button>
+
+            <div class="hint">
+                Get a 64-char shareable code
+            </div>
+
         </div>
 
-        <div id="videoContainer">
-            <video id="localVideo" autoplay muted playsinline></video>
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-
-        <div class="chat-messages" id="chatMessages"></div>
-
-        <div class="chat-input-area">
-            <button class="action-btn" id="attachFileBtn" title="Attach File"><i class="fas fa-paperclip"></i></button>
-            <input type="file" id="fileInput" class="file-input-hidden" multiple>
-            <input type="text" id="chatInput" placeholder="Type a message..." />
-            <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-        </div>
     </div>
 
-    <!-- ===== হোস্ট সাইড মেনু ===== -->
-    <div id="hostControls">
-        <button onclick="closeHostMenu()" style="background:none; border:none; color:#b0b3b8; font-size:1.2rem; float:right; cursor:pointer;">✕</button>
-        <h3>🔧 Host Controls</h3>
-        <div class="token-box">
-            <strong>Room Token:</strong>
-            <div class="token-row">
-                <input type="text" id="roomTokenDisplay" readonly>
-                <button onclick="copyToken()">Copy</button>
+
+    <!-- JOIN -->
+    <div class="tab-content" id="tabJoin">
+
+        <div class="auth-form">
+
+            <div class="form-group">
+                <input
+                    type="text"
+                    id="joinUsername"
+                    placeholder="Your name"
+                >
             </div>
+
+            <div class="form-group">
+                <input
+                    type="text"
+                    id="joinCodeInput"
+                    placeholder="Paste join code"
+                >
+            </div>
+
+            <button class="btn-auth" id="joinRoomBtn">
+                <i class="fas fa-door-open"></i>
+                Join Room
+            </button>
+
+            <div class="hint">
+                Paste the code from creator
+            </div>
+
         </div>
-        <h4 style="margin:12px 0 8px;">👥 Participants</h4>
-        <div id="participantsList"></div>
+
     </div>
 
-    <!-- ===== ফ্লোটিং কগ বাটন (ঠিক করা) ===== -->
-    <button id="hostMenuToggle" onclick="toggleHostMenu()">
-        <i class="fas fa-cog"></i>
-    </button>
 
-    <!-- ===== কাস্টম কনফর্ম মডাল ===== -->
-    <div class="custom-modal-overlay" id="customModal">
-        <div class="custom-modal">
-            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <h3 id="modalTitle">Are you sure?</h3>
-            <p id="modalMessage">This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button class="btn-cancel" id="modalCancel">Cancel</button>
-                <button class="btn-danger" id="modalConfirm">OK</button>
+    <!-- ========================================================
+         MESSENGER
+    ========================================================= -->
+    <div id="messenger" class="messenger">
+
+        <!-- ONLY THIS AREA SCROLLS -->
+        <div id="messageContainer" class="messages-area">
+
+            <div class="empty-state">
+
+                <div class="greeting-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+
+                <div class="greeting-title">
+                    No messages here yet...
+                </div>
+
+                <div class="greeting-sub">
+                    Send a message or tap the
+                    <span class="highlight" id="greetingHighlight">
+                        greeting
+                    </span>
+                    below.
+                </div>
+
             </div>
+
         </div>
+
+
+        <!-- FIXED BOTTOM INPUT -->
+        <div class="input-row">
+
+            <input
+                type="text"
+                id="chatInput"
+                placeholder="Type a message..."
+                disabled
+            >
+
+            <label class="file-btn">
+
+                <i class="fas fa-paperclip"></i>
+
+                <input
+                    type="file"
+                    id="fileInput"
+                >
+
+            </label>
+
+            <button id="sendMsgBtn" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+
+        </div>
+
     </div>
 
-    <!-- ===== স্ক্রিপ্ট ===== -->
-    <script src="js/config.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script>
-        // ============================================================
-        // P2P.JS - সম্পূর্ণ ফ্রন্টএন্ড (কাস্টম এলার্ট + মডাল)
-        // ============================================================
+</div>
 
 
-        // ===== গ্লোবাল ভেরিয়েবল =====
-        var currentUser = null;
-        var roomId = null;
-        var isHost = false;
-        var peerConnections = {};
-        var dataChannels = {};
-        var localStream = null;
-        var currentHostId = null;
-        var pendingConfirm = null; // কাস্টম কনফর্মের জন্য
+<!-- ============================================================
+     SIDE MENU
+============================================================ -->
 
-        // ===== DOM রেফারেন্স =====
-        var lobby = document.getElementById('lobbyContainer');
-        var chatRoom = document.getElementById('chatRoom');
-        var chatMessages = document.getElementById('chatMessages');
-        var chatInput = document.getElementById('chatInput');
-        var sendBtn = document.getElementById('sendBtn');
-        var fileInput = document.getElementById('fileInput');
-        var attachBtn = document.getElementById('attachFileBtn');
-        var localVideo = document.getElementById('localVideo');
-        var remoteVideo = document.getElementById('remoteVideo');
-        var toggleVideoBtn = document.getElementById('toggleVideoBtn');
-        var toggleAudioBtn = document.getElementById('toggleAudioBtn');
-        var leaveBtn = document.getElementById('leaveRoomBtn');
+<div class="sidemenu-overlay" id="sidemenuOverlay"></div>
 
-        var roomListContainer = document.getElementById('roomListContainer');
-        var createBtn = document.getElementById('createRoomBtn');
-        var joinBtn = document.getElementById('joinRoomBtn');
-        var joinRoomIdInput = document.getElementById('joinRoomIdInput');
-        var roomNameInput = document.getElementById('roomNameInput');
-        var createdRoomInfo = document.getElementById('createdRoomInfo');
-        var joinStatus = document.getElementById('joinStatus');
-        var participantsList = document.getElementById('participantsList');
-        var hostMenuToggle = document.getElementById('hostMenuToggle');
-        var hostControls = document.getElementById('hostControls');
-        var roomTokenDisplay = document.getElementById('roomTokenDisplay');
+<div class="sidemenu" id="sidemenu">
 
-        // মডাল এলিমেন্ট
-        var modalOverlay = document.getElementById('customModal');
-        var modalTitle = document.getElementById('modalTitle');
-        var modalMessage = document.getElementById('modalMessage');
-        var modalCancel = document.getElementById('modalCancel');
-        var modalConfirm = document.getElementById('modalConfirm');
+    <div class="sidemenu-header">
 
-        // ===== কাস্টম কনফর্ম =====
-        function customConfirm(title, message) {
-            return new Promise(function(resolve) {
-                modalTitle.textContent = title;
-                modalMessage.textContent = message;
-                modalOverlay.classList.add('show');
+        <span class="title">
+            Menu
+        </span>
 
-                function cleanup() {
-                    modalOverlay.classList.remove('show');
-                    modalCancel.removeEventListener('click', onCancel);
-                    modalConfirm.removeEventListener('click', onConfirm);
-                }
-                function onCancel() { cleanup(); resolve(false); }
-                function onConfirm() { cleanup(); resolve(true); }
+        <button class="sidemenu-close" id="sidemenuClose">
+            <i class="fas fa-times"></i>
+        </button>
 
-                modalCancel.addEventListener('click', onCancel);
-                modalConfirm.addEventListener('click', onConfirm);
-            });
+    </div>
+
+    <div class="sidemenu-body">
+
+        <button class="menu-item" id="menuCopyToken">
+
+            <span class="icon">
+                <i class="fas fa-copy"></i>
+            </span>
+
+            Copy Token
+
+        </button>
+
+
+        <button class="menu-item" id="menuWhoJoined">
+
+            <span class="icon">
+                <i class="fas fa-users"></i>
+            </span>
+
+            Who joined?
+
+            <span class="badge-count" id="joinedCount">
+                0
+            </span>
+
+        </button>
+
+
+        <div class="menu-divider"></div>
+
+
+        <button class="menu-item danger" id="menuLeaveRoom">
+
+            <span class="icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </span>
+
+            Leave Room
+
+        </button>
+
+    </div>
+
+
+    <div class="sidemenu-footer">
+        p2p v1.0
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+
+<script>
+/* ============================================================
+   SUPABASE
+============================================================ */
+
+const SUPABASE_URL =
+'https://mjuowfrzvgnqrazqnunr.supabase.co';
+
+const SUPABASE_ANON_KEY =
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
+
+
+const supabaseClient =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    {
+        auth:{
+            autoRefreshToken:false,
+            persistSession:false
         }
+    }
+);
 
-        // মডালের বাইরে ক্লিক করলে বন্ধ
-        modalOverlay.addEventListener('click', function(e) {
-            if (e.target === modalOverlay) {
-                modalOverlay.classList.remove('show');
-                if (pendingConfirm) { pendingConfirm(false); pendingConfirm = null; }
-            }
+
+/* ============================================================
+   DOM
+============================================================ */
+
+const $ = id => document.getElementById(id);
+
+const chatTitle = $('chatTitle');
+const statusDot = $('statusDot');
+const statusText = $('statusText');
+
+const createUsername = $('createUsername');
+const createRoomBtn = $('createRoomBtn');
+
+const joinUsername = $('joinUsername');
+const joinCodeInput = $('joinCodeInput');
+const joinRoomBtn = $('joinRoomBtn');
+
+const tabsContainer = $('tabsContainer');
+
+const tabBtns =
+tabsContainer.querySelectorAll('.tab-btn');
+
+const tabCreate = $('tabCreate');
+const tabJoin = $('tabJoin');
+
+const messenger = $('messenger');
+
+const messageContainer =
+$('messageContainer');
+
+const chatInput = $('chatInput');
+const sendMsgBtn = $('sendMsgBtn');
+const fileInput = $('fileInput');
+
+const backBtn = $('backBtn');
+const menuDotsBtn = $('menuDotsBtn');
+
+const sidemenuOverlay =
+$('sidemenuOverlay');
+
+const sidemenu =
+$('sidemenu');
+
+const sidemenuClose =
+$('sidemenuClose');
+
+const menuCopyToken =
+$('menuCopyToken');
+
+const menuWhoJoined =
+$('menuWhoJoined');
+
+const menuLeaveRoom =
+$('menuLeaveRoom');
+
+const joinedCount =
+$('joinedCount');
+
+const greetingHighlight =
+$('greetingHighlight');
+
+const toast = $('toast');
+
+
+/* ============================================================
+   STATE
+============================================================ */
+
+let currentRoomId = null;
+let currentUsername = '';
+let channel = null;
+let messages = [];
+let joinCode = '';
+let participants = new Set();
+
+
+/* ============================================================
+   UTILITY
+============================================================ */
+
+function generateJoinCode(){
+
+    const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    let code = '';
+
+    for(let i = 0; i < 64; i++){
+
+        const randomIndex =
+        crypto.getRandomValues(
+            new Uint32Array(1)
+        )[0] % chars.length;
+
+        code += chars[randomIndex];
+    }
+
+    return code;
+}
+
+
+function formatFileSize(bytes){
+
+    if(bytes < 1024)
+        return bytes + ' B';
+
+    if(bytes < 1048576)
+        return (bytes / 1024).toFixed(1) + ' KB';
+
+    return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+
+function getFileIcon(mimeType){
+
+    if(!mimeType)
+        return 'fa-file';
+
+    if(mimeType.startsWith('image/'))
+        return 'fa-file-image';
+
+    if(mimeType.startsWith('video/'))
+        return 'fa-file-video';
+
+    if(mimeType.startsWith('audio/'))
+        return 'fa-file-audio';
+
+    if(
+        mimeType.includes('zip') ||
+        mimeType.includes('rar')
+    )
+        return 'fa-file-archive';
+
+    if(mimeType.includes('pdf'))
+        return 'fa-file-pdf';
+
+    if(mimeType.includes('text'))
+        return 'fa-file-alt';
+
+    return 'fa-file';
+}
+
+
+function isImageFile(mimeType){
+
+    return mimeType &&
+           mimeType.startsWith('image/');
+}
+
+
+function isVideoFile(mimeType){
+
+    return mimeType &&
+           mimeType.startsWith('video/');
+}
+
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+function showToast(msg,duration=3000){
+
+    toast.textContent = msg;
+
+    toast.classList.add('show');
+
+    clearTimeout(toast._timer);
+
+    toast._timer =
+    setTimeout(()=>{
+        toast.classList.remove('show');
+    },duration);
+}
+
+
+/* ============================================================
+   COPY
+============================================================ */
+
+function copyToClipboard(text){
+
+    if(
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+    ){
+
+        navigator.clipboard
+        .writeText(text)
+        .then(()=>{
+            showToast('✅ Token copied!');
+        })
+        .catch(()=>{
+            fallbackCopy(text);
         });
 
-        // ===== ইউটিলিটি =====
-        function showAlert(msg, type) {
-            var el = document.querySelector('.custom-alert');
-            if (el) el.remove();
-            var div = document.createElement('div');
-            div.className = 'custom-alert ' + (type || 'info');
-            div.textContent = msg;
-            document.body.appendChild(div);
-            setTimeout(function() { div.remove(); }, 4000);
-        }
+    }else{
 
-        function escapeHtml(text) {
-            var div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        fallbackCopy(text);
+    }
+}
 
-        // ===== সিগন্যালিং =====
-        async function sendSignal(targetUserId, data) {
-            try {
-                await window.apiRequest('/p2p/signal', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        room_id: roomId,
-                        from: currentUser.id,
-                        to: targetUserId,
-                        data: data
-                    })
-                });
-            } catch (e) { }
-        }
 
-        async function pollSignals() {
-            if (!roomId || !currentUser) return;
-            try {
-                var res = await window.apiRequest('/p2p/signals?room_id=' + roomId + '&user_id=' + currentUser.id);
-                if (res && res.success && res.data) {
-                    res.data.forEach(function(signal) {
-                        handleSignal(signal.from, signal.data);
-                    });
-                }
-            } catch (e) { }
-        }
+function fallbackCopy(text){
 
-        // ===== WebRTC =====
-        function createPeerConnection(targetUserId) {
-            var config = {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
-                ]
-            };
-            var pc = new RTCPeerConnection(config);
-            peerConnections[targetUserId] = pc;
+    const ta =
+    document.createElement('textarea');
 
-            var dc = pc.createDataChannel('chat');
-            dataChannels[targetUserId] = dc;
-            dc.onmessage = function(e) {
-                try {
-                    var data = JSON.parse(e.data);
-                    if (data.type === 'text') {
-                        appendMessage(data.from, data.text, false);
-                    } else if (data.type === 'file') {
-                        var blob = new Blob([Uint8Array.from(atob(data.content), function(c) { return c.charCodeAt(0); })], { type: data.mime });
-                        var url = URL.createObjectURL(blob);
-                        appendMessage(data.from, '<a href="' + url + '" download="' + data.name + '" class="file">📎 ' + data.name + '</a>', false);
+    ta.value = text;
+
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+
+    document.body.appendChild(ta);
+
+    ta.select();
+
+    try{
+
+        document.execCommand('copy');
+
+        showToast('✅ Token copied!');
+
+    }catch(_){
+
+        showToast('⚠️ Copy manually');
+    }
+
+    document.body.removeChild(ta);
+}
+
+
+function shareCode(code){
+
+    if(navigator.share){
+
+        navigator.share({
+
+            title:'Chat Room Join Code',
+
+            text:
+            `Join my chat room with this code: ${code}`
+
+        }).catch(()=>{});
+
+    }else{
+
+        copyToClipboard(code);
+    }
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+function updateStatus(isOnline,text){
+
+    statusDot.className =
+    'dot ' + (isOnline ? 'online' : 'offline');
+
+    statusText.textContent =
+    text || (isOnline ? 'Online' : 'Offline');
+}
+
+
+/* ============================================================
+   TABS
+============================================================ */
+
+function switchTab(tabId){
+
+    tabBtns.forEach(btn=>{
+        btn.classList.remove('active');
+    });
+
+    document
+    .querySelector(
+        `.tab-btn[data-tab="${tabId}"]`
+    )
+    .classList.add('active');
+
+
+    if(tabId === 'create'){
+
+        tabCreate.classList.add('active');
+        tabJoin.classList.remove('active');
+
+    }else{
+
+        tabJoin.classList.add('active');
+        tabCreate.classList.remove('active');
+    }
+}
+
+
+/* ============================================================
+   PARTICIPANTS
+============================================================ */
+
+function updateJoinedCount(){
+
+    const count =
+    participants.size || 0;
+
+    joinedCount.textContent = count;
+}
+
+
+/* ============================================================
+   RENDER MESSAGES
+============================================================ */
+
+function renderMessages(){
+
+    if(!messageContainer)
+        return;
+
+
+    if(!messages || messages.length === 0){
+
+        messageContainer.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="greeting-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+
+                <div class="greeting-title">
+                    No messages here yet...
+                </div>
+
+                <div class="greeting-sub">
+                    Send a message or tap the
+                    <span class="highlight"
+                          id="greetingHighlight">
+                        greeting
+                    </span>
+                    below.
+                </div>
+
+            </div>
+        `;
+
+
+        const newHighlight =
+        document.getElementById(
+            'greetingHighlight'
+        );
+
+        if(newHighlight){
+
+            newHighlight.addEventListener(
+                'click',
+                ()=>{
+                    if(
+                        chatInput &&
+                        !chatInput.disabled
+                    ){
+                        chatInput.focus();
                     }
-                } catch (e) { }
-            };
-            dc.onopen = function() { };
-            dc.onclose = function() { };
+                }
+            );
+        }
 
-            if (localStream) {
-                localStream.getTracks().forEach(function(track) { pc.addTrack(track, localStream); });
+        return;
+    }
+
+
+    const currentUser =
+    currentUsername || 'Me';
+
+    let html = '';
+
+
+    messages.forEach(msg=>{
+
+        const isSelf =
+        msg.username === currentUser;
+
+        const avatarLetter =
+        msg.username
+        ? msg.username.charAt(0).toUpperCase()
+        : '?';
+
+
+        const timeStr =
+        msg.time
+        ? new Date(msg.time)
+            .toLocaleTimeString(
+                'en-US',
+                {
+                    hour:'2-digit',
+                    minute:'2-digit'
+                }
+            )
+        : '';
+
+
+        let content = '';
+
+
+        if(msg.text){
+
+            content += `
+                <span class="text">
+                    ${escapeHtml(msg.text)}
+                </span>
+            `;
+        }
+
+
+        if(msg.file){
+
+            const icon =
+            getFileIcon(
+                msg.file.mimeType
+            );
+
+            const size =
+            formatFileSize(
+                msg.file.size
+            );
+
+            const isImg =
+            isImageFile(
+                msg.file.mimeType
+            );
+
+            const isVid =
+            isVideoFile(
+                msg.file.mimeType
+            );
+
+
+            content += `
+
+                <a
+                    href="${msg.file.url}"
+                    target="_blank"
+                    class="file-attachment"
+                    download="${escapeHtml(msg.file.name)}"
+                >
+
+                    <i class="fas ${icon}"></i>
+
+                    <span>
+                        ${escapeHtml(msg.file.name)}
+                    </span>
+
+                    <span class="file-size">
+                        (${size})
+                    </span>
+
+                </a>
+            `;
+
+
+            if(isImg){
+
+                content += `
+
+                    <img
+                        src="${msg.file.url}"
+                        class="file-preview"
+                        alt="${escapeHtml(msg.file.name)}"
+                    >
+                `;
             }
 
-            pc.ontrack = function(event) {
-                if (event.streams && event.streams[0]) {
-                    remoteVideo.srcObject = event.streams[0];
-                    remoteVideo.style.display = 'block';
-                }
-            };
 
-            pc.onicecandidate = function(event) {
-                if (event.candidate) {
-                    sendSignal(targetUserId, { type: 'candidate', candidate: event.candidate });
-                }
-            };
+            if(isVid){
 
-            return pc;
-        }
+                content += `
 
-        async function createOffer(targetUserId) {
-            var pc = createPeerConnection(targetUserId);
-            var offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            sendSignal(targetUserId, { type: 'offer', sdp: offer });
-        }
-
-        async function handleSignal(from, data) {
-            if (data.type === 'offer') {
-                var pc = createPeerConnection(from);
-                await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-                var answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                sendSignal(from, { type: 'answer', sdp: answer });
-            } else if (data.type === 'answer') {
-                var pc = peerConnections[from];
-                if (pc) await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-            } else if (data.type === 'candidate') {
-                var pc = peerConnections[from];
-                if (pc) await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+                    <video
+                        src="${msg.file.url}"
+                        class="file-preview"
+                        controls
+                    ></video>
+                `;
             }
         }
 
-        // ===== UI =====
-        function appendMessage(sender, text, isOwn) {
-            var div = document.createElement('div');
-            div.className = 'msg' + (isOwn ? ' own' : '');
-            var senderSpan = '<div class="sender">' + escapeHtml(sender) + '</div>';
-            div.innerHTML = senderSpan + text;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
 
-        function switchToChat(roomIdParam, isHostParam, hostId) {
-            roomId = roomIdParam;
-            isHost = isHostParam;
-            currentHostId = hostId || currentUser.id;
+        html += `
 
-            lobby.style.display = 'none';
-            chatRoom.classList.add('active');
-            document.getElementById('chatRoomTitle').textContent = 'Room: ' + roomId.substring(0, 8);
+            <div class="msg ${isSelf ? 'self' : ''}">
 
-            if (isHost) {
-                hostMenuToggle.style.display = 'flex';
-                hostControls.style.display = 'block';
-                roomTokenDisplay.value = roomId;
-                loadParticipants();
-                setInterval(loadParticipants, 5000);
+                <div class="avatar">
+                    ${escapeHtml(avatarLetter)}
+                </div>
+
+                <div class="bubble">
+
+                    <span class="sender">
+                        ${escapeHtml(msg.username || 'Unknown')}
+                    </span>
+
+                    ${content}
+
+                    <span class="time">
+                        ${timeStr}
+                    </span>
+
+                </div>
+
+            </div>
+        `;
+    });
+
+
+    messageContainer.innerHTML = html;
+
+    requestAnimationFrame(()=>{
+        messageContainer.scrollTop =
+        messageContainer.scrollHeight;
+    });
+}
+
+
+/* ============================================================
+   HTML ESCAPE
+============================================================ */
+
+function escapeHtml(value){
+
+    return String(value ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+}
+
+
+/* ============================================================
+   REALTIME
+============================================================ */
+
+function setupRealtime(roomId,username){
+
+    if(channel){
+
+        try{
+            channel.unsubscribe();
+        }catch(_){}
+
+        channel = null;
+    }
+
+
+    if(!roomId)
+        return;
+
+
+    currentRoomId = roomId;
+    currentUsername = username;
+
+    participants.clear();
+
+    participants.add(username);
+
+
+    const channelName =
+    `room:${roomId}`;
+
+
+    channel =
+    supabaseClient.channel(
+        channelName,
+        {
+            config:{
+                broadcast:{
+                    ack:true
+                }
             }
-
-            setInterval(pollSignals, 3000);
         }
+    );
 
-        // ===== হোস্ট কন্ট্রোল =====
-        function toggleHostMenu() {
-            hostControls.classList.toggle('show');
-        }
 
-        function closeHostMenu() {
-            hostControls.classList.remove('show');
-        }
+    channel.on(
+        'broadcast',
+        {event:'message'},
+        (payload)=>{
 
-        function copyToken() {
-            roomTokenDisplay.select();
-            document.execCommand('copy');
-            showAlert('Token copied!', 'success');
-        }
+            const {
+                username:sender,
+                text,
+                file,
+                time
+            } = payload.payload;
 
-        async function loadParticipants() {
-            if (!isHost || !roomId) return;
-            try {
-                var res = await window.apiRequest('/p2p/participants?room_id=' + roomId);
-                if (res && res.success) {
-                    participantsList.innerHTML = res.data.map(function(p) {
-                        var actions = '';
-                        if (p.status === 'pending') {
-                            actions += '<button class="btn-approve" onclick="approveUser(\'' + p.user_id + '\')">Approve</button>';
-                        }
-                        if (p.status === 'approved' && p.user_id !== currentUser.id) {
-                            actions += '<button class="btn-kick" onclick="kickUser(\'' + p.user_id + '\')">Kick</button>';
-                        }
-                        return '<div class="participant-item"><span>' + escapeHtml(p.user_name) + ' (' + p.status + ')</span><div class="actions">' + actions + '</div></div>';
-                    }).join('');
-                }
-            } catch (e) { }
-        }
 
-        async function approveUser(userId) {
-            var ok = await customConfirm('Approve User', 'Allow this user to join the room?');
-            if (!ok) return;
-            try {
-                await window.apiRequest('/p2p/approve', {
-                    method: 'POST',
-                    body: JSON.stringify({ room_id: roomId, host_id: currentUser.id, user_id: userId })
-                });
-                showAlert('User approved!', 'success');
-                loadParticipants();
-            } catch (e) { showAlert('Failed to approve', 'error'); }
-        }
-
-        async function kickUser(userId) {
-            var ok = await customConfirm('Kick User', 'This user will be removed from the room and cannot join again.');
-            if (!ok) return;
-            try {
-                await window.apiRequest('/p2p/kick', {
-                    method: 'POST',
-                    body: JSON.stringify({ room_id: roomId, host_id: currentUser.id, user_id: userId })
-                });
-                showAlert('User kicked!', 'success');
-                loadParticipants();
-                if (peerConnections[userId]) {
-                    peerConnections[userId].close();
-                    delete peerConnections[userId];
-                    delete dataChannels[userId];
-                }
-            } catch (e) { showAlert('Failed to kick', 'error'); }
-        }
-
-        // ===== মেসেজ =====
-        function sendMessage(text) {
-            if (!text.trim()) return;
-            appendMessage('You', text, true);
-            Object.keys(dataChannels).forEach(function(key) {
-                var dc = dataChannels[key];
-                if (dc.readyState === 'open') {
-                    dc.send(JSON.stringify({ type: 'text', from: currentUser.username, text: text }));
-                }
+            messages.push({
+                username:sender,
+                text,
+                file,
+                time
             });
-            chatInput.value = '';
+
+
+            participants.add(sender);
+
+            updateJoinedCount();
+
+            renderMessages();
         }
+    );
 
-        sendBtn.onclick = function() { sendMessage(chatInput.value); };
-        chatInput.onkeydown = function(e) { if (e.key === 'Enter') sendMessage(this.value); };
 
-        // ===== ফাইল =====
-        attachBtn.onclick = function() { fileInput.click(); };
-        fileInput.onchange = function() {
-            var files = this.files;
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var data = e.target.result.split(',')[1];
-                    var payload = JSON.stringify({
-                        type: 'file',
-                        from: currentUser.username,
-                        name: file.name,
-                        mime: file.type,
-                        content: data
-                    });
-                    Object.keys(dataChannels).forEach(function(key) {
-                        var dc = dataChannels[key];
-                        if (dc.readyState === 'open') dc.send(payload);
-                    });
-                    appendMessage('You', '📎 ' + file.name, true);
+    channel.subscribe((status)=>{
+
+        if(status === 'SUBSCRIBED'){
+
+            console.log(
+                `✅ Connected to room ${roomId}`
+            );
+
+
+            chatInput.disabled = false;
+            sendMsgBtn.disabled = false;
+            fileInput.disabled = false;
+
+            messenger.classList.add('visible');
+
+            updateStatus(true,'Online');
+
+            chatTitle.textContent =
+            'Chat Room';
+
+
+            setTimeout(()=>{
+
+                channel.send({
+
+                    type:'broadcast',
+
+                    event:'message',
+
+                    payload:{
+
+                        username:
+                        '🟢 ' + username,
+
+                        text:
+                        'joined the room',
+
+                        time:Date.now()
+                    }
+
+                });
+
+            },500);
+
+
+            setTimeout(()=>{
+                chatInput.focus();
+            },100);
+
+        }else{
+
+            console.warn(
+                'Subscribe status:',
+                status
+            );
+        }
+    });
+
+
+    chatInput.disabled = false;
+    sendMsgBtn.disabled = false;
+    fileInput.disabled = false;
+
+    messages = [];
+
+    participants.add(username);
+
+    updateJoinedCount();
+
+    renderMessages();
+}
+
+
+/* ============================================================
+   SEND MESSAGE
+============================================================ */
+
+async function sendChatMessage(
+    text,
+    fileData=null
+){
+
+    if(!channel || !currentRoomId)
+        return false;
+
+
+    const msgData = {
+
+        username:
+        currentUsername || 'Guest',
+
+        time:
+        Date.now()
+    };
+
+
+    if(text)
+        msgData.text = text;
+
+
+    if(fileData)
+        msgData.file = fileData;
+
+
+    const {error} =
+    await channel.send({
+
+        type:'broadcast',
+
+        event:'message',
+
+        payload:msgData
+    });
+
+
+    if(error){
+
+        showToast(
+            '⚠️ Error: ' + error.message
+        );
+
+        return false;
+    }
+
+
+    messages.push(msgData);
+
+    participants.add(
+        currentUsername
+    );
+
+    updateJoinedCount();
+
+    renderMessages();
+
+    return true;
+}
+
+
+/* ============================================================
+   FILE UPLOAD
+============================================================ */
+
+async function handleFileUpload(file){
+
+    if(
+        file.size >
+        50 * 1024 * 1024
+    ){
+
+        showToast(
+            '⚠️ Max 50MB allowed'
+        );
+
+        return;
+    }
+
+
+    try{
+
+        showToast('📤 Uploading...');
+
+
+        const reader =
+        new FileReader();
+
+
+        const base64 =
+        await new Promise(
+            (resolve,reject)=>{
+
+                reader.onload =
+                ()=>{
+                    resolve(
+                        reader.result
+                    );
                 };
+
+                reader.onerror = reject;
+
                 reader.readAsDataURL(file);
             }
-            this.value = '';
+        );
+
+
+        const fileData = {
+
+            name:file.name,
+
+            size:file.size,
+
+            mimeType:file.type,
+
+            url:base64
         };
 
-        // ===== মিডিয়া =====
-        async function initMedia() {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream;
-                localVideo.style.display = 'block';
-                Object.keys(peerConnections).forEach(function(key) {
-                    var pc = peerConnections[key];
-                    localStream.getTracks().forEach(function(t) { pc.addTrack(t, localStream); });
-                });
-            } catch (e) { showAlert('Camera/Mic access denied', 'error'); }
+
+        const success =
+        await sendChatMessage(
+            null,
+            fileData
+        );
+
+
+        if(success){
+
+            showToast(
+                '✅ File shared!'
+            );
         }
 
-        toggleVideoBtn.onclick = function() {
-            if (!localStream) return initMedia();
-            var track = localStream.getVideoTracks()[0];
-            if (track) {
-                track.enabled = !track.enabled;
-                toggleVideoBtn.style.color = track.enabled ? '#4caf50' : '#e94560';
+
+    }catch(error){
+
+        console.error(
+            'File upload error:',
+            error
+        );
+
+        showToast(
+            '⚠️ Upload failed'
+        );
+    }
+}
+
+
+/* ============================================================
+   CREATE ROOM
+============================================================ */
+
+async function handleCreateRoom(){
+
+    const username =
+    createUsername.value.trim() ||
+    'Guest';
+
+
+    if(username.length < 2){
+
+        showToast(
+            '⚠️ Name must be at least 2 characters'
+        );
+
+        return;
+    }
+
+
+    joinCode =
+    generateJoinCode();
+
+
+    const roomId =
+    joinCode;
+
+
+    currentUsername =
+    username;
+
+
+    tabsContainer.style.display =
+    'none';
+
+
+    setupRealtime(
+        roomId,
+        username
+    );
+
+
+    createRoomBtn.disabled = true;
+
+    createRoomBtn.innerHTML =
+    '<i class="fas fa-check"></i> Created';
+
+    createUsername.disabled = true;
+
+
+    showToast(
+        '🎉 Room created!'
+    );
+
+
+    chatInput.focus();
+}
+
+
+/* ============================================================
+   JOIN ROOM
+============================================================ */
+
+async function handleJoinRoom(){
+
+    const username =
+    joinUsername.value.trim() ||
+    'Guest';
+
+
+    const code =
+    joinCodeInput.value.trim();
+
+
+    if(username.length < 2){
+
+        showToast(
+            '⚠️ Name must be at least 2 characters'
+        );
+
+        return;
+    }
+
+
+    if(code.length !== 64){
+
+        showToast(
+            '⚠️ Enter a valid 64-character code'
+        );
+
+        return;
+    }
+
+
+    const roomId = code;
+
+    joinCode = code;
+
+    currentUsername =
+    username;
+
+
+    tabsContainer.style.display =
+    'none';
+
+
+    setupRealtime(
+        roomId,
+        username
+    );
+
+
+    joinUsername.disabled = true;
+
+    joinCodeInput.disabled = true;
+
+    joinRoomBtn.disabled = true;
+
+    joinRoomBtn.innerHTML =
+    '<i class="fas fa-spinner fa-spin"></i> Joining...';
+
+
+    showToast(
+        '✅ Joined the room!'
+    );
+
+
+    chatInput.focus();
+}
+
+
+/* ============================================================
+   LEAVE ROOM
+============================================================ */
+
+function leaveRoom(){
+
+    if(channel){
+
+        try{
+            channel.unsubscribe();
+        }catch(_){}
+
+        channel = null;
+    }
+
+
+    currentRoomId = null;
+
+    currentUsername = '';
+
+    messages = [];
+
+    joinCode = '';
+
+    participants.clear();
+
+
+    tabsContainer.style.display =
+    'flex';
+
+    messenger.classList.remove(
+        'visible'
+    );
+
+
+    updateStatus(
+        false,
+        'Ready'
+    );
+
+
+    chatTitle.textContent =
+    'p2p';
+
+
+    chatInput.disabled = true;
+
+    sendMsgBtn.disabled = true;
+
+    fileInput.disabled = true;
+
+
+    createRoomBtn.disabled = false;
+
+    createRoomBtn.innerHTML =
+    '<i class="fas fa-rocket"></i> Create Room';
+
+    createUsername.disabled = false;
+
+    createUsername.value = '';
+
+
+    joinUsername.disabled = false;
+
+    joinCodeInput.disabled = false;
+
+    joinRoomBtn.disabled = false;
+
+    joinRoomBtn.innerHTML =
+    '<i class="fas fa-door-open"></i> Join Room';
+
+    joinUsername.value = '';
+
+    joinCodeInput.value = '';
+
+
+    updateJoinedCount();
+
+    switchTab('create');
+
+
+    messageContainer.innerHTML = `
+
+        <div class="empty-state">
+
+            <div class="greeting-icon">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+
+            <div class="greeting-title">
+                No messages here yet...
+            </div>
+
+            <div class="greeting-sub">
+                Send a message or tap the
+                <span
+                    class="highlight"
+                    id="greetingHighlight"
+                >
+                    greeting
+                </span>
+                below.
+            </div>
+
+        </div>
+    `;
+
+
+    const newHighlight =
+    document.getElementById(
+        'greetingHighlight'
+    );
+
+
+    if(newHighlight){
+
+        newHighlight.addEventListener(
+            'click',
+            ()=>{
+                if(
+                    chatInput &&
+                    !chatInput.disabled
+                ){
+                    chatInput.focus();
+                }
             }
-        };
+        );
+    }
 
-        toggleAudioBtn.onclick = function() {
-            if (!localStream) return initMedia();
-            var track = localStream.getAudioTracks()[0];
-            if (track) {
-                track.enabled = !track.enabled;
-                toggleAudioBtn.style.color = track.enabled ? '#4caf50' : '#e94560';
+
+    showToast(
+        '👋 Left the room'
+    );
+}
+
+
+/* ============================================================
+   TABS
+============================================================ */
+
+tabBtns.forEach(btn=>{
+
+    btn.addEventListener(
+        'click',
+        ()=>{
+            switchTab(
+                btn.dataset.tab
+            );
+        }
+    );
+});
+
+
+/* ============================================================
+   CREATE / JOIN
+============================================================ */
+
+createRoomBtn.addEventListener(
+    'click',
+    handleCreateRoom
+);
+
+
+joinRoomBtn.addEventListener(
+    'click',
+    handleJoinRoom
+);
+
+
+/* ============================================================
+   BACK
+============================================================ */
+
+backBtn.addEventListener(
+    'click',
+    ()=>{
+
+        if(currentRoomId){
+
+            leaveRoom();
+
+        }else{
+
+            showToast(
+                '👋 Goodbye!'
+            );
+        }
+    }
+);
+
+
+/* ============================================================
+   SEND BUTTON
+============================================================ */
+
+sendMsgBtn.addEventListener(
+    'click',
+    async ()=>{
+
+        const text =
+        chatInput.value.trim();
+
+
+        if(text){
+
+            await sendChatMessage(text);
+
+            chatInput.value = '';
+
+            chatInput.focus();
+        }
+    }
+);
+
+
+/* ============================================================
+   ENTER SEND
+============================================================ */
+
+chatInput.addEventListener(
+    'keydown',
+    async e=>{
+
+        if(e.key === 'Enter'){
+
+            e.preventDefault();
+
+
+            const text =
+            chatInput.value.trim();
+
+
+            if(text){
+
+                await sendChatMessage(
+                    text
+                );
+
+                chatInput.value = '';
+
+                chatInput.focus();
             }
-        };
+        }
+    }
+);
 
-        // ===== লিভ রুম (কাস্টম কনফর্ম) =====
-        leaveBtn.onclick = function() {
-            customConfirm('Leave Room', 'Are you sure you want to leave this room?')
-                .then(function(ok) {
-                    if (!ok) return;
-                    if (isHost) {
-                        window.apiRequest('/p2p/delete-room', {
-                            method: 'POST',
-                            body: JSON.stringify({ room_id: roomId, host_id: currentUser.id })
-                        }).then(function() {
-                            Object.keys(peerConnections).forEach(function(k) { peerConnections[k].close(); });
-                            location.reload();
-                        });
-                    } else {
-                        Object.keys(peerConnections).forEach(function(k) { peerConnections[k].close(); });
-                        location.reload();
-                    }
-                });
-        };
 
-        // ===== রুম লিস্ট =====
-        async function loadRooms() {
-            try {
-                var res = await window.apiRequest('/p2p/rooms');
-                if (res && res.success) {
-                    if (res.data.length === 0) {
-                        roomListContainer.innerHTML = '<div style="text-align:center; color:#b0b3b8; padding:20px;">No active rooms</div>';
-                        return;
-                    }
-                    roomListContainer.innerHTML = res.data.map(function(room) {
-                        return '<div class="room-item"><div class="info"><div class="name">📡 ' + escapeHtml(room.host_name) + '\'s Room</div><div class="meta">👥 ' + (room.members || 1) + ' members · ' + room.room_id.substring(0, 8) + '</div></div><button class="join-btn" onclick="quickJoin(\'' + room.room_id + '\')">Join</button></div>';
-                    }).join('');
-                }
-            } catch (e) { }
+/* ============================================================
+   FILE
+============================================================ */
+
+fileInput.addEventListener(
+    'change',
+    async e=>{
+
+        const file =
+        e.target.files[0];
+
+
+        if(file){
+
+            await handleFileUpload(
+                file
+            );
+
+            fileInput.value = '';
+        }
+    }
+);
+
+
+/* ============================================================
+   JOIN ENTER
+============================================================ */
+
+joinCodeInput.addEventListener(
+    'keydown',
+    e=>{
+
+        if(e.key === 'Enter'){
+
+            e.preventDefault();
+
+            handleJoinRoom();
+        }
+    }
+);
+
+
+/* ============================================================
+   CREATE ENTER
+============================================================ */
+
+createUsername.addEventListener(
+    'keydown',
+    e=>{
+
+        if(e.key === 'Enter'){
+
+            e.preventDefault();
+
+            handleCreateRoom();
+        }
+    }
+);
+
+
+/* ============================================================
+   SIDE MENU OPEN
+============================================================ */
+
+menuDotsBtn.addEventListener(
+    'click',
+    ()=>{
+
+        sidemenu.classList.add(
+            'open'
+        );
+
+        sidemenuOverlay.classList.add(
+            'show'
+        );
+    }
+);
+
+
+/* ============================================================
+   SIDE MENU CLOSE
+============================================================ */
+
+sidemenuClose.addEventListener(
+    'click',
+    ()=>{
+
+        sidemenu.classList.remove(
+            'open'
+        );
+
+        sidemenuOverlay.classList.remove(
+            'show'
+        );
+    }
+);
+
+
+sidemenuOverlay.addEventListener(
+    'click',
+    ()=>{
+
+        sidemenu.classList.remove(
+            'open'
+        );
+
+        sidemenuOverlay.classList.remove(
+            'show'
+        );
+    }
+);
+
+
+/* ============================================================
+   COPY TOKEN
+============================================================ */
+
+menuCopyToken.addEventListener(
+    'click',
+    ()=>{
+
+        if(joinCode){
+
+            copyToClipboard(
+                joinCode
+            );
+
+            showToast(
+                '✅ Token copied!'
+            );
+
+        }else{
+
+            showToast(
+                '⚠️ No room active'
+            );
         }
 
-        window.quickJoin = function(id) {
-            joinRoomIdInput.value = id;
-            joinBtn.click();
-        };
 
-        // ===== ইভেন্ট =====
-        createBtn.onclick = async function() {
-            try {
-                var res = await window.apiRequest('/p2p/create-room', {
-                    method: 'POST',
-                    body: JSON.stringify({ host_id: currentUser.id, host_name: currentUser.username })
-                });
-                if (res && res.success) {
-                    var rid = res.data.room_id;
-                    createdRoomInfo.innerHTML = '✅ Room created! <strong>ID: ' + rid + '</strong>';
-                    showAlert('Room created! Share the Token with friends.', 'success');
-                    switchToChat(rid, true);
-                    setInterval(function() {
-                        window.apiRequest('/p2p/heartbeat', {
-                            method: 'POST',
-                            body: JSON.stringify({ room_id: rid, host_id: currentUser.id })
-                        });
-                    }, 10000);
-                }
-            } catch (e) { showAlert('Failed to create room', 'error'); }
-        };
+        sidemenu.classList.remove(
+            'open'
+        );
 
-        joinBtn.onclick = async function() {
-            var input = joinRoomIdInput.value.trim();
-            if (!input) { showAlert('Enter Room ID or Token', 'error'); return; }
-            try {
-                var res = await window.apiRequest('/p2p/join-room', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        room_id: input,
-                        token: input,
-                        user_id: currentUser.id,
-                        user_name: currentUser.username
-                    })
-                });
-                if (res && res.success) {
-                    if (res.data.status === 'pending') {
-                        joinStatus.textContent = '⏳ Waiting for host approval...';
-                        showAlert('Request sent to host. Waiting for approval.', 'info');
-                        setTimeout(pollApproval, 5000);
-                    } else if (res.data.status === 'approved') {
-                        showAlert('Joined room!', 'success');
-                        switchToChat(input, false, res.data.host_id);
-                    }
-                } else {
-                    showAlert(res.error || 'Failed to join', 'error');
-                }
-            } catch (e) { showAlert('Error joining room', 'error'); }
-        };
+        sidemenuOverlay.classList.remove(
+            'show'
+        );
+    }
+);
 
-        async function pollApproval() {
-            var input = joinRoomIdInput.value.trim();
-            if (!input) return;
-            try {
-                var res = await window.apiRequest('/p2p/join-room', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        room_id: input,
-                        token: input,
-                        user_id: currentUser.id,
-                        user_name: currentUser.username
-                    })
-                });
-                if (res && res.success && res.data.status === 'approved') {
-                    showAlert('Host approved!', 'success');
-                    switchToChat(input, false, res.data.host_id);
-                } else {
-                    setTimeout(pollApproval, 5000);
-                }
-            } catch (e) { setTimeout(pollApproval, 5000); }
+
+/* ============================================================
+   WHO JOINED
+============================================================ */
+
+menuWhoJoined.addEventListener(
+    'click',
+    ()=>{
+
+        if(!currentRoomId){
+
+            showToast(
+                '⚠️ No room active'
+            );
+
+        }else{
+
+            const list =
+            Array.from(participants)
+            .filter(
+                p=>!p.startsWith('🟢')
+            );
+
+
+            const count =
+            list.length;
+
+
+            if(count === 0){
+
+                showToast(
+                    '👥 No one else yet. Share the token!'
+                );
+
+            }else{
+
+                showToast(
+                    '👥 Participants: ' +
+                    list.join(', ')
+                );
+            }
         }
 
-        // ===== পেজ লোড =====
-        document.addEventListener('DOMContentLoaded', function() {
-            var userId = localStorage.getItem('userId');
-            if (!userId) { window.location.href = 'login.html'; return; }
 
-            window.apiRequest('/users/' + userId).then(function(result) {
-                if (result && result.success) {
-                    currentUser = result.data;
-                    document.getElementById('userBadge').textContent = '@' + currentUser.username;
-                    loadRooms();
-                    setInterval(loadRooms, 15000);
-                } else {
-                    localStorage.removeItem('userId');
-                    window.location.href = 'login.html';
-                }
-            }).catch(function() {
-                localStorage.removeItem('userId');
-                window.location.href = 'login.html';
-            });
-        });
+        sidemenu.classList.remove(
+            'open'
+        );
 
-    </script>
+        sidemenuOverlay.classList.remove(
+            'show'
+        );
+    }
+);
+
+
+/* ============================================================
+   LEAVE
+============================================================ */
+
+menuLeaveRoom.addEventListener(
+    'click',
+    ()=>{
+
+        if(!currentRoomId){
+
+            showToast(
+                '⚠️ No room to leave'
+            );
+
+            sidemenu.classList.remove(
+                'open'
+            );
+
+            sidemenuOverlay.classList.remove(
+                'show'
+            );
+
+            return;
+        }
+
+
+        sidemenu.classList.remove(
+            'open'
+        );
+
+        sidemenuOverlay.classList.remove(
+            'show'
+        );
+
+
+        leaveRoom();
+    }
+);
+
+
+/* ============================================================
+   GREETING
+============================================================ */
+
+if(greetingHighlight){
+
+    greetingHighlight.addEventListener(
+        'click',
+        ()=>{
+
+            if(
+                chatInput &&
+                !chatInput.disabled
+            ){
+
+                chatInput.focus();
+            }
+        }
+    );
+}
+
+
+/* ============================================================
+   CLEANUP
+============================================================ */
+
+window.addEventListener(
+    'beforeunload',
+    ()=>{
+
+        if(channel){
+
+            try{
+                channel.unsubscribe();
+            }catch(_){}
+        }
+    }
+);
+
+
+/* ============================================================
+   INIT
+============================================================ */
+
+console.log(
+    '🚀 p2p · app style chat'
+);
+
+updateStatus(
+    false,
+    'Ready'
+);
+
+updateJoinedCount();
+
+</script>
+
 </body>
 </html>

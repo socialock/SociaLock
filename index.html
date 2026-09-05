@@ -1,11 +1,30 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="SociaLock — the social network for developers and cybersecurity professionals." />
+    <meta name="keywords" content="SociaLock" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <!-- ===== SEO END ===== -->
     <style>
-        /* ===== মিনিমাল স্টাইল – কোনো লোডিং ইফেক্ট নেই ===== */
+        /* ===== Minimal style - no loading effect ===== */
         * {
             margin: 0;
             padding: 0;
@@ -80,7 +99,7 @@
 
     <script>
         // ============================================================
-        // index.html – দ্রুত রিডাইরেক্ট (কোনো লোডিং শো না)
+        // index.html - fast redirect (no loading shown)
         // ============================================================
 
         (function() {
@@ -88,7 +107,7 @@
 
             var userId = localStorage.getItem('userId');
 
-            // অতি দ্রুত রিডাইরেক্ট – কন্টেন্ট দেখার আগেই
+            // Very fast redirect - before content is visible
             if (userId) {
                 window.location.replace('home.html');
             } else {

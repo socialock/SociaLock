@@ -1,0 +1,241 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Tool - SociaLock</title>
+    <meta name="description" content="View a shared tool on SociaLock.">
+    <meta name="robots" content="noindex, follow">
+    <meta name="theme-color" content="#1877f2">
+    <link rel="icon" href="/assets/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
+    <link rel="apple-touch-icon" href="/assets/icon-180.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="js/config.js"></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        html,body{min-height:100%;background:#18191a;color:#e4e6eb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+        body{display:flex;justify-content:center;padding:20px 14px}
+        .wrap{width:100%;max-width:520px;margin:auto}
+        .header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+        .back{width:42px;height:42px;border:0;border-radius:50%;background:#242526;color:#e4e6eb;font-size:18px;cursor:pointer}
+        .back:hover{background:#3a3b3c}
+        .title{font-size:20px;font-weight:700}
+        .card{background:#242526;border:1px solid #3a3b3c;border-radius:16px;padding:24px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+        .icon{width:72px;height:72px;margin:0 auto 16px;border-radius:18px;background:#1877f2;color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px}
+        h1{font-size:22px;line-height:1.3;word-break:break-word;margin-bottom:8px}
+        .type{display:inline-block;background:#3a3b3c;color:#b0b3b8;font-size:12px;padding:5px 11px;border-radius:12px;margin-bottom:10px}
+        .domain{font-size:13px;color:#8b98a8;word-break:break-all;margin-bottom:8px}
+        .views{font-size:13px;color:#8b98a8;margin-bottom:22px;display:flex;align-items:center;justify-content:center;gap:6px}
+        .actions{display:flex;flex-direction:column;gap:10px}
+        button.action{border:0;border-radius:24px;padding:12px 16px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px}
+        .open{background:#1877f2;color:#fff}.open:hover{background:#166fe0}
+        .share{background:#3a3b3c;color:#e4e6eb}.share:hover{background:#4a4b4c}
+        .status{background:#242526;border:1px solid #3a3b3c;border-radius:16px;padding:24px;text-align:center;color:#b0b3b8}
+        .status i{font-size:28px;margin-bottom:12px;color:#1877f2}
+        .error i{color:#e94560}
+        .small{font-size:13px;line-height:1.5;margin-top:7px}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="header">
+        <button class="back" id="backBtn" aria-label="Back"><i class="fas fa-arrow-left"></i></button>
+        <div class="title">Shared Tool</div>
+    </div>
+
+    <div id="loading" class="status">
+        <i class="fas fa-spinner fa-spin"></i>
+        <div>Loading tool...</div>
+    </div>
+
+    <div id="error" class="status error" style="display:none">
+        <i class="fas fa-triangle-exclamation"></i>
+        <div id="errorText">Tool not found.</div>
+        <div class="small">The tool may have been removed or the link may be invalid.</div>
+    </div>
+
+    <div id="toolCard" class="card" style="display:none">
+        <div class="icon"><i class="fas fa-wrench"></i></div>
+        <h1 id="toolName"></h1>
+        <div class="type" id="toolType"></div>
+        <div class="domain" id="toolDomain"></div>
+        <div class="views"><i class="fas fa-eye"></i> <span id="toolViewsCount">0</span> views</div>
+        <div class="actions">
+            <button class="action open" id="openBtn"><i class="fas fa-external-link-alt"></i> Open Tool</button>
+            <button class="action share" id="shareBtn"><i class="fas fa-share-alt"></i> Share Tool</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const sharedId = params.get('id');
+    const sharedName = params.get('name');
+    const sharedLink = params.get('link');
+
+    function showError(message) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('toolCard').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('errorText').textContent = message;
+    }
+
+    function getShareUrl(tool) {
+        const path = window.location.pathname;
+            const directory = path.substring(0, path.lastIndexOf('/') + 1);
+            const baseUrl = `${window.location.origin}${directory}tool.html`;
+        const id = tool && tool.id != null && String(tool.id).trim() !== ''
+            ? String(tool.id).trim()
+            : '';
+
+        if (id && id.toLowerCase() !== 'null' && id.toLowerCase() !== 'undefined') {
+            return `${baseUrl}?id=${encodeURIComponent(id)}`;
+        }
+
+        const name = tool?.name ? String(tool.name) : '';
+        const link = tool?.link ? String(tool.link) : '';
+        return `${baseUrl}?name=${encodeURIComponent(name)}&link=${encodeURIComponent(link)}`;
+    }
+
+    function sameText(a, b) {
+        return String(a ?? '').trim().toLowerCase() === String(b ?? '').trim().toLowerCase();
+    }
+
+    // Same anti-fake-view id used on tools.html - persisted per browser so
+    // repeated clicks from the same visitor don't keep inflating the count.
+    function getViewerKey() {
+        let key = localStorage.getItem('viewerKey');
+        if (!key) {
+            key = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : `v-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            localStorage.setItem('viewerKey', key);
+        }
+        return key;
+    }
+
+    async function recordToolView(toolId) {
+        if (toolId == null || String(toolId).trim() === '') return;
+        try {
+            const result = await apiRequest(`/tools/${encodeURIComponent(toolId)}/view`, {
+                method: 'POST',
+                body: JSON.stringify({ viewer_key: getViewerKey() })
+            });
+            if (result && result.success && typeof result.views_count === 'number') {
+                const el = document.getElementById('toolViewsCount');
+                if (el) el.textContent = result.views_count;
+            }
+        } catch (e) { /* ignore - never block opening the tool */ }
+    }
+
+    async function loadTool() {
+        if (!sharedId && !sharedName) {
+            showError('Invalid tool link. No tool identifier was provided.');
+            return;
+        }
+
+        try {
+            const result = await apiRequest('/tools');
+            const tools = result && Array.isArray(result.data) ? result.data : [];
+
+            let tool = null;
+
+            // 1) Preferred: real database ID.
+            if (sharedId) {
+                const id = String(sharedId).trim();
+                tool = tools.find(t =>
+                    t && t.id != null &&
+                    String(t.id).trim() === id &&
+                    id.toLowerCase() !== 'null' &&
+                    id.toLowerCase() !== 'undefined'
+                );
+            }
+
+            // 2) Fallback for database-created tools whose id is NULL.
+            // Match both name and link so duplicate names cannot select the wrong tool.
+            if (!tool && sharedName && sharedLink) {
+                tool = tools.find(t =>
+                    t &&
+                    sameText(t.name, sharedName) &&
+                    String(t.link ?? '').trim() === String(sharedLink).trim()
+                );
+            }
+
+            // 3) Last fallback: name only if the API has no usable link match.
+            if (!tool && sharedName) {
+                const matches = tools.filter(t => t && sameText(t.name, sharedName));
+                if (matches.length === 1) tool = matches[0];
+            }
+
+            if (!tool) {
+                showError('Tool not found. It may have been removed or the shared link is invalid.');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('toolCard').style.display = 'block';
+            document.getElementById('toolName').textContent = tool.name || 'Untitled Tool';
+            document.getElementById('toolType').textContent = tool.type || 'Tool';
+
+            let domain = '';
+            try {
+                if (tool.link) domain = new URL(tool.link).hostname;
+            } catch (_) {}
+            document.getElementById('toolDomain').textContent = domain;
+            document.getElementById('toolViewsCount').textContent = Number(tool.views_count) || 0;
+
+            document.getElementById('openBtn').onclick = () => {
+                if (tool.link) {
+                    window.open(tool.link, '_blank', 'noopener,noreferrer');
+                    recordToolView(tool.id);
+                } else {
+                    showError('This tool does not have a valid link.');
+                }
+            };
+
+            document.getElementById('shareBtn').onclick = async () => {
+                const url = getShareUrl(tool);
+                const data = {
+                    title: tool.name || 'SociaLock Tool',
+                    text: `🔧 ${tool.name || 'Tool'} - ${tool.type || 'Tool'}`,
+                    url
+                };
+
+                if (typeof window.openShareSheet === 'function') {
+                    window.openShareSheet(data);
+                } else if (navigator.share) {
+                    try { await navigator.share(data); } catch (_) {}
+                } else if (navigator.clipboard) {
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        alert('Tool link copied!');
+                    } catch (_) {
+                        window.prompt('Copy this tool link:', url);
+                    }
+                } else {
+                    window.prompt('Copy this tool link:', url);
+                }
+            };
+        } catch (error) {
+            showError('Unable to load this tool. Please try again.');
+        }
+    }
+
+    document.getElementById('backBtn').onclick = () => {
+        if (history.length > 1) history.back();
+        else window.location.href = 'tools.html';
+    };
+
+    loadTool();
+</script>
+</body>
+</html>

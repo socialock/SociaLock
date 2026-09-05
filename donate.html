@@ -1,9 +1,54 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Donate - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Support SociaLock's development. Donate via Bitcoin, Ethereum, or Tron to help us keep building free tools and community features for developers and cybersecurity professionals." />
+    <meta name="keywords" content="donate SociaLock, support open community, crypto donation developer platform, fund cybersecurity community" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/donate.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Donate - SociaLock" />
+    <meta property="og:description" content="Support SociaLock's development. Donate via Bitcoin, Ethereum, or Tron to help us keep building free tools and community features for developers and cybersecurity professionals." />
+    <meta property="og:url" content="https://socialock.pages.dev/donate.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Donate - SociaLock" />
+    <meta name="twitter:description" content="Support SociaLock's development. Donate via Bitcoin, Ethereum, or Tron to help us keep building free tools and community features for developers and cybersecurity professionals." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Donate to SociaLock",
+        "url": "https://socialock.pages.dev/donate.html",
+        "description": "Support SociaLock's development. Donate via Bitcoin, Ethereum, or Tron to help us keep building free tools and community features for developers and cybersecurity professionals.",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "SociaLock",
+            "url": "https://socialock.pages.dev"
+        }
+    }
+    </script>
+    <!-- ===== SEO END ===== -->
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -22,20 +67,20 @@
         .donate-hero h2 { font-size: 1.2rem; margin-bottom: 6px; }
         .donate-hero p { color: #b0b3b8; font-size: 0.9rem; line-height: 1.5; }
 
-        .method-card { background: #242526; border: 1px solid #3a3b3c; border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; }
+        .method-card { background: #242526; border: 1px solid #3a3b3c; border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; opacity: 0.6; }
         .method-card .icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; flex-shrink: 0; }
         .method-card .icon img { width: 24px; height: 24px; object-fit: contain; }
         .method-card .info { flex: 1; min-width: 0; }
         .method-card .name { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .method-card .name .badge { background: #2d88ff; color: white; font-size: 0.6rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.3px; }
+        .method-card .name .badge { background: #8a8d91; color: white; font-size: 0.6rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.3px; }
         .method-card .detail { font-size: 0.82rem; color: #b0b3b8; margin-top: 4px; word-break: break-all; font-family: monospace; }
         .method-card .network-hint { font-size: 0.72rem; color: #8a8d91; margin-top: 2px; }
-        .copy-btn { background: #3a3b3c; border: none; color: #e4e6eb; padding: 8px 14px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; flex-shrink: 0; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .copy-btn:hover { background: #4a4b4c; }
+        .method-card .unavailable-text { color: #e94560; font-weight: 600; font-size: 0.85rem; }
+        .copy-btn { background: #3a3b3c; border: none; color: #e4e6eb; padding: 8px 14px; border-radius: 8px; font-size: 0.78rem; cursor: not-allowed; flex-shrink: 0; transition: 0.2s; display: flex; align-items: center; gap: 6px; opacity: 0.5; }
         .copy-btn i { font-size: 0.8rem; }
 
-        .note-card { background: rgba(24,119,242,0.1); border: 1px solid rgba(24,119,242,0.3); border-radius: 12px; padding: 12px 14px; margin-top: 16px; font-size: 0.83rem; color: #b0b3b8; display: flex; gap: 10px; align-items: flex-start; }
-        .note-card i { color: #1877f2; margin-top: 2px; }
+        .note-card { background: rgba(233,69,96,0.1); border: 1px solid rgba(233,69,96,0.3); border-radius: 12px; padding: 12px 14px; margin-top: 16px; font-size: 0.83rem; color: #b0b3b8; display: flex; gap: 10px; align-items: flex-start; }
+        .note-card i { color: #e94560; margin-top: 2px; }
 
         .custom-alert { position: fixed; top: 20px; right: 20px; left: 20px; padding: 12px 16px; border-radius: 12px; color: white; z-index: 9999; max-width: 400px; margin: 0 auto; font-size: 0.95rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
         .custom-alert.success { background: #2e7d32; }
@@ -63,10 +108,10 @@
             </div>
             <div class="info">
                 <div class="name">Bitcoin (BTC) <span class="badge">Segwit</span></div>
-                <div class="detail" id="btcAddress">bc1qn9qarudffqratmknncxce88dh8la66vj0tvp95</div>
+                <div class="unavailable-text"><i class="fas fa-clock"></i> Currently Unavailable</div>
                 <div class="network-hint"><i class="fas fa-circle-info"></i> Network: Bitcoin (BTC)</div>
             </div>
-            <button class="copy-btn" data-copy="bc1qn9qarudffqratmknncxce88dh8la66vj0tvp95"><i class="fas fa-copy"></i> Copy</button>
+            <button class="copy-btn" disabled><i class="fas fa-copy"></i> Unavailable</button>
         </div>
 
         <!-- Tron (USDT - TRC20) -->
@@ -76,10 +121,10 @@
             </div>
             <div class="info">
                 <div class="name">USDT (TRC-20) <span class="badge">Tron</span></div>
-                <div class="detail" id="trc20Address">TC7RiLZyYmYqzNJEZMyStjQKdJHthGeNyb</div>
+                <div class="unavailable-text"><i class="fas fa-clock"></i> Currently Unavailable</div>
                 <div class="network-hint"><i class="fas fa-circle-info"></i> Network: TRON (TRC-20)</div>
             </div>
-            <button class="copy-btn" data-copy="TC7RiLZyYmYqzNJEZMyStjQKdJHthGeNyb"><i class="fas fa-copy"></i> Copy</button>
+            <button class="copy-btn" disabled><i class="fas fa-copy"></i> Unavailable</button>
         </div>
 
         <!-- Ethereum / Arbitrum (ETH, USDC, etc.) -->
@@ -89,47 +134,22 @@
             </div>
             <div class="info">
                 <div class="name">Ethereum (ETH / USDC) <span class="badge">ERC-20</span></div>
-                <div class="detail" id="ethAddress">0x177E30C23521ECe61D1AD7303Ec721b7647BeA8a</div>
+                <div class="unavailable-text"><i class="fas fa-clock"></i> Currently Unavailable</div>
                 <div class="network-hint"><i class="fas fa-circle-info"></i> Networks: Ethereum (ERC-20) • Arbitrum (ARB-ERC20)</div>
             </div>
-            <button class="copy-btn" data-copy="0x177E30C23521ECe61D1AD7303Ec721b7647BeA8a"><i class="fas fa-copy"></i> Copy</button>
+            <button class="copy-btn" disabled><i class="fas fa-copy"></i> Unavailable</button>
         </div>
 
         <div class="note-card">
-            <i class="fas fa-circle-info"></i>
-            <span><strong>Important:</strong> Always send using the correct network shown above. Sending on the wrong network may result in permanent loss of funds. Donations are voluntary, non-refundable, and do not unlock any features.</span>
+            <i class="fas fa-circle-exclamation"></i>
+            <span><strong>Donations are temporarily paused.</strong> We're currently updating our donation infrastructure. Please check back soon. Thank you for your support!</span>
         </div>
     </div>
 
     <script>
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const text = btn.getAttribute('data-copy');
-                try {
-                    await navigator.clipboard.writeText(text);
-                    showToast('Address copied to clipboard ✅');
-                } catch (e) {
-                    // Fallback for older browsers
-                    const input = document.createElement('input');
-                    input.value = text;
-                    document.body.appendChild(input);
-                    input.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(input);
-                    showToast('Address copied ✅');
-                }
-            });
-        });
-
-        function showToast(message) {
-            const existing = document.querySelector('.custom-alert');
-            if (existing) existing.remove();
-            const alert = document.createElement('div');
-            alert.className = 'custom-alert success';
-            alert.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>${message}</span>`;
-            document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 2600);
-        }
+        // Copy functionality is disabled since addresses are removed.
+        // Keeping the script minimal.
+        console.log('Donation addresses temporarily unavailable.');
     </script>
 </body>
 </html>

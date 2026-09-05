@@ -1,18 +1,86 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Login - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Join SociaLock, the social network built for developers and cybersecurity professionals. Share code, security tools and write-ups, chat P2P, go live, and connect with the infosec &amp; dev community worldwide." />
+    <meta name="keywords" content="developer social network, cybersecurity community, infosec network, hacker community, programmer social platform, security tools sharing, dev community, SociaLock login, sign up developers" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/login.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Login - SociaLock" />
+    <meta property="og:description" content="Join SociaLock, the social network built for developers and cybersecurity professionals. Share code, security tools and write-ups, chat P2P, go live, and connect with the infosec &amp; dev community worldwide." />
+    <meta property="og:url" content="https://socialock.pages.dev/login.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Login - SociaLock" />
+    <meta name="twitter:description" content="Join SociaLock, the social network built for developers and cybersecurity professionals. Share code, security tools and write-ups, chat P2P, go live, and connect with the infosec &amp; dev community worldwide." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://socialock.pages.dev/#organization",
+                "name": "SociaLock",
+                "url": "https://socialock.pages.dev",
+                "logo": "https://socialock.pages.dev/assets/icon-512.png",
+                "description": "SociaLock is a social network for developers and cybersecurity professionals to share tools, posts, and connect in real time."
+            },
+            {
+                "@type": "WebSite",
+                "@id": "https://socialock.pages.dev/#website",
+                "name": "SociaLock",
+                "url": "https://socialock.pages.dev",
+                "publisher": {
+                    "@id": "https://socialock.pages.dev/#organization"
+                }
+            },
+            {
+                "@type": "WebApplication",
+                "name": "SociaLock",
+                "url": "https://socialock.pages.dev",
+                "applicationCategory": "SocialNetworkingApplication",
+                "operatingSystem": "Any (Web-based)",
+                "description": "Join SociaLock, the social network built for developers and cybersecurity professionals. Share code, security tools and write-ups, chat P2P, go live, and connect with the infosec &amp; dev community worldwide.",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "USD"
+                }
+            }
+        ]
+    }
+    </script>
+    <!-- ===== SEO END ===== -->
     
-    <!-- ===== 1. FIREBASE CDN (সবার আগে) ===== -->
+    <!-- ===== 1. FIREBASE CDN (first) ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <style>
-        /* ===== রুট ভেরিয়েবল (ডার্ক থিম) ===== */
+        /* ===== Dark theme ===== */
         :root {
             --bg-primary: #0a0a1a;
             --bg-secondary: #14142b;
@@ -127,7 +195,7 @@
             color: var(--text-primary);
             padding: 8px;
         }
-        /* ===== কাস্টম ড্রপডাউন (সার্চ + লিস্ট) ===== */
+        /* ===== Custom dropdown (search + list) ===== */
         .custom-select-wrapper {
             position: relative;
             width: 100%;
@@ -401,7 +469,7 @@
         }
         .custom-alert button:hover { opacity: 1; }
 
-        /* ===== রেস্পন্সিভ ===== */
+        /* ===== Responsive ===== */
         @media (max-width: 480px) {
             .auth-card { padding: 1.5rem 1rem; }
             .auth-card h2 { font-size: 1.4rem; }
@@ -475,7 +543,7 @@
                     <div class="username-hint"><i class="fa-solid fa-circle-info"></i> Only English letters, numbers and underscore (A-z, 0-9, _) — max 20 characters</div>
                 </div>
 
-                <!-- ===== কাস্টম দেশ নির্বাচন (সার্চ + লিস্ট) ===== -->
+                <!-- ===== Custom country selector (search + list) ===== -->
                 <div class="form-group">
                     <label for="regCountryInput"><i class="fa-solid fa-earth-americas"></i> Country</label>
                     <div class="custom-select-wrapper">
@@ -498,8 +566,7 @@
 
                 <div class="privacy-policy-text">
                     By creating account you agree with our
-                    <a href="privacy.html">Privacy</a> &amp;
-                    <a href="policy.html">Policy</a>
+                    <a href="privacypolicy.html">Privacy & Policy</a>
                 </div>
 
                 <button id="registerBtn" class="btn-primary" disabled><i class="fa-solid fa-user-check"></i> Create Account</button>
@@ -516,10 +583,10 @@
     <script src="js/firebase-config.js"></script>
     <script>
         // ============================================================
-        // 📁 login.html - সম্পূর্ণ স্ক্রিপ্ট
+        // 📁 login.html -
         // ============================================================
 
-        // ---------- DOM রেফারেন্স ----------
+        // ---------- DOM ----------
         const loginTab = document.querySelector('[data-tab="login"]');
         const registerTab = document.querySelector('[data-tab="register"]');
         const loginForm = document.getElementById('loginForm');
@@ -544,9 +611,14 @@
 
         let currentCaptcha = '';
         let isUsernameAvailable = false;
+        // Holds the Firebase user object when someone signed in with Google
+        // but doesn't have an account yet, so "Create Account" can reuse the
+        // same Firebase Auth user instead of trying to create a brand new
+        // one with the same email (which Firebase rejects as already in use).
+        let pendingGoogleUser = null;
 
         // ============================================================
-        // 🌍 COUNTRY LIST (A-Z) - ১৯৭টি দেশ
+        // 🌍 COUNTRY LIST (A-Z) - 197 countries
         // ============================================================
         const countryList = [
             "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",
@@ -591,7 +663,7 @@
         ];
 
         // ============================================================
-        // 🌍 CUSTOM DROPDOWN (সার্চ + লিস্ট)
+        // 🌍 CUSTOM DROPDOWN (search + list)
         // ============================================================
         let selectedCountry = '';
 
@@ -612,7 +684,7 @@
             });
             countryDropdown.innerHTML = html;
 
-            // ক্লিক ইভেন্ট
+            // Click event
             countryDropdown.querySelectorAll('.option-item').forEach(el => {
                 el.addEventListener('click', function() {
                     const val = this.getAttribute('data-value');
@@ -629,10 +701,10 @@
             checkRegFormValidity();
         }
 
-        // ইনপুট টাইপ করলে ফিল্টার
+        // Filter as user types
         regCountryInput.addEventListener('input', function() {
             const val = this.value;
-            // যদি ইউজার নিজে টাইপ করে, সেটা সিলেক্টেড না
+            // If the user types manually, it isn't selected
             if (val !== selectedCountry) {
                 selectedCountry = '';
                 regCountryHidden.value = '';
@@ -642,20 +714,20 @@
             checkRegFormValidity();
         });
 
-        // ফোকাসে ড্রপডাউন খুলে
+        // Open dropdown on focus
         regCountryInput.addEventListener('focus', function() {
             countryDropdown.classList.add('open');
             renderCountryList(this.value);
         });
 
-        // বাইরে ক্লিক করলে বন্ধ
+        // Close when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.custom-select-wrapper')) {
                 countryDropdown.classList.remove('open');
             }
         });
 
-        // কিবোর্ড: Enter বা Escape
+        // Keyboard: Enter or Escape
         regCountryInput.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 countryDropdown.classList.remove('open');
@@ -815,6 +887,20 @@
                 const result = await window.apiRequest(`/users/${userId}`);
 
                 if (result && result.success) {
+                    // Banned accounts are blocked from logging in entirely.
+                    if (result.data && result.data.is_banned) {
+                        try { await firebase.auth().signOut(); } catch (e) {}
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('token');
+                        showAlert(result.data.ban_reason
+                            ? `Your account has been banned. Reason: ${result.data.ban_reason}`
+                            : 'Your account has been banned.', 'error');
+                        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
+                        loginBtn.disabled = false;
+                        return;
+                    }
+
+                    let tokenIssued = false;
                     try {
                         const idToken = await firebaseUser.user.getIdToken();
                         const tokenResult = await window.apiRequest('/auth/token', {
@@ -823,6 +909,16 @@
                         });
                         if (tokenResult && tokenResult.success && tokenResult.data && tokenResult.data.token) {
                             localStorage.setItem('token', tokenResult.data.token);
+                            tokenIssued = true;
+                        } else if (tokenResult && tokenResult.banned) {
+                            // Belt-and-suspenders: the server also refuses to issue a
+                            // session token for a banned account.
+                            try { await firebase.auth().signOut(); } catch (e) {}
+                            localStorage.removeItem('userId');
+                            localStorage.removeItem('token');
+                            loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
+                            loginBtn.disabled = false;
+                            return;
                         }
                     } catch (tokenErr) { /* non-fatal - user can still browse read-only */ }
 
@@ -872,9 +968,23 @@
             registerBtn.innerHTML = '<span class="spinner"></span> Creating account...';
             registerBtn.disabled = true;
 
+            // If the person got here via "Sign in with Google" (email already
+            // authenticated with Firebase for that flow), reuse that same
+            // Firebase user instead of calling createUserWithEmailAndPassword
+            // again - Firebase would otherwise reject it with
+            // "email-already-in-use" since the Google sign-in already created
+            // the Firebase Auth record for this email.
+            const isGoogleSignup = !!(pendingGoogleUser && pendingGoogleUser.email === email);
+            let createdFirebaseUser = null;
+            let userId;
+
             try {
-                const firebaseUser = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                const userId = firebaseUser.user.uid;
+                if (isGoogleSignup) {
+                    userId = pendingGoogleUser.uid;
+                } else {
+                    createdFirebaseUser = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    userId = createdFirebaseUser.user.uid;
+                }
 
                 const result = await window.apiRequest('/auth/register', {
                     method: 'POST',
@@ -888,6 +998,7 @@
                 });
 
                 if (result && result.success) {
+                    pendingGoogleUser = null;
                     localStorage.setItem('userId', userId);
                     if (result.data && result.data.token) {
                         localStorage.setItem('token', result.data.token);
@@ -897,7 +1008,12 @@
                         window.location.href = 'home.html';
                     }, 800);
                 } else {
-                    await firebaseUser.user.delete();
+                    // Only delete the Firebase user if we created it just now for
+                    // this attempt - never delete the person's real Google-linked
+                    // Firebase account just because our backend save failed.
+                    if (createdFirebaseUser) {
+                        await createdFirebaseUser.user.delete();
+                    }
                     showAlert('Failed to save account data!', 'error');
                     registerBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> Create Account';
                     registerBtn.disabled = false;
@@ -928,6 +1044,19 @@
 
                 const result = await window.apiRequest(`/users/${userId}`);
                 if (result && result.success) {
+                    // Banned accounts are blocked from logging in entirely.
+                    if (result.data && result.data.is_banned) {
+                        try { await firebase.auth().signOut(); } catch (e) {}
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('token');
+                        showAlert(result.data.ban_reason
+                            ? `Your account has been banned. Reason: ${result.data.ban_reason}`
+                            : 'Your account has been banned.', 'error');
+                        googleSignInBtn.innerHTML = '<span>Sign in with Google</span>';
+                        googleSignInBtn.disabled = false;
+                        return;
+                    }
+
                     localStorage.setItem('userId', userId);
                     try {
                         const idToken = await user.getIdToken();
@@ -937,6 +1066,13 @@
                         });
                         if (tokenResult && tokenResult.success && tokenResult.data && tokenResult.data.token) {
                             localStorage.setItem('token', tokenResult.data.token);
+                        } else if (tokenResult && tokenResult.banned) {
+                            try { await firebase.auth().signOut(); } catch (e) {}
+                            localStorage.removeItem('userId');
+                            localStorage.removeItem('token');
+                            googleSignInBtn.innerHTML = '<span>Sign in with Google</span>';
+                            googleSignInBtn.disabled = false;
+                            return;
                         }
                     } catch (tokenErr) { /* non-fatal */ }
                     showAlert('Login successful!', 'success');
@@ -944,6 +1080,7 @@
                         window.location.href = 'home.html';
                     }, 800);
                 } else {
+                    pendingGoogleUser = user;
                     registerTab.click();
                     regEmail.value = user.email;
                     regEmail.disabled = true;

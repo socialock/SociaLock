@@ -1,9 +1,28 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Settings - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Manage your SociaLock account settings." />
+    <meta name="keywords" content="account settings" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/settings.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <!-- ===== SEO END ===== -->
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -184,12 +203,23 @@
             </div>
         </div>
 
+        <div class="settings-section" id="adminSection" style="display:none;">
+            <div class="settings-section-title">Admin</div>
+            <div class="settings-card">
+                <a href="admin.html" class="settings-item">
+                    <div class="icon" style="background:#e94560;"><i class="fas fa-user-shield"></i></div>
+                    <div class="text"><div class="label">Ban / Unban Users</div><div class="sub">Manage banned accounts</div></div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </a>
+            </div>
+        </div>
+
         <div class="settings-section">
             <div class="settings-section-title">Danger Zone</div>
             <div class="settings-card">
-                <a href="#" class="settings-item danger" onclick="comingSoon(event, 'Deactivate Account')">
-                    <div class="icon" style="background:#e94560;"><i class="fas fa-user-clock"></i></div>
-                    <div class="text"><div class="label">Deactivate Account <span class="badge-soon">Soon</span></div></div>
+                <a href="deleteaccount.html" class="settings-item danger">
+                    <div class="icon" style="background:#e94560;"><i class="fas fa-user-slash"></i></div>
+                    <div class="text"><div class="label">Delete Account</div><div class="sub">Permanently delete your account and all your data</div></div>
                     <i class="fas fa-chevron-right chevron"></i>
                 </a>
                 <a href="#" class="settings-item danger" id="logoutBtn">
@@ -210,6 +240,13 @@
         if (!userId) {
             window.location.href = 'login.html';
         }
+
+        (async function checkAdmin() {
+            const result = await window.apiRequest(`/users/${userId}`);
+            if (result && result.success && result.data && result.data.role === 'admin') {
+                document.getElementById('adminSection').style.display = '';
+            }
+        })();
 
         function comingSoon(e, feature) {
             e.preventDefault();

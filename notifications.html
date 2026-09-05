@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Notifications - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Your notifications on SociaLock." />
+    <meta name="keywords" content="SociaLock notifications" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/notifications.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <!-- ===== SEO END ===== -->
     
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -22,7 +33,7 @@
             width: 100%;
             z-index: 999;
             border-bottom: 1px solid #3a3b3c;
-            height: 46px;
+            height: 54px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -60,7 +71,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            margin-top: 46px;
+            margin-top: 54px;
         }
         .main-container {
             max-width: 700px;
@@ -82,7 +93,8 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-        .notif-header h1 { font-size: 1.3rem; color: #e4e6eb; }
+        .notif-header h1 { font-size: 1.3rem; color: #e4e6eb; display: flex; align-items: center; gap: 8px; }
+        .notif-header h1 i { color: #1877f2; font-size: 1.4rem; }
         .notif-header .header-actions {
             display: flex;
             gap: 8px;
@@ -97,6 +109,9 @@
             padding: 4px 12px;
             border-radius: 16px;
             transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .notif-header button:hover { background: #3a3b3c; color: #e4e6eb; }
         .notif-header .delete-all-btn {
@@ -142,10 +157,11 @@
         .notif-text .highlight { color: #1877f2; font-weight: 500; }
         .notif-time { font-size: 0.75rem; color: #b0b3b8; margin-top: 2px; }
 
-        .notif-icon { font-size: 1.2rem; color: #b0b3b8; flex-shrink: 0; }
+        .notif-icon { font-size: 1.2rem; color: #b0b3b8; flex-shrink: 0; width: 24px; text-align: center; }
         .notif-icon.like { color: #e94560; }
         .notif-icon.comment { color: #4caf50; }
         .notif-icon.reply { color: #f7b731; }
+        .notif-icon.follow { color: #1877f2; }
 
         .notif-delete-btn {
             background: none;
@@ -165,7 +181,7 @@
             padding: 3rem 1.5rem;
             color: #b0b3b8;
         }
-        .no-notifs .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        .no-notifs .icon { font-size: 3rem; margin-bottom: 1rem; display: block; color: #b0b3b8; }
         .no-notifs h3 { font-size: 1.1rem; color: #e4e6eb; margin-bottom: 0.3rem; }
         .no-notifs p { font-size: 0.9rem; }
 
@@ -188,10 +204,10 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         @media (max-width: 480px) {
-            .navbar-bottom { height: 42px; }
-            .nav-icon-bottom { font-size: 1.3rem; padding: 2px 8px; }
-            .nav-icon-bottom .label { font-size: 0.5rem; }
-            .main-wrapper { margin-top: 42px; }
+            .navbar-bottom { height: 50px; }
+            .nav-icon-bottom { font-size: 1.5rem; padding: 4px 10px; }
+            .nav-icon-bottom .label { font-size: 0.58rem; }
+            .main-wrapper { margin-top: 50px; }
             .main-container { padding: 0 10px; }
             .notif-item { padding: 10px 12px; }
             .notif-avatar { width: 38px; height: 38px; font-size: 15px; }
@@ -200,7 +216,7 @@
             .notif-header button { font-size: 0.75rem; padding: 3px 8px; }
         }
     
-        /* ===== কাস্টম কনফার্ম মডাল ===== */
+        /* ===== Custom confirm modal ===== */
         .custom-modal-overlay {
             display: none;
             position: fixed;
@@ -266,6 +282,154 @@
             color: white;
         }
         .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
+
+        /* ===== SKELETON LOADER STYLES ===== */
+        .skeleton-notif-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #242526;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #3a3b3c;
+        }
+        .skeleton-notif-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-notif-avatar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-notif-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .skeleton-line {
+            height: 14px;
+            border-radius: 6px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-line.short { width: 40%; }
+        .skeleton-line.medium { width: 60%; }
+        .skeleton-line.long { width: 85%; }
+        .skeleton-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-notif-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-notif-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-delete-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-delete-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 12px;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 12px;
+        }
+        .skeleton-title {
+            height: 24px;
+            width: 140px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-title::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-header-btn {
+            height: 28px;
+            width: 80px;
+            border-radius: 16px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-header-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        .skeleton-notifs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
     </style>
 
 </head>
@@ -283,20 +447,81 @@
 
     <div class="main-wrapper">
         <div class="main-container" id="mainContainer">
-            <div class="notif-header">
-                <h1>🔔 Notifications</h1>
-                <div class="header-actions">
-                    <button id="markAllReadBtn">✅ Mark all read</button>
-                    <button id="deleteAllBtn" class="delete-all-btn">🗑️ Delete all</button>
+            <!-- ===== SKELETON HEADER ===== -->
+            <div id="skeletonHeader" class="skeleton-header">
+                <div class="skeleton-title"></div>
+                <div style="display:flex; gap:8px;">
+                    <div class="skeleton-header-btn"></div>
+                    <div class="skeleton-header-btn"></div>
                 </div>
             </div>
-            <div id="notificationsContainer"><div class="loading-spinner">⏳ Loading notifications...</div></div>
+
+            <!-- ===== REAL HEADER ===== -->
+            <div class="notif-header" id="realHeader" style="display:none;">
+                <h1><i class="fas fa-bell"></i> Notifications</h1>
+                <div class="header-actions">
+                    <button id="markAllReadBtn"><i class="fas fa-check-double"></i> Mark all read</button>
+                    <button id="deleteAllBtn" class="delete-all-btn"><i class="fas fa-trash-alt"></i> Delete all</button>
+                </div>
+            </div>
+
+            <!-- ===== SKELETON NOTIFICATIONS ===== -->
+            <div id="skeletonNotifs" class="skeleton-notifs-list">
+                <div class="skeleton-notif-item">
+                    <div class="skeleton-notif-avatar"></div>
+                    <div class="skeleton-notif-body">
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-notif-icon"></div>
+                    <div class="skeleton-delete-btn"></div>
+                </div>
+                <div class="skeleton-notif-item">
+                    <div class="skeleton-notif-avatar"></div>
+                    <div class="skeleton-notif-body">
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-notif-icon"></div>
+                    <div class="skeleton-delete-btn"></div>
+                </div>
+                <div class="skeleton-notif-item">
+                    <div class="skeleton-notif-avatar"></div>
+                    <div class="skeleton-notif-body">
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-notif-icon"></div>
+                    <div class="skeleton-delete-btn"></div>
+                </div>
+                <div class="skeleton-notif-item">
+                    <div class="skeleton-notif-avatar"></div>
+                    <div class="skeleton-notif-body">
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-notif-icon"></div>
+                    <div class="skeleton-delete-btn"></div>
+                </div>
+                <div class="skeleton-notif-item">
+                    <div class="skeleton-notif-avatar"></div>
+                    <div class="skeleton-notif-body">
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-notif-icon"></div>
+                    <div class="skeleton-delete-btn"></div>
+                </div>
+            </div>
+
+            <!-- ===== REAL NOTIFICATIONS ===== -->
+            <div id="notificationsContainer" style="display:none;"></div>
         </div>
     </div>
 
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
-    <!-- ===== কাস্টম কনফার্ম মডাল ===== -->
+    <!-- ===== Custom confirm modal ===== -->
     <div class="custom-modal-overlay" id="customModal">
         <div class="custom-modal">
             <div class="modal-icon" id="modalIcon">⚠️</div>
@@ -310,7 +535,7 @@
     </div>
 
     <script>
-        // ===== কাস্টম কনফার্ম =====
+        // ===== Custom confirm =====
         let pendingConfirmResolve = null;
         function customConfirm(title, message, icon = '⚠️') {
             return new Promise(function(resolve) {
@@ -336,6 +561,20 @@
             }
         });
 
+        // ===== SKELETON CONTROLS =====
+        function showSkeleton() {
+            document.getElementById('skeletonHeader').style.display = 'flex';
+            document.getElementById('skeletonNotifs').style.display = 'flex';
+            document.getElementById('realHeader').style.display = 'none';
+            document.getElementById('notificationsContainer').style.display = 'none';
+        }
+
+        function hideSkeletonAndShowReal() {
+            document.getElementById('skeletonHeader').style.display = 'none';
+            document.getElementById('skeletonNotifs').style.display = 'none';
+            document.getElementById('realHeader').style.display = 'flex';
+            document.getElementById('notificationsContainer').style.display = 'block';
+        }
 
         // ============================================================
         // NOTIFICATIONS - INDIVIDUAL READ REMOVED
@@ -348,11 +587,35 @@
         let badge = document.getElementById('notifBadge');
 
         // ============================================================
+        // OPEN NOTIFICATION (marks it read, then navigates)
+        // ============================================================
+        async function openNotification(notifId, navUrl) {
+            const userId = localStorage.getItem('userId');
+            const notif = allNotifications.find(n => n.id === notifId);
+
+            if (userId && notif && !notif.is_read) {
+                try {
+                    await window.apiRequest(`/notifications/${notifId}/read`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ user_id: userId })
+                    });
+                    notif.is_read = true;
+                    await updateBadge();
+                } catch (err) { /* ignore - still navigate */ }
+            }
+
+            if (navUrl && navUrl !== '#') {
+                window.location.href = navUrl;
+            }
+        }
+        window.openNotification = openNotification;
+
+        // ============================================================
         // DELETE NOTIFICATION (keep this)
         // ============================================================
         async function deleteNotification(notifId, event) {
             event.stopPropagation();
-            if (!(await customConfirm('Delete Notification', 'Delete this notification?', '🗑️'))) return;
+            if (!(await customConfirm('Delete Notification', 'Delete this notification?', ''))) return;
 
             const userId = localStorage.getItem('userId');
             if (!userId) {
@@ -491,11 +754,12 @@
             if (!notifications || notifications.length === 0) {
                 container.innerHTML = `
                     <div class="no-notifs">
-                        <span class="icon">🔔</span>
+                        <span class="icon"><i class="fas fa-bell-slash"></i></span>
                         <h3>No notifications yet</h3>
                         <p>When someone likes, comments or replies to your posts, you will see it here.</p>
                     </div>
                 `;
+                hideSkeletonAndShowReal();
                 return;
             }
 
@@ -515,6 +779,9 @@
                 } else if (notif.type === 'reply') {
                     iconHtml = '<i class="fas fa-reply"></i>';
                     iconClass = 'reply';
+                } else if (notif.type === 'follow') {
+                    iconHtml = '<i class="fas fa-user-plus"></i>';
+                    iconClass = 'follow';
                 } else {
                     iconHtml = '<i class="fas fa-bell"></i>';
                     iconClass = '';
@@ -522,14 +789,22 @@
 
                 const actorName = escapeHtml(notif.actor_username || 'User');
                 const actorInitial = (notif.actor_username || 'U').charAt(0).toUpperCase();
+                const actorCount = notif.actor_count || 1;
 
                 let message = '';
                 if (notif.type === 'like') {
-                    message = `<strong>${actorName}</strong> liked your post`;
+                    if (actorCount > 1) {
+                        const othersCount = actorCount - 1;
+                        message = `<strong>${actorName}</strong> and <strong>${othersCount} other${othersCount > 1 ? 's' : ''}</strong> liked your post`;
+                    } else {
+                        message = `<strong>${actorName}</strong> liked your post`;
+                    }
                 } else if (notif.type === 'comment') {
                     message = `<strong>${actorName}</strong> commented on your post`;
                 } else if (notif.type === 'reply') {
                     message = `<strong>${actorName}</strong> replied to your comment`;
+                } else if (notif.type === 'follow') {
+                    message = `<strong>${actorName}</strong> started following you`;
                 } else {
                     message = `<strong>${actorName}</strong> interacted with your post`;
                 }
@@ -537,9 +812,8 @@
                 const navUrl = notif.post_id ? `post.html?postId=${notif.post_id}` : '#';
                 const unreadClass = isUnread ? 'unread' : '';
 
-                // ✅ onclick শুধু নেভিগেট করবে, markAsRead কল করবে না
                 html += `
-                    <div class="notif-item ${unreadClass}" data-id="${notif.id}" onclick="window.location.href='${navUrl}';">
+                    <div class="notif-item ${unreadClass}" data-id="${notif.id}" onclick="openNotification('${notif.id}', '${navUrl}')">
                         <div class="notif-avatar" onclick="event.stopPropagation(); window.location.href='userprofile.html?userId=${notif.actor_id}'">${actorInitial}</div>
                         <div class="notif-body">
                             <div class="notif-text">${message}</div>
@@ -552,6 +826,7 @@
             });
 
             container.innerHTML = html;
+            hideSkeletonAndShowReal();
         }
 
         // ============================================================
@@ -563,6 +838,9 @@
                 window.location.href = 'login.html';
                 return;
             }
+
+            // Show skeleton immediately
+            showSkeleton();
 
             try {
                 // Load user
@@ -601,12 +879,13 @@
             } catch (err) {
                 container.innerHTML = `
                     <div class="no-notifs" style="padding:40px;text-align:center;">
-                        <span class="icon" style="font-size:48px;">❌</span>
+                        <span class="icon" style="font-size:48px;color:#e94560;"><i class="fas fa-exclamation-circle"></i></span>
                         <h3>Error Loading Page</h3>
                         <p>${err.message || 'Something went wrong'}</p>
-                        <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:#1877f2;border:none;color:white;border-radius:8px;cursor:pointer;">Retry</button>
+                        <button onclick="location.reload()" style="margin-top:16px;padding:10px 24px;background:#1877f2;border:none;color:white;border-radius:8px;cursor:pointer;"><i class="fas fa-sync"></i> Retry</button>
                     </div>
                 `;
+                hideSkeletonAndShowReal();
             }
         });
     </script>

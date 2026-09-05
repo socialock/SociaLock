@@ -1,975 +1,3840 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Live - SociaLock</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Live · P2P Stream</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Watch and host live P2P video streams on SociaLock, the social network for developers and cybersecurity professionals." />
+    <meta name="keywords" content="live streaming, p2p live video, developer live stream, cybersecurity live" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/live.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Live · P2P Stream" />
+    <meta property="og:description" content="Watch and host live P2P video streams on SociaLock, the social network for developers and cybersecurity professionals." />
+    <meta property="og:url" content="https://socialock.pages.dev/live.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Live · P2P Stream" />
+    <meta name="twitter:description" content="Watch and host live P2P video streams on SociaLock, the social network for developers and cybersecurity professionals." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <!-- ===== SEO END ===== -->
 
-    <!-- ===== FIREBASE CDN ===== -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <style>
-        /* ===== রিসেট ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #18191a;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #e4e6eb;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-        /* ===== হেডার ===== */
-        .app-header {
-            background: #242526;
-            padding: 10px 16px;
-            border-bottom: 1px solid #3a3b3c;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        .app-header .back-btn {
-            background: none;
-            border: none;
-            color: #b0b3b8;
-            font-size: 1.4rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 50%;
-            transition: 0.2s;
-        }
-        .app-header .back-btn:hover { background: #3a3b3c; color: #fff; }
-        .app-header h1 { font-size: 1.2rem; font-weight: 600; flex: 1; }
-        .app-header .user-badge {
-            background: #3a3b3c;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            color: #b0b3b8;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        /* ===== লবি ===== */
-        .lobby-container {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            max-width: 720px;
-            width: 100%;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .action-card {
-            background: #242526;
-            border-radius: 14px;
-            padding: 16px 18px;
-            border: 1px solid #3a3b3c;
-        }
-        .action-card h3 { font-size: 0.95rem; margin-bottom: 12px; color: #e4e6eb; }
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-        .row input, .row select {
-            flex: 1;
-            padding: 8px 12px;
-            background: #3a3b3c;
-            border: 1px solid #3a3b3c;
-            border-radius: 8px;
-            color: #e4e6eb;
-            outline: none;
-            font-size: 0.9rem;
-            min-width: 120px;
-        }
-        .row input:focus { border-color: #1877f2; }
-        .row .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: #b0b3b8;
-            flex-wrap: wrap;
-        }
-        .row .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #1877f2;
-            cursor: pointer;
-        }
-        .btn-primary {
-            background: #1877f2;
-            border: none;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-        .btn-primary:hover { background: #166fe5; }
-        .btn-success { background: #4caf50; }
-        .btn-success:hover { background: #43a047; }
-        .btn-danger { background: #e94560; }
-        .btn-danger:hover { background: #c62828; }
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
 
-        .room-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .room-item {
-            background: #242526;
-            border: 1px solid #3a3b3c;
-            border-radius: 10px;
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .room-item:hover { border-color: #1877f2; }
-        .room-item .info .name { font-weight: 600; font-size: 0.9rem; }
-        .room-item .info .meta { font-size: 0.7rem; color: #b0b3b8; }
-        .room-item .join-btn {
-            background: #1877f2;
-            border: none;
-            color: white;
-            padding: 5px 14px;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.75rem;
-        }
+body {
+    background: #07090d;
+    color: #e9edf3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        .privacy-tag {
-            font-size: 0.6rem;
-            background: #3a3b3c;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 6px;
-            color: #b0b3b8;
-        }
-        .privacy-tag.public { background: rgba(76,175,80,0.15); color: #4caf50; }
-        .privacy-tag.private { background: rgba(233,69,96,0.15); color: #e94560; }
+.app {
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #080b10;
+    position: relative;
+}
 
-        .status-msg { font-size: 0.8rem; color: #b0b3b8; margin-top: 6px; }
+/* ============================================================
+   HEADER
+============================================================ */
 
-        /* ===== স্ট্রিম রুম ===== */
-        .stream-room {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-        }
-        .stream-room.active { display: flex; }
+.header {
+    flex: 0 0 44px;
+    height: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    background: rgba(13, 17, 24, .95);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    position: relative;
+    z-index: 20;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
 
-        .stream-main {
-            flex: 1;
-            display: flex;
-            flex-wrap: wrap;
-            overflow: hidden;
-        }
-        .video-area {
-            flex: 3;
-            min-width: 300px;
-            background: #0a0a0a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            height: 100%;
-            min-height: 250px;
-        }
-        .video-area video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            max-height: 80vh;
-        }
-        .video-area .stream-info {
-            position: absolute;
-            top: 12px;
-            left: 16px;
-            background: rgba(0,0,0,0.6);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .video-area .stream-info .viewer-count {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: #4caf50;
-        }
-        .video-area .live-badge {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: #e94560;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
 
-        .side-panel {
-            flex: 1;
-            min-width: 220px;
-            max-width: 360px;
-            background: #18191a;
-            border-left: 1px solid #3a3b3c;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .chat-box {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .chat-msg {
-            font-size: 0.85rem;
-            padding: 4px 0;
-            word-break: break-word;
-        }
-        .chat-msg .sender { font-weight: 600; color: #1877f2; margin-right: 6px; }
-        .chat-msg .sender.host { color: #e94560; }
-        .chat-msg.system { color: #b0b3b8; font-style: italic; font-size: 0.8rem; text-align: center; }
+.header-left .live-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff4d4d, #e63946);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #fff;
+    flex-shrink: 0;
+    animation: pulse-live 1.8s infinite;
+}
 
-        .chat-input-area {
-            padding: 10px 12px;
-            border-top: 1px solid #3a3b3c;
-            display: flex;
-            gap: 8px;
-            background: #242526;
-            flex-shrink: 0;
-        }
-        .chat-input-area input {
-            flex: 1;
-            padding: 8px 12px;
-            background: #3a3b3c;
-            border: none;
-            border-radius: 20px;
-            color: #e4e6eb;
-            outline: none;
-            font-size: 0.85rem;
-        }
-        .chat-input-area input:focus { border: 1px solid #1877f2; }
-        .chat-input-area button {
-            background: #1877f2;
-            border: none;
-            color: white;
-            border-radius: 50%;
-            width: 34px;
-            height: 34px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .chat-input-area button:hover { background: #166fe5; }
+@keyframes pulse-live {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 77, 77, .5);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(255, 77, 77, 0);
+    }
+}
 
-        .participant-list {
-            max-height: 150px;
-            overflow-y: auto;
-            border-top: 1px solid #3a3b3c;
-            padding: 8px 12px;
-            background: #1c1c1e;
-            flex-shrink: 0;
-        }
-        .participant-list .p-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            padding: 2px 0;
-        }
-        .participant-list .p-item .badge { font-size: 0.6rem; color: #b0b3b8; }
-        .participant-list .p-item .ban-btn {
-            background: none;
-            border: none;
-            color: #e94560;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
+.header-title {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-        .stream-controls {
-            padding: 10px 16px;
-            background: #242526;
-            border-top: 1px solid #3a3b3c;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .stream-controls button {
-            background: #3a3b3c;
-            border: none;
-            color: #b0b3b8;
-            padding: 6px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .stream-controls button:hover { background: #4a4b4c; color: #fff; }
-        .stream-controls button.active { background: #1877f2; color: white; }
-        .stream-controls button.danger { background: #e94560; color: white; }
-        .stream-controls button.danger:hover { background: #c62828; }
+.header-title .name {
+    color: #edf1f7;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        /* ===== কাস্টম মডাল ===== */
-        .custom-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-        }
-        .custom-modal-overlay.show { display: flex; }
-        .custom-modal {
-            background: #242526;
-            border-radius: 16px;
-            padding: 24px 20px 20px;
-            max-width: 340px;
-            width: 90%;
-            border: 1px solid #3a3b3c;
-            text-align: center;
-        }
-        .custom-modal .modal-icon { font-size: 2.4rem; margin-bottom: 6px; }
-        .custom-modal h3 { font-size: 1.1rem; margin-bottom: 6px; }
-        .custom-modal p { font-size: 0.9rem; color: #b0b3b8; margin-bottom: 16px; }
-        .custom-modal .modal-actions { display: flex; gap: 10px; justify-content: center; }
-        .custom-modal .modal-actions button {
-            padding: 6px 20px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        .custom-modal .modal-actions .btn-cancel { background: #3a3b3c; color: #b0b3b8; }
-        .custom-modal .modal-actions .btn-confirm { background: #e94560; color: white; }
+.header-title .status {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #687588;
+    font-size: 8px;
+    line-height: 11px;
+}
 
-        .custom-alert {
-            position: fixed;
-            top: 70px;
-            right: 10px;
-            left: 10px;
-            padding: 10px 16px;
-            border-radius: 8px;
-            color: white;
-            z-index: 10000;
-            max-width: 400px;
-            margin: 0 auto;
-            animation: slideIn 0.3s ease;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        .custom-alert.success { background: #4caf50; }
-        .custom-alert.error { background: #e94560; }
-        .custom-alert.info { background: #1877f2; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+.header-title .status .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-        @media (max-width: 768px) {
-            .side-panel { max-width: 100%; border-left: none; border-top: 1px solid #3a3b3c; max-height: 50vh; }
-            .stream-main { flex-direction: column; }
-            .video-area { min-height: 200px; }
-            .row { flex-direction: column; align-items: stretch; }
-            .row .checkbox-group { justify-content: center; }
-        }
-    </style>
+.header-title .status .dot.online {
+    background: #42d392;
+    box-shadow: 0 0 7px rgba(66, 211, 146, .6);
+}
+
+.header-title .status .dot.offline {
+    background: #687588;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.header-right .username-badge {
+    background: rgba(255, 255, 255, .06);
+    padding: 2px 8px;
+    border-radius: 16px;
+    font-size: 9px;
+    color: #aab5c5;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid rgba(255, 255, 255, .06);
+}
+
+.header-right button {
+    width: 26px;
+    height: 26px;
+    border: 0;
+    background: transparent;
+    color: #7f8a9b;
+    font-size: 11px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-right button:hover {
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+}
+
+/* ============================================================
+   AUTH
+============================================================ */
+
+.auth-panels {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: #080b10;
+    flex-shrink: 0;
+}
+
+.auth-panel {
+    flex: 1;
+    background: #111722;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, .06);
+}
+
+.auth-panel h3 {
+    color: #8490a2;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+}
+
+.auth-panel .form-group {
+    margin-bottom: 5px;
+}
+
+.auth-panel .form-group input {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    background: #0a0d12;
+    color: #edf2f8;
+    font-size: 11px;
+    outline: none;
+}
+
+.auth-panel .form-group input:focus {
+    border-color: rgba(79, 156, 255, .3);
+}
+
+.auth-panel .btn-auth {
+    width: 100%;
+    height: 32px;
+    border: 0;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #4d98ff, #6559e8);
+    color: #fff;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.auth-panel .btn-auth:hover {
+    filter: brightness(1.08);
+}
+
+.auth-panel .btn-auth:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.auth-panel .hint {
+    color: #4f5a6b;
+    font-size: 7px;
+    margin-top: 3px;
+    text-align: center;
+}
+
+/* ============================================================
+   LIVE AREA
+============================================================ */
+
+.live-area {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    display: none;
+    flex-direction: column;
+    background: #0a0d12;
+    position: relative;
+    overflow: hidden;
+}
+
+.live-area.visible {
+    display: flex;
+}
+
+/* ============================================================
+   VIDEO CONTAINER
+============================================================ */
+
+.video-container {
+    flex: 1;
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+}
+
+/* ============================================================
+   ALL VIDEO FULL SIZE
+============================================================ */
+
+#remoteVideo,
+#localVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+/*
+   Remote video
+   Viewer only
+*/
+#remoteVideo {
+    z-index: 1;
+    display: none;
+}
+
+/*
+   Local video
+   Host only
+*/
+#localVideo {
+    z-index: 1;
+    display: none;
+}
+
+/*
+   Explicit visibility classes
+*/
+#remoteVideo.video-visible,
+#localVideo.video-visible {
+    display: block;
+}
+
+/* ============================================================
+   STREAM PLACEHOLDER
+============================================================ */
+
+.stream-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 50%, #121820, #07090d);
+    z-index: 2;
+}
+
+.stream-placeholder .big-icon {
+    font-size: 48px;
+    color: #2a3344;
+    margin-bottom: 10px;
+    opacity: .5;
+}
+
+.stream-placeholder .title {
+    color: #687588;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.stream-placeholder .sub {
+    color: #3f4a5a;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+/* ============================================================
+   LIVE OVERLAY
+============================================================ */
+
+.live-overlay {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0, 0, 0, .75);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.live-overlay .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .2;
+    }
+}
+
+.live-overlay .live-text {
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.live-overlay .viewer-count {
+    color: #aab5c5;
+    font-size: 8px;
+    margin-left: 2px;
+}
+
+/* ============================================================
+   LIVE STATS
+============================================================ */
+
+.live-stats {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, .75);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.live-stats span {
+    color: #aab5c5;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.live-stats span i {
+    color: #4d98ff;
+    font-size: 9px;
+}
+
+/* ============================================================
+   FULLSCREEN BUTTON
+============================================================ */
+
+.fullscreen-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, .7);
+    border: 1px solid rgba(255, 255, 255, .15);
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: .2s;
+    backdrop-filter: blur(8px);
+}
+
+.fullscreen-btn:hover {
+    background: rgba(255, 255, 255, .15);
+    transform: scale(1.05);
+}
+
+/* ============================================================
+   CAMERA SWITCH
+============================================================ */
+
+.cam-switch-btn {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    right: 80px;
+    background: rgba(0, 0, 0, .7);
+    border: 1px solid rgba(255, 255, 255, .15);
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 30;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: .2s;
+    backdrop-filter: blur(8px);
+}
+
+.cam-switch-btn.visible {
+    display: flex;
+}
+
+.cam-switch-btn:hover {
+    background: rgba(255, 255, 255, .15);
+    transform: scale(1.05);
+}
+
+/* ============================================================
+   HOST CONTROLS
+============================================================ */
+
+.host-controls {
+    display: none;
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, .85);
+    padding: 6px 14px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    backdrop-filter: blur(12px);
+    z-index: 35;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.host-controls.visible {
+    display: flex;
+}
+
+.host-controls button {
+    background: none;
+    border: none;
+    color: #aab5c5;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 16px;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-family: inherit;
+}
+
+.host-controls button:hover {
+    background: rgba(255, 255, 255, .08);
+    color: #fff;
+}
+
+.host-controls button.danger:hover {
+    color: #ff4d4d;
+}
+
+.host-controls .divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255, 255, 255, .06);
+}
+
+/* ============================================================
+   CHAT
+============================================================ */
+
+.chat-area {
+    flex: 0 0 180px;
+    max-height: 180px;
+    min-height: 120px;
+    display: none;
+    flex-direction: column;
+    background: rgba(8, 11, 16, .98);
+    border-top: 1px solid rgba(255, 255, 255, .06);
+    position: relative;
+    z-index: 5;
+}
+
+.chat-area.visible {
+    display: flex;
+}
+
+.chat-header {
+    flex: 0 0 30px;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, .04);
+}
+
+.chat-header .title {
+    color: #8490a2;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chat-header .title .count {
+    background: rgba(255, 255, 255, .06);
+    padding: 0 5px;
+    border-radius: 8px;
+    font-size: 7px;
+    color: #687588;
+}
+
+.chat-header .actions button {
+    background: none;
+    border: none;
+    color: #4f5a6b;
+    font-size: 9px;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 8px;
+    transition: .2s;
+}
+
+.chat-header .actions button:hover {
+    background: rgba(255, 255, 255, .06);
+    color: #aab5c5;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 10px;
+    scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(130, 145, 170, .2);
+    border-radius: 20px;
+}
+
+.chat-msg {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 2px;
+    animation: fadeIn .15s ease;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-msg .sender {
+    color: #5d9cff;
+    font-size: 9px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.chat-msg .sender.host {
+    color: #ff4d4d;
+}
+
+.chat-msg .sender.self {
+    color: #42d392;
+}
+
+.chat-msg .text {
+    color: #dce2ea;
+    font-size: 10px;
+    word-break: break-word;
+}
+
+.chat-msg .time {
+    color: #4f5a6b;
+    font-size: 6px;
+    flex-shrink: 0;
+    margin-left: 2px;
+}
+
+.chat-msg .badge {
+    font-size: 6px;
+    background: #ff4d4d;
+    color: #fff;
+    padding: 0 4px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-left: 2px;
+    flex-shrink: 0;
+}
+
+.chat-empty {
+    text-align: center;
+    color: #4f5a6b;
+    font-size: 9px;
+    padding: 12px 0;
+}
+
+.chat-input-row {
+    flex: 0 0 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-top: 1px solid rgba(255, 255, 255, .04);
+}
+
+.chat-input-row input {
+    flex: 1;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    background: #111722;
+    color: #edf2f8;
+    font-size: 11px;
+    outline: none;
+    transition: .2s;
+}
+
+.chat-input-row input:focus {
+    border-color: rgba(79, 156, 255, .3);
+}
+
+.chat-input-row input::placeholder {
+    color: #4f5a6b;
+}
+
+.chat-input-row input:disabled {
+    opacity: .4;
+}
+
+.chat-input-row button {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4d98ff, #6559e8);
+    color: #fff;
+    font-size: 11px;
+    cursor: pointer;
+    transition: .2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-input-row button:hover {
+    transform: scale(1.04);
+}
+
+.chat-input-row button:disabled {
+    opacity: .4;
+    transform: none;
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translate(-50%, 12px);
+    max-width: 90%;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: #151a22;
+    border: 1px solid rgba(255, 255, 255, .08);
+    color: #e6ebf2;
+    font-size: 9px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: .25s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* ============================================================
+   TOKEN
+============================================================ */
+
+.token-display {
+    display: none;
+    background: rgba(0, 0, 0, .5);
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: #aab5c5;
+    letter-spacing: .3px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.token-display.visible {
+    display: inline-block;
+}
+
+/* ============================================================
+   FULLSCREEN
+============================================================ */
+
+.video-container:fullscreen,
+.video-container:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
+    background: #000 !important;
+    overflow: hidden !important;
+}
+
+.video-container:fullscreen #remoteVideo,
+.video-container:-webkit-full-screen #remoteVideo,
+.video-container:fullscreen #localVideo,
+.video-container:-webkit-full-screen #localVideo {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    background: #000 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.video-container:fullscreen .stream-placeholder,
+.video-container:-webkit-full-screen .stream-placeholder {
+    background: #000;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media(max-width:600px) {
+
+    html,
+    body {
+        overflow: hidden;
+    }
+
+    body {
+        display: block;
+        padding: 0;
+        background: #080b10;
+    }
+
+    .app {
+        width: 100%;
+        height: 100dvh;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+    }
+
+    .header {
+        flex: 0 0 40px;
+        height: 40px;
+        min-height: 40px;
+        padding: 0 8px;
+    }
+
+    .header-title .name {
+        font-size: 11px;
+    }
+
+    .header-right .username-badge {
+        font-size: 8px;
+        padding: 2px 6px;
+        max-width: 60px;
+    }
+
+    .auth-panels {
+        flex-direction: column;
+        gap: 5px;
+        padding: 8px;
+    }
+
+    .auth-panel {
+        padding: 8px;
+    }
+
+    .live-area {
+        flex: 1 1 auto;
+        height: 0;
+        min-height: 0;
+    }
+
+    .video-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    #remoteVideo,
+    #localVideo {
+        width: 100%;
+        height: 100%;
+        inset: 0;
+        object-fit: contain;
+    }
+
+    .chat-area {
+        flex: 0 0 140px;
+        max-height: 140px;
+        min-height: 100px;
+    }
+
+    .host-controls {
+        bottom: 10px;
+        padding: 4px 10px;
+        gap: 2px;
+        width: 94%;
+    }
+
+    .host-controls button {
+        font-size: 8px;
+        padding: 2px 5px;
+    }
+
+    .live-overlay {
+        top: 8px;
+        left: 8px;
+        padding: 3px 8px;
+    }
+
+    .live-stats {
+        top: 8px;
+        right: 8px;
+        padding: 3px 8px;
+        gap: 5px;
+    }
+
+    .token-display {
+        max-width: 50px;
+        font-size: 6px;
+    }
+
+    .chat-msg .sender {
+        font-size: 8px;
+    }
+
+    .chat-msg .text {
+        font-size: 9px;
+    }
+
+    .fullscreen-btn {
+        bottom: 16px;
+        right: 14px;
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+    }
+
+    .cam-switch-btn {
+        bottom: 16px;
+        right: 68px;
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+    }
+
+    .video-container:fullscreen,
+    .video-container:-webkit-full-screen {
+        width: 100vw !important;
+        height: 100dvh !important;
+    }
+
+    .video-container:fullscreen #remoteVideo,
+    .video-container:-webkit-full-screen #remoteVideo,
+    .video-container:fullscreen #localVideo,
+    .video-container:-webkit-full-screen #localVideo {
+        width: 100% !important;
+        height: 100% !important;
+        inset: 0 !important;
+        object-fit: contain !important;
+    }
+}
+
+@media(max-width:380px) {
+
+    .header {
+        flex: 0 0 36px;
+        height: 36px;
+        min-height: 36px;
+    }
+
+    .header-title .name {
+        font-size: 10px;
+    }
+
+    .header-right .username-badge {
+        max-width: 40px;
+        font-size: 7px;
+        padding: 1px 5px;
+    }
+
+    .chat-area {
+        flex: 0 0 110px;
+        max-height: 110px;
+        min-height: 90px;
+    }
+
+    .chat-input-row input {
+        font-size: 9px;
+        height: 24px;
+    }
+
+    .chat-input-row button {
+        width: 24px;
+        height: 24px;
+        font-size: 9px;
+    }
+
+    .host-controls button {
+        font-size: 7px;
+        padding: 2px 4px;
+    }
+
+    .fullscreen-btn {
+        bottom: 12px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .cam-switch-btn {
+        bottom: 12px;
+        right: 56px;
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <!-- ===== হেডার ===== -->
-    <div class="app-header">
-        <button class="back-btn" onclick="window.location.href='messages.html'"><i class="fas fa-arrow-left"></i></button>
-        <h1>📡 Live</h1>
-        <span class="user-badge" id="userBadge">Loading...</span>
+<div class="app">
+
+    <!-- HEADER -->
+    <div class="header">
+
+        <div class="header-left">
+
+            <div class="live-icon">
+                <i class="fas fa-broadcast-tower"></i>
+            </div>
+
+            <div class="header-title">
+
+                <span class="name" id="chatTitle">
+                    Live Stream
+                </span>
+
+                <span class="status">
+                    <span class="dot offline" id="statusDot"></span>
+                    <span id="statusText">Offline</span>
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="header-right">
+
+            <span class="token-display" id="tokenDisplay"></span>
+
+            <span class="username-badge" id="userBadge">
+                Anonymous
+            </span>
+
+        </div>
+
     </div>
 
-    <!-- ===== লবি ===== -->
-    <div class="lobby-container" id="lobbyContainer">
-        <div class="action-card">
-            <h3>🎬 Create Live</h3>
-            <div class="row">
-                <input type="text" id="createRoomName" placeholder="Room Name *">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="isPrivate">
-                    <label for="isPrivate">Private</label>
-                </div>
-                <input type="text" id="createPassword" placeholder="Password (if private)" style="flex:0.5; min-width:100px;">
-                <button class="btn-primary" id="createBtn"><i class="fas fa-video"></i> Start</button>
+    <!-- AUTH -->
+    <div id="authPanels" class="auth-panels">
+
+        <div class="auth-panel">
+
+            <h3>
+                <i class="fas fa-plus-circle"></i>
+                Start Live
+            </h3>
+
+            <div class="form-group">
+                <input
+                    type="text"
+                    id="hostName"
+                    placeholder="Your name"
+                />
             </div>
-            <div id="createStatus" class="status-msg"></div>
+
+            <button class="btn-auth" id="startLiveBtn">
+                <i class="fas fa-broadcast-tower"></i>
+                Go Live
+            </button>
+
+            <div class="hint">
+                Get a 64-char token to share
+            </div>
+
         </div>
 
-        <div class="action-card">
-            <h3>🔑 Join Live</h3>
-            <div class="row">
-                <input type="text" id="joinRoomName" placeholder="Room Name / ID *">
-                <input type="text" id="joinPassword" placeholder="Password (if private)">
-                <button class="btn-primary btn-success" id="joinBtn"><i class="fas fa-sign-in-alt"></i> Join</button>
+        <div class="auth-panel">
+
+            <h3>
+                <i class="fas fa-door-open"></i>
+                Join Live
+            </h3>
+
+            <div class="form-group">
+                <input
+                    type="text"
+                    id="viewerName"
+                    placeholder="Your name"
+                />
             </div>
-            <div id="joinStatus" class="status-msg"></div>
+
+            <div class="form-group">
+                <input
+                    type="text"
+                    id="joinTokenInput"
+                    placeholder="Paste token"
+                />
+            </div>
+
+            <button class="btn-auth" id="joinLiveBtn">
+                <i class="fas fa-sign-in-alt"></i>
+                Join
+            </button>
+
+            <div class="hint">
+                Paste the token from host
+            </div>
+
         </div>
 
-        <div class="action-card">
-            <h3>🌍 Public Live Streams</h3>
-            <div id="publicRoomList" class="room-list">
-                <div style="text-align:center; color:#b0b3b8; padding:16px;">Loading public streams...</div>
-            </div>
-        </div>
     </div>
 
-    <!-- ===== স্ট্রিম রুম ===== -->
-    <div class="stream-room" id="streamRoom">
-        <div class="stream-main">
-            <div class="video-area">
-                <video id="remoteVideo" autoplay playsinline></video>
-                <video id="localVideo" autoplay muted playsinline style="position:absolute; bottom:16px; right:16px; width:120px; border-radius:8px; border:2px solid #3a3b3c; display:none;"></video>
-                <div class="stream-info">
-                    <span id="streamTitle">Loading...</span>
-                    <span class="viewer-count"><i class="fas fa-user"></i> <span id="viewerCount">0</span></span>
+    <!-- LIVE -->
+    <div id="liveArea" class="live-area">
+
+        <div class="video-container" id="videoContainer">
+
+            <!-- Viewer video -->
+            <video
+                id="remoteVideo"
+                autoplay
+                playsinline
+            ></video>
+
+            <!-- Host video -->
+            <video
+                id="localVideo"
+                autoplay
+                playsinline
+                muted
+            ></video>
+
+            <!-- Placeholder -->
+            <div
+                class="stream-placeholder"
+                id="streamPlaceholder"
+            >
+
+                <div class="big-icon">
+                    <i class="fas fa-video"></i>
                 </div>
-                <div class="live-badge"><i class="fas fa-circle"></i> LIVE</div>
+
+                <div
+                    class="title"
+                    id="streamTitle"
+                >
+                    Waiting for stream...
+                </div>
+
+                <div
+                    class="sub"
+                    id="streamSub"
+                >
+                    Host will start streaming soon
+                </div>
+
             </div>
-            <div class="side-panel">
-                <div class="chat-box" id="chatMessages"></div>
-                <div class="participant-list" id="participantList">
-                    <div style="font-size:0.75rem; color:#b0b3b8; padding:4px;">Participants (0)</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="chatInput" placeholder="Send a message...">
-                    <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
+
+            <!-- LIVE -->
+            <div
+                class="live-overlay"
+                id="liveOverlay"
+                style="display:none;"
+            >
+
+                <span class="live-dot"></span>
+
+                <span class="live-text">
+                    LIVE
+                </span>
+
+                <span
+                    class="viewer-count"
+                    id="viewerCount"
+                >
+                    0 watching
+                </span>
+
             </div>
+
+            <!-- STATS -->
+            <div
+                class="live-stats"
+                id="liveStats"
+                style="display:none;"
+            >
+
+                <span>
+                    <i class="fas fa-user"></i>
+                    <span id="viewerCount2">0</span>
+                </span>
+
+                <span>
+                    <i class="fas fa-comment"></i>
+                    <span id="commentCount">0</span>
+                </span>
+
+            </div>
+
+            <!-- FULLSCREEN -->
+            <button
+                class="fullscreen-btn"
+                id="fullscreenBtn"
+                title="Fullscreen"
+            >
+                <i class="fas fa-expand"></i>
+            </button>
+
+            <!-- CAMERA SWITCH -->
+            <button
+                class="cam-switch-btn"
+                id="camSwitchBtn"
+                title="Switch Camera"
+            >
+                <i class="fas fa-sync-alt"></i>
+            </button>
+
+            <!-- HOST CONTROLS -->
+            <div
+                class="host-controls"
+                id="hostControls"
+            >
+
+                <button id="toggleCamBtn">
+                    <i class="fas fa-video"></i>
+                    Cam
+                </button>
+
+                <button id="toggleMicBtn">
+                    <i class="fas fa-microphone"></i>
+                    Mic
+                </button>
+
+                <div class="divider"></div>
+
+                <button
+                    id="endLiveBtn"
+                    class="danger"
+                >
+                    <i class="fas fa-power-off"></i>
+                    End
+                </button>
+
+                <div class="divider"></div>
+
+                <button id="copyTokenBtn">
+                    <i class="fas fa-copy"></i>
+                    Token
+                </button>
+
+                <button id="muteChatBtn">
+                    <i class="fas fa-microphone-slash"></i>
+                    Mute
+                </button>
+
+                <button id="clearChatBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    Clear
+                </button>
+
+            </div>
+
         </div>
-        <div class="stream-controls">
-            <button id="toggleMicBtn"><i class="fas fa-microphone"></i> Mic</button>
-            <button id="toggleCamBtn"><i class="fas fa-video"></i> Cam</button>
-            <button id="endStreamBtn" class="danger"><i class="fas fa-sign-out-alt"></i> End</button>
-        </div>
+
     </div>
 
-    <!-- ===== কাস্টম মডাল ===== -->
-    <div class="custom-modal-overlay" id="customModal">
-        <div class="custom-modal">
-            <div class="modal-icon" id="modalIcon">⚠️</div>
-            <h3 id="modalTitle">Are you sure?</h3>
-            <p id="modalMessage">This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button class="btn-cancel" id="modalCancel">Cancel</button>
-                <button class="btn-confirm" id="modalConfirm">OK</button>
+    <!-- CHAT -->
+    <div
+        id="chatArea"
+        class="chat-area"
+    >
+
+        <div class="chat-header">
+
+            <span class="title">
+
+                <i class="fas fa-comment"></i>
+                Live Comments
+
+                <span
+                    class="count"
+                    id="chatCount"
+                >
+                    0
+                </span>
+
+            </span>
+
+            <div class="actions">
+
+                <button id="chatFilterBtn">
+                    <i class="fas fa-filter"></i>
+                </button>
+
             </div>
+
         </div>
+
+        <div
+            class="chat-messages"
+            id="chatMessages"
+        >
+
+            <div class="chat-empty">
+                💬 No comments yet. Be the first!
+            </div>
+
+        </div>
+
+        <div class="chat-input-row">
+
+            <input
+                type="text"
+                id="chatInput"
+                placeholder="Say something..."
+                disabled
+            />
+
+            <button
+                id="sendChatBtn"
+                disabled
+            >
+                <i class="fas fa-paper-plane"></i>
+            </button>
+
+        </div>
+
     </div>
 
-    <script src="js/config.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script>
-        // ============================================================
-        // LIVE.JS - সম্পূর্ণ (ভিউয়ার কাউন্ট সহ)
-        // ============================================================
+</div>
 
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
 
-        // ===== গ্লোবাল =====
-        var currentUser = null;
-        var roomId = null;
-        var isHost = false;
-        var hostId = null;
-        var peerConnections = {};
-        var dataChannels = {};
-        var localStream = null;
-        var participantList = {};
-        var isMicOn = true;
-        var isCamOn = true;
+<script>
 
-        // ===== DOM =====
-        var lobby = document.getElementById('lobbyContainer');
-        var streamRoom = document.getElementById('streamRoom');
-        var localVideo = document.getElementById('localVideo');
-        var remoteVideo = document.getElementById('remoteVideo');
-        var chatMessages = document.getElementById('chatMessages');
-        var chatInput = document.getElementById('chatInput');
-        var sendChatBtn = document.getElementById('sendChatBtn');
-        var participantListEl = document.getElementById('participantList');
-        var streamTitle = document.getElementById('streamTitle');
-        var viewerCountSpan = document.getElementById('viewerCount');
-        var toggleMicBtn = document.getElementById('toggleMicBtn');
-        var toggleCamBtn = document.getElementById('toggleCamBtn');
-        var endStreamBtn = document.getElementById('endStreamBtn');
+/* ============================================================
+   SUPABASE
+============================================================ */
 
-        var createBtn = document.getElementById('createBtn');
-        var joinBtn = document.getElementById('joinBtn');
-        var createRoomName = document.getElementById('createRoomName');
-        var createPassword = document.getElementById('createPassword');
-        var joinRoomName = document.getElementById('joinRoomName');
-        var joinPassword = document.getElementById('joinPassword');
-        var isPrivateCheck = document.getElementById('isPrivate');
-        var publicList = document.getElementById('publicRoomList');
-        var createStatus = document.getElementById('createStatus');
-        var joinStatus = document.getElementById('joinStatus');
+const SUPABASE_URL =
+    'https://mjuowfrzvgnqrazqnunr.supabase.co';
 
-        // ===== মডাল =====
-        var modal = document.getElementById('customModal');
-        var modalTitle = document.getElementById('modalTitle');
-        var modalMessage = document.getElementById('modalMessage');
-        var modalIcon = document.getElementById('modalIcon');
-        var modalCancel = document.getElementById('modalCancel');
-        var modalConfirm = document.getElementById('modalConfirm');
-        var pendingResolve = null;
+const SUPABASE_ANON_KEY =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
 
-        function showConfirm(title, message, icon = '⚠️') {
-            return new Promise(function(resolve) {
-                modalIcon.textContent = icon;
-                modalTitle.textContent = title;
-                modalMessage.textContent = message;
-                modal.classList.add('show');
-                pendingResolve = resolve;
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        }
+    );
+
+/* ============================================================
+   DOM
+============================================================ */
+
+const $ = id => document.getElementById(id);
+
+const chatTitle = $('chatTitle');
+const statusDot = $('statusDot');
+const statusText = $('statusText');
+const userBadge = $('userBadge');
+const tokenDisplay = $('tokenDisplay');
+
+const authPanels = $('authPanels');
+const hostName = $('hostName');
+const startLiveBtn = $('startLiveBtn');
+const viewerName = $('viewerName');
+const joinTokenInput = $('joinTokenInput');
+const joinLiveBtn = $('joinLiveBtn');
+
+const liveArea = $('liveArea');
+const videoContainer = $('videoContainer');
+
+const localVideo = $('localVideo');
+const remoteVideo = $('remoteVideo');
+
+const streamPlaceholder = $('streamPlaceholder');
+const streamTitle = $('streamTitle');
+const streamSub = $('streamSub');
+
+const liveOverlay = $('liveOverlay');
+const liveStats = $('liveStats');
+
+const viewerCount = $('viewerCount');
+const viewerCount2 = $('viewerCount2');
+const commentCount = $('commentCount');
+
+const hostControls = $('hostControls');
+const endLiveBtn = $('endLiveBtn');
+const copyTokenBtn = $('copyTokenBtn');
+const muteChatBtn = $('muteChatBtn');
+const clearChatBtn = $('clearChatBtn');
+
+const toggleCamBtn = $('toggleCamBtn');
+const toggleMicBtn = $('toggleMicBtn');
+
+const fullscreenBtn = $('fullscreenBtn');
+const camSwitchBtn = $('camSwitchBtn');
+
+const chatArea = $('chatArea');
+const chatMessages = $('chatMessages');
+const chatInput = $('chatInput');
+const sendChatBtn = $('sendChatBtn');
+const chatCount = $('chatCount');
+const chatFilterBtn = $('chatFilterBtn');
+
+const toast = $('toast');
+
+/* ============================================================
+   STATE
+============================================================ */
+
+let myUsername = '';
+let isHost = false;
+let roomToken = '';
+let roomId = null;
+
+let channel = null;
+let isSubscribed = false;
+
+let isMuted = false;
+
+let viewers = new Set();
+let comments = [];
+
+let isCameraOn = true;
+let isMicOn = true;
+
+let localStream = null;
+let peerConnection = null;
+
+let isFullscreen = false;
+
+let cameraFacingMode = 'environment';
+
+let lastMessageTime = 0;
+
+const MIN_INTERVAL = 2000;
+
+/* ============================================================
+   FILTER
+============================================================ */
+
+const BAD_WORDS = [
+    'fuck',
+    'shit',
+    'asshole',
+    'bitch',
+    'cunt',
+    'dick',
+    'pussy',
+    'motherfucker',
+    'nigga',
+    'nigger',
+    'chutiya',
+    'bhosdike',
+    'madarchod',
+    'benchod',
+    'lund',
+    'gandu',
+    'harami',
+    'kutta',
+    'rascal',
+    'bastard',
+    'whore',
+    'slut',
+    'fag',
+    'retard'
+];
+
+const HARMFUL_PATTERNS = [
+    /\.onion/i,
+    /bit\.ly/i,
+    /tinyurl\.com/i,
+    /goo\.gl/i,
+    /shorturl\.at/i,
+    /rb\.gy/i,
+    /cutt\.ly/i,
+    /ow\.ly/i,
+    /is\.gd/i,
+    /buff\.ly/i,
+    /adf\.ly/i,
+    /t\.co/i,
+    /tiny\.cc/i
+];
+
+/* ============================================================
+   UTILITY
+============================================================ */
+
+function generateToken() {
+
+    const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    let code = '';
+
+    for (let i = 0; i < 64; i++) {
+
+        const randomIndex =
+            crypto.getRandomValues(
+                new Uint32Array(1)
+            )[0] % chars.length;
+
+        code += chars[randomIndex];
+    }
+
+    return code;
+}
+
+function sanitizeInput(text) {
+
+    if (window.DOMPurify) {
+        return window.DOMPurify.sanitize(text);
+    }
+
+    return text;
+}
+
+function escapeHtml(value) {
+
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function formatTime(timestamp) {
+
+    return new Date(timestamp).toLocaleTimeString(
+        'en-US',
+        {
+            hour: '2-digit',
+            minute: '2-digit'
+        }
+    );
+}
+
+function containsBadWord(text) {
+
+    const lower = text.toLowerCase();
+
+    return BAD_WORDS.some(
+        word => lower.includes(word)
+    );
+}
+
+function containsHarmfulLink(text) {
+
+    return HARMFUL_PATTERNS.some(
+        pattern => pattern.test(text)
+    );
+}
+
+function filterMessage(text) {
+
+    if (containsBadWord(text)) {
+        return {
+            allowed: false,
+            reason: 'Profanity detected'
+        };
+    }
+
+    if (containsHarmfulLink(text)) {
+        return {
+            allowed: false,
+            reason: 'Harmful link detected'
+        };
+    }
+
+    return {
+        allowed: true
+    };
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+function showToast(msg, duration = 3000) {
+
+    toast.textContent = msg;
+
+    toast.classList.add('show');
+
+    clearTimeout(toast._timer);
+
+    toast._timer =
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, duration);
+}
+
+/* ============================================================
+   COPY
+============================================================ */
+
+function copyToClipboard(text) {
+
+    if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+    ) {
+
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                showToast('✅ Token copied!');
+            })
+            .catch(() => {
+                fallbackCopy(text);
             });
-        }
-        modalCancel.onclick = function() { modal.classList.remove('show'); if (pendingResolve) { pendingResolve(false);
-                pendingResolve = null; } };
-        modalConfirm.onclick = function() { modal.classList.remove('show'); if (pendingResolve) { pendingResolve(true);
-                pendingResolve = null; } };
-        modal.onclick = function(e) { if (e.target === modal) { modal.classList.remove('show'); if (pendingResolve) { pendingResolve(
-                        false);
-                    pendingResolve = null; } } };
 
-        // ===== ইউটিলিটি =====
-        function showAlert(msg, type = 'info') {
-            var el = document.querySelector('.custom-alert');
-            if (el) el.remove();
-            var div = document.createElement('div');
-            div.className = 'custom-alert ' + type;
-            div.textContent = msg;
-            document.body.appendChild(div);
-            setTimeout(function() { div.remove(); }, 4000);
-        }
+    } else {
 
-        function escapeHtml(text) {
-            var div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        fallbackCopy(text);
+    }
+}
 
-        // ===== সিগন্যালিং =====
-        async function sendSignal(targetUserId, data) {
-            try {
-                await window.apiRequest('/live/signal', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        room_id: roomId,
-                        from: currentUser.id,
-                        to: targetUserId,
-                        data: data
-                    })
-                });
-            } catch (e) { }
-        }
+function fallbackCopy(text) {
 
-        async function pollSignals() {
-            if (!roomId || !currentUser) return;
-            try {
-                var res = await window.apiRequest('/live/signals?room_id=' + roomId + '&user_id=' + currentUser.id);
-                if (res && res.success && res.data) {
-                    res.data.forEach(function(signal) {
-                        handleSignal(signal.from, signal.data);
-                    });
-                }
-            } catch (e) { }
-        }
+    const ta =
+        document.createElement('textarea');
 
-        // ===== WebRTC =====
-        function createPeerConnection(targetUserId) {
-            var config = {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
-                ]
-            };
-            var pc = new RTCPeerConnection(config);
-            peerConnections[targetUserId] = pc;
+    ta.value = text;
 
-            var dc = pc.createDataChannel('live-chat');
-            dataChannels[targetUserId] = dc;
-            dc.onmessage = function(e) {
-                try {
-                    var data = JSON.parse(e.data);
-                    if (data.type === 'chat') {
-                        appendMessage(data.from, data.text, data.from === currentUser.id);
-                    } else if (data.type === 'system') {
-                        appendSystemMessage(data.text);
-                    }
-                } catch (e) { }
-            };
-            dc.onopen = function() { };
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
 
-            if (localStream && isHost) {
-                localStream.getTracks().forEach(function(t) { pc.addTrack(t, localStream); });
-            }
+    document.body.appendChild(ta);
 
-            pc.ontrack = function(event) {
-                if (event.streams && event.streams[0]) {
-                    if (!isHost) {
-                        remoteVideo.srcObject = event.streams[0];
-                        remoteVideo.style.display = 'block';
-                    }
-                }
-            };
+    ta.select();
 
-            pc.onicecandidate = function(event) {
-                if (event.candidate) {
-                    sendSignal(targetUserId, { type: 'candidate', candidate: event.candidate });
-                }
-            };
+    try {
 
-            return pc;
+        document.execCommand('copy');
+
+        showToast('✅ Token copied!');
+
+    } catch (_) {
+
+        showToast('⚠️ Copy manually');
+    }
+
+    document.body.removeChild(ta);
+}
+
+/* ============================================================
+   VIDEO VISIBILITY
+============================================================ */
+
+function showHostVideo() {
+
+    remoteVideo.classList.remove('video-visible');
+
+    remoteVideo.style.display = 'none';
+
+    localVideo.classList.add('video-visible');
+
+    localVideo.style.display = 'block';
+
+    streamPlaceholder.style.display = 'none';
+}
+
+function showViewerVideo() {
+
+    localVideo.classList.remove('video-visible');
+
+    localVideo.style.display = 'none';
+
+    remoteVideo.classList.add('video-visible');
+
+    remoteVideo.style.display = 'block';
+}
+
+function showPlaceholder() {
+
+    localVideo.classList.remove('video-visible');
+    remoteVideo.classList.remove('video-visible');
+
+    localVideo.style.display = 'none';
+    remoteVideo.style.display = 'none';
+
+    streamPlaceholder.style.display = 'flex';
+}
+
+/* ============================================================
+   COMMENTS
+============================================================ */
+
+function renderComments() {
+
+    if (!chatMessages) return;
+
+    if (!comments || comments.length === 0) {
+
+        chatMessages.innerHTML =
+            '<div class="chat-empty">💬 No comments yet. Be the first!</div>';
+
+        chatCount.textContent = '0';
+
+        if (commentCount) {
+            commentCount.textContent = '0';
         }
 
-        async function hostCreateOffer(viewerId) {
-            var pc = createPeerConnection(viewerId);
-            var offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            sendSignal(viewerId, { type: 'offer', sdp: offer });
-        }
+        return;
+    }
 
-        async function viewerCreateOffer(hostId) {
-            var pc = createPeerConnection(hostId);
-            var offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            sendSignal(hostId, { type: 'offer', sdp: offer });
-        }
+    let html = '';
 
-        async function handleSignal(from, data) {
-            if (data.type === 'offer') {
-                var pc = createPeerConnection(from);
-                await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-                var answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                sendSignal(from, { type: 'answer', sdp: answer });
-            } else if (data.type === 'answer') {
-                var pc = peerConnections[from];
-                if (pc) await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-            } else if (data.type === 'candidate') {
-                var pc = peerConnections[from];
-                if (pc) await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-            }
-        }
+    const currentUser =
+        myUsername || 'Anonymous';
 
-        // ===== ইউআই =====
-        function appendMessage(sender, text, isOwn) {
-            var div = document.createElement('div');
-            div.className = 'chat-msg';
-            var isHostUser = (sender === currentUser?.id && isHost) || sender === 'Host';
-            var senderName = isOwn ? 'You' : (participantList[sender] || sender.substring(0, 6));
-            if (isHostUser) senderName = '🎙️ Host';
-            div.innerHTML = '<span class="sender' + (isHostUser ? ' host' : '') + '">' + escapeHtml(senderName) + ':</span> ' +
-                escapeHtml(text);
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+    comments.forEach(msg => {
 
-        function appendSystemMessage(text) {
-            var div = document.createElement('div');
-            div.className = 'chat-msg system';
-            div.textContent = text;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+        const isSelf =
+            msg.username === currentUser;
 
-        function updateParticipantsUI() {
-            var total = Object.keys(participantList).length;
-            viewerCountSpan.textContent = total;
-            var html = '<div style="font-size:0.75rem; color:#b0b3b8; padding:4px;">Participants (' + total + ')</div>';
-            var userId = currentUser.id;
-            Object.keys(participantList).forEach(function(id) {
-                var name = participantList[id] || id.substring(0, 6);
-                var isHostUser = (id === hostId);
-                var isYou = (id === userId);
-                var badge = '';
-                if (isHostUser) badge = '🎙️';
-                if (isYou) badge = '👤';
-                var banBtn = '';
-                if (isHost && !isHostUser && !isYou) {
-                    banBtn = '<button class="ban-btn" onclick="banUser(\'' + id + '\')"><i class="fas fa-ban"></i></button>';
-                }
-                html += '<div class="p-item"><span>' + badge + ' ' + escapeHtml(name) + (isYou ? ' (You)' : '') + '</span>' +
-                    banBtn + '</div>';
-            });
-            participantListEl.innerHTML = html;
-        }
+        const isHostUser =
+            msg.isHost || false;
 
-        // ===== হোস্ট & ভিউয়ার =====
-        function switchToStream(roomIdParam, isHostParam, hostIdParam) {
-            roomId = roomIdParam;
-            isHost = isHostParam;
-            hostId = hostIdParam || currentUser.id;
+        const timeStr =
+            msg.created_at
+                ? formatTime(msg.created_at)
+                : '';
 
-            lobby.style.display = 'none';
-            streamRoom.classList.add('active');
-            streamTitle.textContent = 'Room: ' + roomId.substring(0, 8) + (isHost ? ' (Host)' : '');
+        const cleanText =
+            sanitizeInput(msg.text || '');
 
-            if (isHost) {
-                initHostMedia();
-                setInterval(pollSignals, 3000);
-                loadParticipants();
-                setInterval(loadParticipants, 5000);
-            } else {
-                remoteVideo.style.display = 'block';
-                setTimeout(function() {
-                    if (hostId) viewerCreateOffer(hostId);
-                }, 1000);
-                setInterval(pollSignals, 3000);
-            }
+        const cleanUsername =
+            sanitizeInput(
+                msg.username || 'Unknown'
+            );
 
-            sendChatBtn.onclick = sendChatMessage;
-            chatInput.onkeydown = function(e) { if (e.key === 'Enter') sendChatMessage(); };
-            toggleMicBtn.onclick = toggleMic;
-            toggleCamBtn.onclick = toggleCam;
-            endStreamBtn.onclick = endStream;
-        }
+        const badge =
+            isHostUser
+                ? '<span class="badge">HOST</span>'
+                : '';
 
-        // ===== মিডিয়া =====
-        async function initHostMedia() {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream;
-                localVideo.style.display = 'block';
-                isMicOn = true;
-                isCamOn = true;
-                toggleMicBtn.innerHTML = '<i class="fas fa-microphone"></i> Mic';
-                toggleCamBtn.innerHTML = '<i class="fas fa-video"></i> Cam';
-            } catch (e) {
-                showAlert('Camera/Mic access denied', 'error');
-            }
-        }
+        const senderClass =
+            isHostUser
+                ? 'host'
+                : (isSelf ? 'self' : '');
 
-        function toggleMic() {
-            if (!localStream) return;
-            var track = localStream.getAudioTracks()[0];
-            if (track) {
-                track.enabled = !track.enabled;
-                isMicOn = track.enabled;
-                toggleMicBtn.innerHTML = isMicOn ? '<i class="fas fa-microphone"></i> Mic' :
-                    '<i class="fas fa-microphone-slash"></i> Mic';
-                toggleMicBtn.style.color = isMicOn ? '#fff' : '#e94560';
-            }
-        }
+        html += `
+            <div class="chat-msg">
 
-        function toggleCam() {
-            if (!localStream) return;
-            var track = localStream.getVideoTracks()[0];
-            if (track) {
-                track.enabled = !track.enabled;
-                isCamOn = track.enabled;
-                toggleCamBtn.innerHTML = isCamOn ? '<i class="fas fa-video"></i> Cam' :
-                    '<i class="fas fa-video-slash"></i> Cam';
-                toggleCamBtn.style.color = isCamOn ? '#fff' : '#e94560';
-                localVideo.style.display = isCamOn ? 'block' : 'none';
-            }
-        }
+                <span class="sender ${senderClass}">
+                    ${cleanUsername} ${badge}
+                </span>
 
-        // ===== চ্যাট =====
-        function sendChatMessage() {
-            var text = chatInput.value.trim();
-            if (!text) return;
-            appendMessage(currentUser.id, text, true);
-            Object.keys(dataChannels).forEach(function(key) {
-                var dc = dataChannels[key];
-                if (dc.readyState === 'open') {
-                    dc.send(JSON.stringify({ type: 'chat', from: currentUser.id, text: text }));
-                }
-            });
-            chatInput.value = '';
-        }
+                <span class="text">
+                    ${cleanText}
+                </span>
 
-        // ===== লোড পার্টিসিপ্যান্ট & ভিউয়ার কাউন্ট আপডেট =====
-        async function loadParticipants() {
-            if (!roomId) return;
-            try {
-                var res = await window.apiRequest('/live/participants?room_id=' + roomId);
-                if (res && res.success) {
-                    var newList = {};
-                    res.data.forEach(function(p) {
-                        newList[p.user_id] = p.user_name;
-                    });
-                    participantList = newList;
-                    updateParticipantsUI();
-                }
-            } catch (e) { }
-        }
+                <span class="time">
+                    ${timeStr}
+                </span>
 
-        // ===== ব্যান =====
-        window.banUser = async function(targetUserId) {
-            var ok = await showConfirm('Ban User', 'This user will be removed and cannot rejoin.', '🚫');
-            if (!ok) return;
-            try {
-                await window.apiRequest('/live/ban', {
-                    method: 'POST',
-                    body: JSON.stringify({ room_id: roomId, host_id: currentUser.id, user_id: targetUserId })
-                });
-                showAlert('User banned!', 'success');
-                if (peerConnections[targetUserId]) {
-                    peerConnections[targetUserId].close();
-                    delete peerConnections[targetUserId];
-                    delete dataChannels[targetUserId];
-                }
-                loadParticipants();
-            } catch (e) { showAlert('Failed to ban', 'error'); }
+            </div>
+        `;
+    });
+
+    chatMessages.innerHTML = html;
+
+    chatCount.textContent =
+        comments.length;
+
+    if (commentCount) {
+        commentCount.textContent =
+            comments.length;
+    }
+
+    chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+}
+
+function addComment(
+    username,
+    text,
+    isHostUser = false
+) {
+
+    comments.push({
+        username,
+        text,
+        created_at: Date.now(),
+        isHost: isHostUser
+    });
+
+    if (comments.length > 500) {
+        comments =
+            comments.slice(-500);
+    }
+
+    renderComments();
+}
+
+/* ============================================================
+   HOST CAMERA
+============================================================ */
+
+async function startLocalStream() {
+
+    try {
+
+        const constraints = {
+
+            video: {
+                width: {
+                    ideal: 1280
+                },
+                height: {
+                    ideal: 720
+                },
+                facingMode:
+                    cameraFacingMode
+            },
+
+            audio: true
         };
 
-        // ===== স্ট্রিম শেষ =====
-        async function endStream() {
-            var ok = await showConfirm('End Stream', 'Are you sure you want to end the live stream?', '⚠️');
-            if (!ok) return;
-            if (isHost) {
-                await window.apiRequest('/live/delete-room', {
-                    method: 'POST',
-                    body: JSON.stringify({ room_id: roomId, host_id: currentUser.id })
-                });
-            }
-            Object.keys(peerConnections).forEach(function(k) { peerConnections[k].close(); });
-            if (localStream) localStream.getTracks().forEach(function(t) { t.stop(); });
-            location.reload();
-        }
+        localStream =
+            await navigator.mediaDevices
+                .getUserMedia(constraints);
 
-        // ===== ক্রিয়েট =====
-        createBtn.onclick = async function() {
-            var name = createRoomName.value.trim();
-            var priv = isPrivateCheck.checked;
-            var pass = createPassword.value.trim();
+        localVideo.srcObject =
+            localStream;
 
-            if (!name) { showAlert('Enter room name', 'error'); return; }
-            if (priv && !pass) { showAlert('Enter password for private room', 'error'); return; }
+        await localVideo.play();
 
-            try {
-                var res = await window.apiRequest('/live/create', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        host_id: currentUser.id,
-                        host_name: currentUser.username,
-                        room_name: name,
-                        type: priv ? 'private' : 'public',
-                        password: pass
-                    })
-                });
-                if (res && res.success) {
-                    var rid = res.data.room_id;
-                    createStatus.textContent = '✅ Room created! ID: ' + rid;
-                    showAlert('Live stream started!', 'success');
-                    switchToStream(rid, true, currentUser.id);
-                } else {
-                    showAlert(res.error || 'Failed to create', 'error');
-                }
-            } catch (e) { showAlert('Error creating room', 'error'); }
-        };
+        isCameraOn = true;
+        isMicOn = true;
 
-        // ===== জয়েন =====
-        joinBtn.onclick = async function() {
-            var name = joinRoomName.value.trim();
-            var pass = joinPassword.value.trim();
+        toggleCamBtn.innerHTML =
+            '<i class="fas fa-video"></i> Cam';
 
-            if (!name) { showAlert('Enter room name', 'error'); return; }
+        toggleMicBtn.innerHTML =
+            '<i class="fas fa-microphone"></i> Mic';
 
-            try {
-                var res = await window.apiRequest('/live/join', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        room_id: name,
-                        user_id: currentUser.id,
-                        user_name: currentUser.username,
-                        password: pass
-                    })
-                });
-                if (res && res.success) {
-                    joinStatus.textContent = '✅ Joined!';
-                    showAlert('Joined live stream!', 'success');
-                    switchToStream(name, false, res.data.host_id);
-                } else {
-                    showAlert(res.error || 'Failed to join', 'error');
-                    joinStatus.textContent = '❌ ' + (res.error || 'Failed');
-                }
-            } catch (e) { showAlert('Error joining room', 'error'); }
-        };
+        camSwitchBtn.classList.add(
+            'visible'
+        );
 
-        // ===== পাবলিক লিস্ট =====
-        async function loadPublicRooms() {
-            try {
-                var res = await window.apiRequest('/live/rooms');
-                if (res && res.success) {
-                    if (res.data.length === 0) {
-                        publicList.innerHTML = '<div style="text-align:center; color:#b0b3b8; padding:12px;">No public streams active</div>';
-                        return;
-                    }
-                    publicList.innerHTML = res.data.map(function(room) {
-                        return '<div class="room-item"><div class="info"><div class="name">📡 ' + escapeHtml(room.room_name) +
-                            ' <span class="privacy-tag public">Public</span></div><div class="meta">🎙️ ' + escapeHtml(room
-                                .host_name) + ' · 👥 ' + (room.viewers || 0) + ' viewers</div></div><button class="join-btn" onclick="quickJoin(\'' +
-                            room.room_id + '\')">Join</button></div>';
-                    }).join('');
-                }
-            } catch (e) { }
-        }
+        showHostVideo();
 
-        window.quickJoin = function(id) {
-            joinRoomName.value = id;
-            joinBtn.click();
-        };
+        showToast(
+            '🎥 Camera & Mic started'
+        );
 
-        // ===== পেজ লোড =====
-        document.addEventListener('DOMContentLoaded', function() {
-            var userId = localStorage.getItem('userId');
-            if (!userId) { window.location.href = 'login.html'; return; }
+        return true;
 
-            window.apiRequest('/users/' + userId).then(function(result) {
-                if (result && result.success) {
-                    currentUser = result.data;
-                    document.getElementById('userBadge').textContent = '@' + currentUser.username;
-                    loadPublicRooms();
-                    setInterval(loadPublicRooms, 10000);
-                } else {
-                    localStorage.removeItem('userId');
-                    window.location.href = 'login.html';
-                }
-            }).catch(function() {
-                localStorage.removeItem('userId');
-                window.location.href = 'login.html';
+    } catch (err) {
+
+        console.error(
+            'Media error:',
+            err
+        );
+
+        showToast(
+            '⚠️ Could not access camera/mic: ' +
+            err.message
+        );
+
+        return false;
+    }
+}
+
+function stopLocalStream() {
+
+    if (localStream) {
+
+        localStream
+            .getTracks()
+            .forEach(track => {
+                track.stop();
             });
+
+        localStream = null;
+    }
+
+    localVideo.srcObject = null;
+
+    camSwitchBtn.classList.remove(
+        'visible'
+    );
+}
+
+/* ============================================================
+   CAMERA SWITCH
+============================================================ */
+
+async function switchCamera() {
+
+    if (!isHost || !localStream) {
+        return;
+    }
+
+    cameraFacingMode =
+        cameraFacingMode === 'environment'
+            ? 'user'
+            : 'environment';
+
+    localStream
+        .getTracks()
+        .forEach(track => {
+            track.stop();
         });
 
-    </script>
+    try {
+
+        const constraints = {
+
+            video: {
+                width: {
+                    ideal: 1280
+                },
+                height: {
+                    ideal: 720
+                },
+                facingMode:
+                    cameraFacingMode
+            },
+
+            audio: true
+        };
+
+        const newStream =
+            await navigator.mediaDevices
+                .getUserMedia(constraints);
+
+        if (peerConnection) {
+
+            const senders =
+                peerConnection.getSenders();
+
+            const videoSender =
+                senders.find(
+                    s =>
+                        s.track &&
+                        s.track.kind === 'video'
+                );
+
+            const audioSender =
+                senders.find(
+                    s =>
+                        s.track &&
+                        s.track.kind === 'audio'
+                );
+
+            const newVideoTrack =
+                newStream
+                    .getVideoTracks()[0];
+
+            const newAudioTrack =
+                newStream
+                    .getAudioTracks()[0];
+
+            if (
+                videoSender &&
+                newVideoTrack
+            ) {
+                await videoSender.replaceTrack(
+                    newVideoTrack
+                );
+            }
+
+            if (
+                audioSender &&
+                newAudioTrack
+            ) {
+                await audioSender.replaceTrack(
+                    newAudioTrack
+                );
+            }
+        }
+
+        localStream = newStream;
+
+        localVideo.srcObject =
+            localStream;
+
+        await localVideo.play();
+
+        showHostVideo();
+
+        showToast(
+            `📷 Switched to ${
+                cameraFacingMode === 'environment'
+                    ? 'back'
+                    : 'front'
+            } camera`
+        );
+
+    } catch (err) {
+
+        console.error(
+            'Camera switch error:',
+            err
+        );
+
+        showToast(
+            '⚠️ Could not switch camera: ' +
+            err.message
+        );
+
+        cameraFacingMode =
+            cameraFacingMode === 'environment'
+                ? 'user'
+                : 'environment';
+    }
+}
+
+/* ============================================================
+   WEBRTC
+============================================================ */
+
+async function createPeerConnection(
+    roomIdStr,
+    isHostUser
+) {
+
+    const configuration = {
+
+        iceServers: [
+
+            {
+                urls:
+                    'stun:stun.l.google.com:19302'
+            },
+
+            {
+                urls:
+                    'stun:stun1.l.google.com:19302'
+            }
+
+        ]
+    };
+
+    peerConnection =
+        new RTCPeerConnection(
+            configuration
+        );
+
+    if (localStream) {
+
+        localStream
+            .getTracks()
+            .forEach(track => {
+
+                peerConnection.addTrack(
+                    track,
+                    localStream
+                );
+
+            });
+    }
+
+    peerConnection.ontrack =
+        event => {
+
+            if (
+                event.streams &&
+                event.streams[0]
+            ) {
+
+                remoteVideo.srcObject =
+                    event.streams[0];
+
+                remoteVideo.play()
+                    .catch(() => {});
+
+                if (!isHost) {
+                    showViewerVideo();
+                }
+
+                streamPlaceholder.style.display =
+                    'none';
+            }
+        };
+
+    peerConnection.onicecandidate =
+        event => {
+
+            if (
+                event.candidate &&
+                channel
+            ) {
+
+                channel.send({
+
+                    type: 'broadcast',
+
+                    event: 'webrtc_ice',
+
+                    payload: {
+
+                        candidate:
+                            event.candidate,
+
+                        from:
+                            myUsername,
+
+                        isHost:
+                            isHostUser
+                    }
+                });
+            }
+        };
+
+    peerConnection.onconnectionstatechange =
+        () => {
+
+            console.log(
+                'Connection state:',
+                peerConnection.connectionState
+            );
+
+            if (
+                peerConnection.connectionState ===
+                'connected'
+            ) {
+
+                showToast(
+                    '📡 Video connected!'
+                );
+
+                liveOverlay.style.display =
+                    'flex';
+
+                liveStats.style.display =
+                    'flex';
+
+                if (isHost) {
+                    showHostVideo();
+                } else {
+                    showViewerVideo();
+                }
+            }
+
+            if (
+                peerConnection.connectionState ===
+                    'disconnected' ||
+                peerConnection.connectionState ===
+                    'failed'
+            ) {
+
+                showToast(
+                    '⚠️ Video disconnected'
+                );
+            }
+        };
+
+    return peerConnection;
+}
+
+/* ============================================================
+   OFFER
+============================================================ */
+
+async function handleOffer(
+    offer,
+    roomIdStr
+) {
+
+    if (!peerConnection) {
+
+        await createPeerConnection(
+            roomIdStr,
+            false
+        );
+    }
+
+    await peerConnection
+        .setRemoteDescription(
+            new RTCSessionDescription(
+                offer
+            )
+        );
+
+    const answer =
+        await peerConnection.createAnswer();
+
+    await peerConnection
+        .setLocalDescription(answer);
+
+    if (channel) {
+
+        channel.send({
+
+            type: 'broadcast',
+
+            event: 'webrtc_answer',
+
+            payload: {
+
+                answer,
+
+                from:
+                    myUsername,
+
+                to:
+                    offer.from
+            }
+        });
+    }
+}
+
+async function handleAnswer(answer) {
+
+    if (peerConnection) {
+
+        await peerConnection
+            .setRemoteDescription(
+                new RTCSessionDescription(
+                    answer
+                )
+            );
+    }
+}
+
+async function handleIceCandidate(
+    candidate
+) {
+
+    if (peerConnection) {
+
+        try {
+
+            await peerConnection
+                .addIceCandidate(
+                    new RTCIceCandidate(
+                        candidate
+                    )
+                );
+
+        } catch (err) {
+
+            console.warn(
+                'ICE candidate error:',
+                err
+            );
+        }
+    }
+}
+
+/* ============================================================
+   FULLSCREEN
+============================================================ */
+
+async function toggleFullscreen() {
+
+    const container =
+        document.getElementById(
+            'videoContainer'
+        );
+
+    try {
+
+        const currentFullscreen =
+            document.fullscreenElement ||
+            document.webkitFullscreenElement;
+
+        if (!currentFullscreen) {
+
+            if (
+                container.requestFullscreen
+            ) {
+
+                await container
+                    .requestFullscreen();
+
+            } else if (
+                container.webkitRequestFullscreen
+            ) {
+
+                container.webkitRequestFullscreen();
+            }
+
+        } else {
+
+            if (document.exitFullscreen) {
+
+                await document.exitFullscreen();
+
+            } else if (
+                document.webkitExitFullscreen
+            ) {
+
+                document.webkitExitFullscreen();
+            }
+        }
+
+    } catch (err) {
+
+        console.warn(
+            'Fullscreen error:',
+            err
+        );
+    }
+}
+
+function updateFullscreenButton() {
+
+    const isFull =
+        !!document.fullscreenElement ||
+        !!document.webkitFullscreenElement;
+
+    isFullscreen = isFull;
+
+    fullscreenBtn.innerHTML =
+        isFull
+            ? '<i class="fas fa-compress"></i>'
+            : '<i class="fas fa-expand"></i>';
+}
+
+/* ============================================================
+   REALTIME
+============================================================ */
+
+function setupRealtime(
+    roomIdStr,
+    username,
+    isHostUser
+) {
+
+    if (channel) {
+
+        try {
+            channel.unsubscribe();
+        } catch (_) {}
+
+        channel = null;
+    }
+
+    roomId =
+        roomIdStr;
+
+    myUsername =
+        username;
+
+    isHost =
+        isHostUser;
+
+    comments = [];
+
+    viewers =
+        new Set();
+
+    viewers.add(username);
+
+    const channelName =
+        `live_room:${roomIdStr}`;
+
+    channel =
+        supabaseClient.channel(
+            channelName,
+            {
+                config: {
+                    broadcast: {
+                        ack: true
+                    }
+                }
+            }
+        );
+
+    /* ========================================================
+       WEBRTC OFFER
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'webrtc_offer'
+        },
+        async payload => {
+
+            if (isHost) {
+                return;
+            }
+
+            const {
+                offer,
+                from,
+                to
+            } = payload.payload;
+
+            if (
+                from !== myUsername &&
+                (!to || to === myUsername)
+            ) {
+
+                await handleOffer(
+                    offer,
+                    roomIdStr
+                );
+            }
+        }
+    );
+
+    /* ========================================================
+       WEBRTC ANSWER
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'webrtc_answer'
+        },
+        async payload => {
+
+            if (!isHost) {
+                return;
+            }
+
+            const {
+                answer,
+                to
+            } = payload.payload;
+
+            if (
+                to === myUsername
+            ) {
+
+                await handleAnswer(
+                    answer
+                );
+            }
+        }
+    );
+
+    /* ========================================================
+       ICE
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'webrtc_ice'
+        },
+        async payload => {
+
+            const {
+                candidate,
+                from,
+                isHost:
+                    senderIsHost
+            } = payload.payload;
+
+            if (
+                from === myUsername
+            ) {
+                return;
+            }
+
+            if (
+                (isHost && !senderIsHost) ||
+                (!isHost && senderIsHost)
+            ) {
+
+                await handleIceCandidate(
+                    candidate
+                );
+            }
+        }
+    );
+
+    /* ========================================================
+       CHAT
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'comment'
+        },
+        payload => {
+
+            const {
+                username: sender,
+                text,
+                isHost:
+                    senderIsHost,
+                created_at
+            } = payload.payload;
+
+            if (
+                sender === myUsername &&
+                text ===
+                    chatInput.value.trim()
+            ) {
+                return;
+            }
+
+            addComment(
+                sender,
+                text,
+                senderIsHost || false
+            );
+
+            viewers.add(sender);
+
+            updateViewerCount();
+        }
+    );
+
+    /* ========================================================
+       VIEWER JOIN
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'viewer_join'
+        },
+        payload => {
+
+            const {
+                username: sender
+            } = payload.payload;
+
+            if (
+                sender !== myUsername
+            ) {
+
+                viewers.add(sender);
+
+                updateViewerCount();
+
+                if (isHost) {
+
+                    showToast(
+                        `👤 ${sender} joined the live`
+                    );
+
+                    sendOfferToViewer(
+                        sender
+                    );
+                }
+            }
+        }
+    );
+
+    /* ========================================================
+       VIEWER LEAVE
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'viewer_leave'
+        },
+        payload => {
+
+            const {
+                username: sender
+            } = payload.payload;
+
+            viewers.delete(sender);
+
+            updateViewerCount();
+        }
+    );
+
+    /* ========================================================
+       END LIVE
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'end_live'
+        },
+        () => {
+
+            if (!isHost) {
+
+                showToast(
+                    '📡 The host has ended the live stream'
+                );
+
+                setTimeout(
+                    () => {
+                        leaveLive();
+                    },
+                    1500
+                );
+            }
+        }
+    );
+
+    /* ========================================================
+       MUTE
+    ======================================================== */
+
+    channel.on(
+        'broadcast',
+        {
+            event: 'mute_toggle'
+        },
+        payload => {
+
+            const {
+                muted
+            } = payload.payload;
+
+            isMuted =
+                muted;
+
+            if (!isHost) {
+
+                chatInput.disabled =
+                    isMuted;
+
+                sendChatBtn.disabled =
+                    isMuted;
+
+                showToast(
+                    isMuted
+                        ? '🔇 Chat muted by host'
+                        : '🔊 Chat unmuted'
+                );
+            }
+        }
+    );
+
+    /* ========================================================
+       SUBSCRIBE
+    ======================================================== */
+
+    channel.subscribe(
+        async status => {
+
+            if (
+                status === 'SUBSCRIBED'
+            ) {
+
+                console.log(
+                    `✅ Connected to live room ${roomIdStr}`
+                );
+
+                isSubscribed = true;
+
+                statusDot.className =
+                    'dot online';
+
+                statusText.textContent =
+                    'Live';
+
+                chatTitle.textContent =
+                    isHost
+                        ? '🔴 Your Live'
+                        : '🔴 Live Stream';
+
+                setTimeout(
+                    () => {
+
+                        if (channel) {
+
+                            channel.send({
+
+                                type:
+                                    'broadcast',
+
+                                event:
+                                    'viewer_join',
+
+                                payload: {
+                                    username:
+                                        myUsername
+                                }
+                            });
+                        }
+
+                    },
+                    300
+                );
+
+                if (isHost) {
+
+                    await startLiveStream();
+
+                } else {
+
+                    showPlaceholder();
+                }
+
+                chatInput.disabled =
+                    isMuted;
+
+                sendChatBtn.disabled =
+                    isMuted;
+
+            } else {
+
+                console.warn(
+                    'Subscribe status:',
+                    status
+                );
+            }
+        }
+    );
+
+    chatInput.disabled =
+        isMuted;
+
+    sendChatBtn.disabled =
+        isMuted;
+
+    updateViewerCount();
+
+    renderComments();
+
+    updateUI();
+}
+
+/* ============================================================
+   HOST START STREAM
+============================================================ */
+
+async function startLiveStream() {
+
+    const ok =
+        await startLocalStream();
+
+    if (!ok) {
+
+        showToast(
+            '⚠️ Failed to start camera'
+        );
+
+        return;
+    }
+
+    await createPeerConnection(
+        roomId,
+        true
+    );
+
+    const offer =
+        await peerConnection
+            .createOffer();
+
+    await peerConnection
+        .setLocalDescription(
+            offer
+        );
+
+    if (channel) {
+
+        channel.send({
+
+            type: 'broadcast',
+
+            event: 'webrtc_offer',
+
+            payload: {
+
+                offer,
+
+                from:
+                    myUsername,
+
+                isHost:
+                    true
+            }
+        });
+    }
+
+    showHostVideo();
+
+    liveOverlay.style.display =
+        'flex';
+
+    liveStats.style.display =
+        'flex';
+
+    showToast(
+        '🎬 Live stream started!'
+    );
+}
+
+/* ============================================================
+   SEND OFFER TO VIEWER
+============================================================ */
+
+async function sendOfferToViewer(
+    viewerName
+) {
+
+    if (
+        !isHost ||
+        !peerConnection
+    ) {
+        return;
+    }
+
+    try {
+
+        const offer =
+            await peerConnection
+                .createOffer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
+
+        await peerConnection
+            .setLocalDescription(
+                offer
+            );
+
+        if (channel) {
+
+            channel.send({
+
+                type:
+                    'broadcast',
+
+                event:
+                    'webrtc_offer',
+
+                payload: {
+
+                    offer,
+
+                    from:
+                        myUsername,
+
+                    to:
+                        viewerName,
+
+                    isHost:
+                        true
+                }
+            });
+        }
+
+    } catch (err) {
+
+        console.warn(
+            'Offer error:',
+            err
+        );
+    }
+}
+
+/* ============================================================
+   UPDATE UI
+============================================================ */
+
+function updateUI() {
+
+    authPanels.style.display =
+        'none';
+
+    liveArea.classList.add(
+        'visible'
+    );
+
+    chatArea.classList.add(
+        'visible'
+    );
+
+    if (isHost) {
+
+        hostControls.classList.add(
+            'visible'
+        );
+
+        tokenDisplay.classList.add(
+            'visible'
+        );
+
+        tokenDisplay.textContent =
+            roomToken;
+
+        chatTitle.textContent =
+            '🔴 Your Live';
+
+        userBadge.textContent =
+            myUsername + ' 👑';
+
+        streamTitle.textContent =
+            '🔴 You are LIVE';
+
+        streamSub.textContent =
+            'Share the token to invite viewers';
+
+        camSwitchBtn.classList.add(
+            'visible'
+        );
+
+        if (localStream) {
+            showHostVideo();
+        }
+
+    } else {
+
+        hostControls.classList.remove(
+            'visible'
+        );
+
+        tokenDisplay.classList.remove(
+            'visible'
+        );
+
+        chatTitle.textContent =
+            '🔴 Live Stream';
+
+        userBadge.textContent =
+            myUsername;
+
+        streamTitle.textContent =
+            '📺 Watching Live';
+
+        streamSub.textContent =
+            'Join the conversation!';
+
+        camSwitchBtn.classList.remove(
+            'visible'
+        );
+    }
+
+    updateViewerCount();
+
+    renderComments();
+}
+
+/* ============================================================
+   VIEWER COUNT
+============================================================ */
+
+function updateViewerCount() {
+
+    const count =
+        viewers.size || 0;
+
+    viewerCount.textContent =
+        count + ' watching';
+
+    viewerCount2.textContent =
+        count;
+}
+
+/* ============================================================
+   CHAT
+============================================================ */
+
+async function sendComment() {
+
+    const text =
+        chatInput.value.trim();
+
+    if (!text) {
+
+        chatInput.focus();
+
+        return;
+    }
+
+    if (
+        isMuted &&
+        !isHost
+    ) {
+
+        showToast(
+            '🔇 Chat is muted by host'
+        );
+
+        return;
+    }
+
+    const now =
+        Date.now();
+
+    if (
+        now - lastMessageTime <
+        MIN_INTERVAL
+    ) {
+
+        showToast(
+            '⏳ Please wait 2 seconds'
+        );
+
+        return;
+    }
+
+    const filterResult =
+        filterMessage(text);
+
+    if (
+        !filterResult.allowed
+    ) {
+
+        showToast(
+            `⛔ ${filterResult.reason}`
+        );
+
+        chatInput.value = '';
+
+        chatInput.focus();
+
+        return;
+    }
+
+    if (
+        !isSubscribed ||
+        !channel
+    ) {
+
+        showToast(
+            '⚠️ Not connected'
+        );
+
+        return;
+    }
+
+    lastMessageTime =
+        now;
+
+    const msgData = {
+
+        username:
+            myUsername,
+
+        text,
+
+        isHost:
+            isHost || false,
+
+        created_at:
+            Date.now()
+    };
+
+    const {
+        error
+    } = await channel.send({
+
+        type:
+            'broadcast',
+
+        event:
+            'comment',
+
+        payload:
+            msgData
+    });
+
+    if (error) {
+
+        showToast(
+            '⚠️ Error: ' +
+            error.message
+        );
+
+        return;
+    }
+
+    addComment(
+        myUsername,
+        text,
+        isHost || false
+    );
+
+    chatInput.value = '';
+
+    chatInput.focus();
+}
+
+/* ============================================================
+   START LIVE
+============================================================ */
+
+async function startLive() {
+
+    const name =
+        hostName.value.trim() ||
+        'Host';
+
+    if (name.length < 2) {
+
+        showToast(
+            '⚠️ Name must be at least 2 characters'
+        );
+
+        return;
+    }
+
+    roomToken =
+        generateToken();
+
+    const roomIdStr =
+        roomToken;
+
+    myUsername =
+        name;
+
+    isHost =
+        true;
+
+    setupRealtime(
+        roomIdStr,
+        name,
+        true
+    );
+
+    setTimeout(
+        () => {
+
+            addComment(
+                '🟢 System',
+                '🎬 Host started the live stream!',
+                false
+            );
+
+        },
+        500
+    );
+
+    showToast(
+        '🎬 Starting live stream...'
+    );
+
+    chatInput.focus();
+}
+
+/* ============================================================
+   JOIN LIVE
+============================================================ */
+
+async function joinLive() {
+
+    const name =
+        viewerName.value.trim() ||
+        'Viewer';
+
+    const token =
+        joinTokenInput.value.trim();
+
+    if (name.length < 2) {
+
+        showToast(
+            '⚠️ Name must be at least 2 characters'
+        );
+
+        return;
+    }
+
+    if (token.length !== 64) {
+
+        showToast(
+            '⚠️ Enter a valid 64-character token'
+        );
+
+        return;
+    }
+
+    myUsername =
+        name;
+
+    isHost =
+        false;
+
+    roomToken =
+        token;
+
+    setupRealtime(
+        token,
+        name,
+        false
+    );
+
+    showToast(
+        '✅ Joined the live stream!'
+    );
+
+    chatInput.focus();
+}
+
+/* ============================================================
+   CAMERA TOGGLE
+============================================================ */
+
+function toggleCamera() {
+
+    if (
+        !isHost ||
+        !localStream
+    ) {
+        return;
+    }
+
+    const videoTrack =
+        localStream
+            .getVideoTracks()[0];
+
+    if (videoTrack) {
+
+        isCameraOn =
+            !isCameraOn;
+
+        videoTrack.enabled =
+            isCameraOn;
+
+        toggleCamBtn.innerHTML =
+            isCameraOn
+                ? '<i class="fas fa-video"></i> Cam'
+                : '<i class="fas fa-video-slash"></i> Cam';
+
+        showToast(
+            isCameraOn
+                ? '📷 Camera on'
+                : '📷 Camera off'
+        );
+    }
+}
+
+/* ============================================================
+   MIC TOGGLE
+============================================================ */
+
+function toggleMic() {
+
+    if (
+        !isHost ||
+        !localStream
+    ) {
+        return;
+    }
+
+    const audioTrack =
+        localStream
+            .getAudioTracks()[0];
+
+    if (audioTrack) {
+
+        isMicOn =
+            !isMicOn;
+
+        audioTrack.enabled =
+            isMicOn;
+
+        toggleMicBtn.innerHTML =
+            isMicOn
+                ? '<i class="fas fa-microphone"></i> Mic'
+                : '<i class="fas fa-microphone-slash"></i> Mic';
+
+        showToast(
+            isMicOn
+                ? '🎤 Mic on'
+                : '🎤 Mic off'
+        );
+    }
+}
+
+/* ============================================================
+   END LIVE
+============================================================ */
+
+async function endLive() {
+
+    if (!isHost) {
+        return;
+    }
+
+    if (
+        !confirm(
+            'Are you sure you want to end the live stream?'
+        )
+    ) {
+        return;
+    }
+
+    if (channel) {
+
+        await channel.send({
+
+            type:
+                'broadcast',
+
+            event:
+                'end_live',
+
+            payload: {
+                ended: true
+            }
+        });
+    }
+
+    showToast(
+        '📡 Live ended'
+    );
+
+    setTimeout(
+        () => {
+            leaveLive();
+        },
+        500
+    );
+}
+
+/* ============================================================
+   LEAVE LIVE
+============================================================ */
+
+function leaveLive() {
+
+    if (channel) {
+
+        try {
+
+            channel.send({
+
+                type:
+                    'broadcast',
+
+                event:
+                    'viewer_leave',
+
+                payload: {
+                    username:
+                        myUsername
+                }
+            });
+
+            channel.unsubscribe();
+
+        } catch (_) {}
+
+        channel = null;
+    }
+
+    stopLocalStream();
+
+    if (peerConnection) {
+
+        try {
+            peerConnection.close();
+        } catch (_) {}
+
+        peerConnection = null;
+    }
+
+    remoteVideo.srcObject =
+        null;
+
+    isSubscribed =
+        false;
+
+    roomId =
+        null;
+
+    roomToken =
+        '';
+
+    comments =
+        [];
+
+    viewers =
+        new Set();
+
+    isHost =
+        false;
+
+    isMuted =
+        false;
+
+    authPanels.style.display =
+        'flex';
+
+    liveArea.classList.remove(
+        'visible'
+    );
+
+    chatArea.classList.remove(
+        'visible'
+    );
+
+    hostControls.classList.remove(
+        'visible'
+    );
+
+    liveOverlay.style.display =
+        'none';
+
+    liveStats.style.display =
+        'none';
+
+    tokenDisplay.classList.remove(
+        'visible'
+    );
+
+    camSwitchBtn.classList.remove(
+        'visible'
+    );
+
+    showPlaceholder();
+
+    statusDot.className =
+        'dot offline';
+
+    statusText.textContent =
+        'Offline';
+
+    chatTitle.textContent =
+        'Live Stream';
+
+    userBadge.textContent =
+        'Anonymous';
+
+    chatInput.disabled =
+        true;
+
+    sendChatBtn.disabled =
+        true;
+
+    hostName.value =
+        '';
+
+    viewerName.value =
+        '';
+
+    joinTokenInput.value =
+        '';
+
+    renderComments();
+
+    showToast(
+        '👋 Left the live'
+    );
+}
+
+/* ============================================================
+   MUTE CHAT
+============================================================ */
+
+async function toggleMute() {
+
+    if (
+        !isHost ||
+        !channel
+    ) {
+        return;
+    }
+
+    isMuted =
+        !isMuted;
+
+    await channel.send({
+
+        type:
+            'broadcast',
+
+        event:
+            'mute_toggle',
+
+        payload: {
+            muted:
+                isMuted
+        }
+    });
+
+    showToast(
+        isMuted
+            ? '🔇 Chat muted'
+            : '🔊 Chat unmuted'
+    );
+
+    muteChatBtn.innerHTML =
+        isMuted
+            ? '<i class="fas fa-microphone"></i> Unmute'
+            : '<i class="fas fa-microphone-slash"></i> Mute';
+}
+
+/* ============================================================
+   CLEAR CHAT
+============================================================ */
+
+function clearChat() {
+
+    if (!isHost) {
+        return;
+    }
+
+    if (
+        !confirm(
+            'Clear all comments?'
+        )
+    ) {
+        return;
+    }
+
+    comments = [];
+
+    renderComments();
+
+    showToast(
+        '🗑 Chat cleared'
+    );
+}
+
+/* ============================================================
+   EVENTS
+============================================================ */
+
+startLiveBtn.addEventListener(
+    'click',
+    startLive
+);
+
+joinLiveBtn.addEventListener(
+    'click',
+    joinLive
+);
+
+sendChatBtn.addEventListener(
+    'click',
+    sendComment
+);
+
+chatInput.addEventListener(
+    'keydown',
+    e => {
+
+        if (e.key === 'Enter') {
+
+            e.preventDefault();
+
+            sendComment();
+        }
+    }
+);
+
+endLiveBtn.addEventListener(
+    'click',
+    endLive
+);
+
+copyTokenBtn.addEventListener(
+    'click',
+    () => {
+
+        if (roomToken) {
+            copyToClipboard(
+                roomToken
+            );
+        }
+    }
+);
+
+muteChatBtn.addEventListener(
+    'click',
+    toggleMute
+);
+
+clearChatBtn.addEventListener(
+    'click',
+    clearChat
+);
+
+toggleCamBtn.addEventListener(
+    'click',
+    toggleCamera
+);
+
+toggleMicBtn.addEventListener(
+    'click',
+    toggleMic
+);
+
+fullscreenBtn.addEventListener(
+    'click',
+    toggleFullscreen
+);
+
+remoteVideo.addEventListener(
+    'dblclick',
+    toggleFullscreen
+);
+
+localVideo.addEventListener(
+    'dblclick',
+    toggleFullscreen
+);
+
+camSwitchBtn.addEventListener(
+    'click',
+    switchCamera
+);
+
+chatFilterBtn.addEventListener(
+    'click',
+    () => {
+
+        showToast(
+            '🔍 Filter feature coming soon!'
+        );
+    }
+);
+
+joinTokenInput.addEventListener(
+    'keydown',
+    e => {
+
+        if (e.key === 'Enter') {
+
+            e.preventDefault();
+
+            joinLive();
+        }
+    }
+);
+
+hostName.addEventListener(
+    'keydown',
+    e => {
+
+        if (e.key === 'Enter') {
+
+            e.preventDefault();
+
+            startLive();
+        }
+    }
+);
+
+/* ============================================================
+   FULLSCREEN EVENTS
+============================================================ */
+
+document.addEventListener(
+    'fullscreenchange',
+    updateFullscreenButton
+);
+
+document.addEventListener(
+    'webkitfullscreenchange',
+    updateFullscreenButton
+);
+
+/* ============================================================
+   CLEANUP
+============================================================ */
+
+window.addEventListener(
+    'beforeunload',
+    () => {
+
+        stopLocalStream();
+
+        if (peerConnection) {
+
+            try {
+                peerConnection.close();
+            } catch (_) {}
+        }
+
+        if (channel) {
+
+            try {
+
+                channel.send({
+
+                    type:
+                        'broadcast',
+
+                    event:
+                        'viewer_leave',
+
+                    payload: {
+
+                        username:
+                            myUsername
+                    }
+                });
+
+                channel.unsubscribe();
+
+            } catch (_) {}
+        }
+    }
+);
+
+/* ============================================================
+   INIT
+============================================================ */
+
+console.log(
+    '📡 Live Stream · P2P Style with WebRTC'
+);
+
+console.log(
+    '🎥 Host camera = FULL SIZE'
+);
+
+console.log(
+    '📺 Viewer video = FULL SIZE'
+);
+
+console.log(
+    '⛶ Fullscreen = FULL VIDEO'
+);
+
+console.log(
+    '📷 Camera switch enabled'
+);
+
+console.log(
+    '💬 Real-time comments enabled'
+);
+
+console.log(
+    '🔒 Content filtering enabled'
+);
+
+statusDot.className =
+    'dot offline';
+
+statusText.textContent =
+    'Offline';
+
+chatInput.disabled =
+    true;
+
+sendChatBtn.disabled =
+    true;
+
+showPlaceholder();
+
+</script>
+
 </body>
 </html>

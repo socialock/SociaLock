@@ -1,9 +1,34 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Following - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="See who you follow and who follows you back on SociaLock." />
+    <meta name="keywords" content="following, followers, SociaLock connections" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/following.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <!-- ===== SEO END ===== -->
+
+    <!-- ===== FIREBASE CDN (First) ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -35,6 +60,14 @@
         }
         .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
         .back-header .back-title { font-size: 18px; font-weight: 600; color: #e4e6eb; }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #b0b3b8;
+            margin-bottom: 16px;
+            padding: 0 4px;
+            font-weight: 400;
+        }
 
         .user-item {
             display: flex;
@@ -105,6 +138,55 @@
         .no-users p { font-size: 14px; }
 
         .loading-spinner { text-align: center; padding: 30px; color: #b0b3b8; }
+        
+        /* ===== SKELETON LOADING ===== */
+        .skeleton-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #242526;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #3a3b3c;
+        }
+        .skeleton-item .skeleton-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .skeleton-item .skeleton-text {
+            flex: 1;
+            margin-left: 12px;
+        }
+        .skeleton-item .skeleton-text .skeleton-line {
+            height: 14px;
+            background: #3a3b3c;
+            border-radius: 6px;
+            width: 60%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .skeleton-item .skeleton-text .skeleton-line.short {
+            width: 40%;
+            margin-top: 6px;
+        }
+        .skeleton-item .skeleton-btn {
+            width: 80px;
+            height: 32px;
+            background: #3a3b3c;
+            border-radius: 20px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
         .custom-alert {
             position: fixed;
             top: 70px;
@@ -131,6 +213,8 @@
             .user-item .action-btn { font-size: 12px; padding: 4px 12px; }
             .back-header .back-btn { font-size: 20px; }
             .back-header .back-title { font-size: 16px; }
+            .skeleton-item .skeleton-avatar { width: 38px; height: 38px; }
+            .skeleton-item .skeleton-btn { width: 70px; height: 28px; }
         }
     </style>
 </head>
@@ -144,13 +228,58 @@
                 </button>
                 <span class="back-title">Following</span>
             </div>
-            <div id="usersContainer"><div class="loading-spinner">⏳ Loading...</div></div>
+            
+            <div class="page-subtitle">People you are following</div>
+            
+            <div id="usersContainer">
+                <!-- Skeleton Loading -->
+                <div class="skeleton-item">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-text">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-btn"></div>
+                </div>
+                <div class="skeleton-item">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-text">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-btn"></div>
+                </div>
+                <div class="skeleton-item">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-text">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-btn"></div>
+                </div>
+                <div class="skeleton-item">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-text">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-btn"></div>
+                </div>
+                <div class="skeleton-item">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-text">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-btn"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // FOLLOWING.JS - সম্পূর্ণ API ভার্সন
+        // FOLLOWING.JS - Full API version (Firebase CDN already loaded)
         // ============================================================
 
         let currentUser = null;
@@ -170,7 +299,7 @@
             }
 
             try {
-                // 1. Current user load
+                // 1. Load current user
                 const userResult = await window.apiRequest(`/users/${userId}`);
                 if (userResult && userResult.success) {
                     currentUser = userResult.data;
@@ -180,7 +309,7 @@
                     return;
                 }
 
-                // 2. Get target user ID (profile page থেকে আসছে)
+                // 2. Get target user ID (from profile page)
                 const params = new URLSearchParams(window.location.search);
                 targetUserId = params.get('userId') || userId;
 
@@ -204,13 +333,13 @@
                     return;
                 }
 
-                // 4. Get current user's following list for follow button
+                // 4. Get current user's following list for follow button state
                 const myFollowingResult = await window.apiRequest(`/users/${userId}/following`);
                 if (myFollowingResult && myFollowingResult.success) {
                     followingList = myFollowingResult.data.map(u => u.id);
                 }
 
-                // 5. Render
+                // 5. Render users
                 container.innerHTML = '';
                 followingUsers.forEach(user => {
                     const isVerified = user.is_verified || false;
@@ -276,7 +405,6 @@
                         btn.textContent = 'Follow';
                         btn.style.background = '#3a3b3c';
                         showAlert('Unfollowed', 'info');
-                        // Update following list
                         followingList = followingList.filter(id => id !== userId);
                     }
                 } else {
@@ -304,7 +432,7 @@
         }
 
         // ============================================================
-        // UTILITY
+        // UTILITY FUNCTIONS
         // ============================================================
         function escapeHtml(text) {
             if (!text) return '';

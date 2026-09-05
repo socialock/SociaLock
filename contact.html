@@ -1,9 +1,54 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Contact Us - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Get in touch with the SociaLock team for support, partnership, security disclosures, or general questions about our developer and cybersecurity social network." />
+    <meta name="keywords" content="contact SociaLock, SociaLock support, developer network support, cybersecurity community contact" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/contact.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Contact Us - SociaLock" />
+    <meta property="og:description" content="Get in touch with the SociaLock team for support, partnership, security disclosures, or general questions about our developer and cybersecurity social network." />
+    <meta property="og:url" content="https://socialock.pages.dev/contact.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Contact Us - SociaLock" />
+    <meta name="twitter:description" content="Get in touch with the SociaLock team for support, partnership, security disclosures, or general questions about our developer and cybersecurity social network." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        "name": "Contact SociaLock",
+        "url": "https://socialock.pages.dev/contact.html",
+        "description": "Get in touch with the SociaLock team for support, partnership, security disclosures, or general questions about our developer and cybersecurity social network.",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "SociaLock",
+            "url": "https://socialock.pages.dev"
+        }
+    }
+    </script>
+    <!-- ===== SEO END ===== -->
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -46,6 +91,9 @@
         .channel-card i { font-size: 1.3rem; color: #1877f2; margin-bottom: 8px; display: block; }
         .channel-card .title { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
         .channel-card .sub { font-size: 0.75rem; color: #8a8d91; word-break: break-word; }
+
+        /* Telegram channel card override */
+        .channel-card.telegram i { color: #2aabee; }
 
         .contact-form { background: #242526; border: 1px solid #3a3b3c; border-radius: 14px; padding: 20px 18px; }
         .form-group { margin-bottom: 16px; }
@@ -106,7 +154,7 @@
 <body>
 
     <div class="back-header">
-        <a href="home.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <a href="home.html" class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></a>
         <div class="back-title">Contact Us</div>
     </div>
 
@@ -119,11 +167,13 @@
         </div>
 
         <div class="contact-channels">
-            <a href="mailto:support@socialock.app" class="channel-card">
-                <i class="fas fa-envelope"></i>
-                <div class="title">Email</div>
-                <div class="sub">support@socialock.app</div>
+            <!-- Telegram channel (replaces email) -->
+            <a href="https://t.me/Socialock1" target="_blank" class="channel-card telegram" id="telegramChannel">
+                <i class="fab fa-telegram-plane"></i>
+                <div class="title">Telegram</div>
+                <div class="sub">@Socialock1</div>
             </a>
+            <!-- Help Center remains -->
             <a href="help.html" class="channel-card">
                 <i class="fas fa-question-circle"></i>
                 <div class="title">Help Center</div>
@@ -156,13 +206,16 @@
             </div>
             <button type="submit" class="submit-btn" id="cSubmitBtn">Send Message</button>
         </form>
-        <div class="demo-note">This is a demo form — messages aren't sent to a live inbox yet.</div>
+        <div class="demo-note">Sent messages via telegram to get response</div>
     </div>
 
-    <script src="js/config.js"></script>
     <script>
+        // Contact Us is publicly accessible - no login required.
+        // If the visitor isn't logged in, send the back button to the
+        // login page instead of the (login-gated) home feed.
         if (!localStorage.getItem('userId')) {
-            window.location.href = 'login.html';
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) backBtn.setAttribute('href', 'login.html');
         }
 
         const messageInput = document.getElementById('cMessage');
@@ -185,6 +238,21 @@
                 btn.textContent = 'Send Message';
             }, 900);
         });
+
+        // Helper for alert (reused from original)
+        function showAlert(message, type = 'info') {
+            const existing = document.querySelector('.custom-alert');
+            if (existing) existing.remove();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `custom-alert ${type}`;
+            alertDiv.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">&times;</button>`;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                if (alertDiv.parentElement) alertDiv.remove();
+            }, 5000);
+        }
     </script>
 </body>
 </html>

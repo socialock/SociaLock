@@ -1,9 +1,40 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Home - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Your SociaLock feed: posts, tools, and updates from the developer and cybersecurity community." />
+    <meta name="keywords" content="SociaLock feed, developer posts, cybersecurity feed" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/home.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Home - SociaLock" />
+    <meta property="og:description" content="Your SociaLock feed: posts, tools, and updates from the developer and cybersecurity community." />
+    <meta property="og:url" content="https://socialock.pages.dev/home.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Home - SociaLock" />
+    <meta name="twitter:description" content="Your SociaLock feed: posts, tools, and updates from the developer and cybersecurity community." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <!-- ===== SEO END ===== -->
     
     <!-- ===== FIREBASE CDN ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -11,7 +42,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ===== আপনার আগের CSS ===== */
+        /* ===== CSS ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; overflow-x: hidden; padding-top: 0; }
 
@@ -23,7 +54,7 @@
             width: 100%;
             z-index: 1000;
             border-bottom: 1px solid #3a3b3c;
-            height: 48px;
+            height: 58px;
             display: flex;
             align-items: center;
         }
@@ -37,12 +68,12 @@
             gap: 8px;
         }
         .nav-left { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .nav-brand { font-size: 1.3rem; font-weight: 700; color: #1877f2; cursor: pointer; display: flex; align-items: center; white-space: nowrap; }
+        .nav-brand { font-size: 1.3rem; font-weight: 700; color: #1877f2; cursor: default; display: flex; align-items: center; white-space: nowrap; }
         .menu-toggle-btn { background: none; border: none; font-size: 1.4rem; color: #b0b3b8; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; }
         .menu-toggle-btn:hover { background: #3a3b3c; }
 
         .nav-search { flex: 1; max-width: 600px; position: relative; margin: 0 12px; }
-        .nav-search input { width: 100%; padding: 10px 16px 10px 44px; border-radius: 24px; border: 1px solid #3a3b3c; background: #3a3b3c; color: #e4e6eb; font-size: 16px; outline: none; cursor: pointer; height: 44px; }
+        .nav-search input { width: 100%; padding: 10px 16px 10px 44px; border-radius: 24px; border: 1px solid #3a3b3c; background: #3a3b3c; color: #e4e6eb; font-size: 16px; outline: none; cursor: default; height: 44px; }
         .nav-search input:focus { border-color: #1877f2; background: #2a2a2a; }
         .nav-search .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #b0b3b8; font-size: 16px; pointer-events: none; }
 
@@ -54,11 +85,11 @@
             background: #242526;
             padding: 4px 8px;
             position: fixed;
-            top: 48px;
+            top: 58px;
             width: 100%;
             z-index: 999;
             border-bottom: 1px solid #3a3b3c;
-            height: 46px;
+            height: 54px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -94,13 +125,13 @@
         .search-fullscreen.show { display: flex; }
         .search-fullscreen .header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
         .search-fullscreen .close-btn { background: none; border: none; font-size: 1.6rem; color: #b0b3b8; cursor: pointer; padding: 6px 10px; border-radius: 50%; transition: 0.2s; }
-        .search-fullscreen .close-btn:hover { background: #3a3b3c; }
+        .search-fullscreen .close-btn:hover { background: transparent; }
         .search-fullscreen input { flex: 1; padding: 14px 20px; border-radius: 24px; border: 1px solid #3a3b3c; background: #2a2a2a; color: #e4e6eb; font-size: 18px; outline: none; height: 48px; }
         .search-fullscreen input::placeholder { color: #888; }
         .search-fullscreen input:focus { border-color: #1877f2; }
         .search-fullscreen .results { flex: 1; overflow-y: auto; margin-top: 8px; }
         .search-fullscreen .result-item { display: flex; align-items: center; padding: 10px 12px; cursor: pointer; border-radius: 6px; transition: 0.2s; font-size: 14px; }
-        .search-fullscreen .result-item:hover { background: #3a3b3c; }
+        .search-fullscreen .result-item:hover { background: transparent ; }
         .search-fullscreen .result-avatar { width: 40px; height: 40px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; flex-shrink: 0; margin-right: 12px; }
         .search-fullscreen .result-name { font-weight: 600; font-size: 15px; color: #e4e6eb; }
         .search-fullscreen .no-result { text-align: center; padding: 30px; color: #b0b3b8; font-size: 15px; }
@@ -135,7 +166,7 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
-            margin-top: 48px;
+            margin-top: 58px;
         }
         .sidemenu-header:hover { background: #3a3b3c; }
         .sidemenu-header .avatar { width: 44px; height: 44px; border-radius: 50%; background: #1877f2; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; flex-shrink: 0; }
@@ -160,7 +191,7 @@
         .sidemenu-body .menu-item.danger .icon { color: #e94560; }
         .sidemenu-footer { padding: 10px 14px; border-top: 1px solid #3a3b3c; font-size: 11px; color: #b0b3b8; text-align: center; }
 
-        .main-container { max-width: 680px; margin: 94px auto 16px; padding: 0 12px; }
+        .main-container { max-width: 680px; margin: 112px auto 16px; padding: 0 12px; }
         .create-post {
             background: #242526;
             border-radius: 10px;
@@ -218,7 +249,7 @@
         .post-more-menu a:hover { background: #3a3b3c; }
         .post-more-menu .danger { color: #e94560; }
 
-        .post-content { font-size: 15px; line-height: 1.5; margin-bottom: 10px; word-wrap: break-word; white-space: pre-wrap; color: #e4e6eb; }
+        .post-content { font-size: 15px; line-height: 1.5; margin-bottom: 10px; word-wrap: break-word; white-space: pre-wrap; color: #e4e6eb; -webkit-touch-callout: none; -webkit-user-select: text; user-select: text; }
         .post-content a { color: #1877f2; text-decoration: none; font-weight: 500; }
         .post-content a:hover { text-decoration: underline; }
 
@@ -269,7 +300,7 @@
         .loading-spinner { text-align: center; padding: 20px; color: #b0b3b8; font-size: 14px; }
         .no-posts { text-align: center; padding: 30px; color: #b0b3b8; font-size: 14px; }
 
-        /* ===== কাস্টম এলার্ট ===== */
+        /* ===== Custom alert ===== */
         .custom-alert {
             position: fixed;
             top: 100px;
@@ -288,7 +319,7 @@
         .custom-alert.info { background: #1877f2; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* ===== কাস্টম কনফর্ম মডাল ===== */
+        /* ===== Custom confirm modal ===== */
         .custom-modal-overlay {
             display: none;
             position: fixed;
@@ -355,18 +386,172 @@
         }
         .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
 
+        /* ===== SKELETON LOADER STYLES ===== */
+        .skeleton-wrapper {
+            background: #242526;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #3a3b3c;
+            overflow: hidden;
+        }
+        .skeleton-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .skeleton-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+        }
+        .skeleton-user-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .skeleton-line {
+            height: 12px;
+            border-radius: 6px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.medium { width: 80%; }
+        .skeleton-line.long { width: 100%; }
+        .skeleton-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        .skeleton-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .skeleton-actions {
+            display: flex;
+            gap: 6px;
+            padding: 4px 0;
+        }
+        .skeleton-btn {
+            flex: 1;
+            height: 36px;
+            border-radius: 6px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-top: 1px solid #3a3b3c;
+            border-bottom: 1px solid #3a3b3c;
+            margin-bottom: 6px;
+        }
+        .skeleton-stats span {
+            height: 14px;
+            width: 60px;
+            background: #3a3b3c;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-stats span::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-create {
+            background: #242526;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .skeleton-create-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-create-avatar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        .skeleton-create-input {
+            flex: 1;
+            height: 34px;
+            border-radius: 18px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-create-input::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
         @media (max-width: 480px) {
-            .navbar-top { height: 42px; padding: 4px 8px; }
-            .navbar-bottom { height: 42px; top: 42px; }
-            .nav-brand { font-size: 0.95rem; }
+            .navbar-top { height: 52px; padding: 4px 8px; }
+            .navbar-bottom { height: 50px; top: 52px; }
+            .nav-brand { font-size: 1.4rem; }
             .nav-search { max-width: 180px; }
-            .nav-search input { font-size: 13px; padding: 6px 10px 6px 34px; height: 34px; }
+            .nav-search input { font-size: 13px; padding: 6px 10px 6px 34px; height: 36px; }
             .nav-search .search-icon { font-size: 13px; left: 12px; }
-            .nav-icon-bottom { font-size: 1.3rem; padding: 2px 8px; }
-            .nav-icon-bottom .label { font-size: 0.5rem; }
+            .nav-icon-bottom { font-size: 1.5rem; padding: 4px 10px; }
+            .nav-icon-bottom .label { font-size: 0.58rem; }
             .sidemenu { width: 240px; left: -240px; }
-            .sidemenu-header { margin-top: 42px; }
-            .main-container { margin: 92px auto 12px; padding: 0 8px; }
+            .sidemenu-header { margin-top: 52px; }
+            .main-container { margin: 110px auto 12px; padding: 0 8px; }
             .post-action-btn { font-size: 13px; padding: 6px; }
             .post-action-btn svg { width: 18px; height: 18px; }
             .post-card { padding: 12px; }
@@ -376,7 +561,7 @@
             .create-post-input { font-size: 13px; padding: 6px 12px; }
             .search-fullscreen input { font-size: 16px; padding: 12px 16px; height: 44px; }
             .ad-card img { max-height: 120px; }
-            .custom-alert { top: 90px; }
+            .custom-alert { top: 100px; }
             .post-follow-btn { font-size: 12px; padding: 2px 8px; }
             .custom-modal { padding: 20px 16px; }
         }
@@ -395,9 +580,7 @@
                 <span class="search-icon"><i class="fas fa-search"></i></span>
                 <input type="text" id="searchInput" placeholder="Search users..." autocomplete="off" readonly>
             </div>
-            <div class="nav-right">
-                <button class="user-menu-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i></button>
-            </div>
+            
         </div>
     </nav>
 
@@ -436,13 +619,15 @@
             <a href="settings.html" class="menu-item" id="sideMenuSettings"><span class="icon"><i class="fas fa-cog"></i></span> Settings</a>
             <a href="contact.html" class="menu-item" id="sideMenuContact"><span class="icon"><i class="fas fa-envelope"></i></span> Contact</a>
             <a href="help.html" class="menu-item" id="sideMenuHelp"><span class="icon"><i class="fas fa-question-circle"></i></span> Help & Support</a>
+            <a href="privacypolicy.html" class="menu-item" id="sideMenuPrivacyPolicy"><span class="icon"><i class="fas fa-user-shield"></i></span> Privacy & Policy</a>
+            <a href="donate.html" class="menu-item" id="sideMenuDonate"><span class="icon"><i class="fas fa-heart"></i></span> Donate</a>
             <div class="menu-divider"></div>
             <a href="#" class="menu-item danger" id="sideMenuLogout"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Logout</a>
         </div>
-        <div class="sidemenu-footer"><i class="fas fa-comment-dots"></i> SociaLock v1.0</div>
+        <div class="sidemenu-footer"><i class="fas fa-comment-dots"></i> ©All rights reserved SociaLock 2026</div>
     </div>
 
-    <!-- ===== কাস্টম কনফর্ম মডাল ===== -->
+    <!-- ===== Custom confirm modal ===== -->
     <div class="custom-modal-overlay" id="customModal">
         <div class="custom-modal">
             <div class="modal-icon" id="modalIcon">⚠️</div>
@@ -457,13 +642,92 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-container">
-        <div class="create-post" onclick="window.location.href='createpost.html'">
+        <!-- ===== SKELETON CREATE POST (shown initially) ===== -->
+        <div class="skeleton-create" id="skeletonCreate">
+            <div class="skeleton-create-avatar"></div>
+            <div class="skeleton-create-input"></div>
+        </div>
+
+        <!-- ===== REAL CREATE POST (hidden initially) ===== -->
+        <div class="create-post" id="realCreatePost" style="display:none;" onclick="window.location.href='createpost.html'">
             <div class="create-post-header">
                 <div class="create-post-avatar" id="createPostAvatar">U</div>
-                <div class="create-post-input">What's on your mind?</div>
+                <div class="create-post-input">Why don't write thoughts ?</div>
             </div>
         </div>
-        <div id="postsContainer"><div class="loading-spinner">⏳ Loading posts...</div></div>
+
+        <!-- ===== SKELETON POSTS ===== -->
+        <div id="skeletonPostsContainer">
+            <div class="skeleton-wrapper">
+                <div class="skeleton-header">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-user-info">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                    </div>
+                </div>
+                <div class="skeleton-content">
+                    <div class="skeleton-line long"></div>
+                    <div class="skeleton-line long"></div>
+                    <div class="skeleton-line medium"></div>
+                </div>
+                <div class="skeleton-stats">
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="skeleton-actions">
+                    <div class="skeleton-btn"></div>
+                    <div class="skeleton-btn"></div>
+                </div>
+            </div>
+            <div class="skeleton-wrapper">
+                <div class="skeleton-header">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-user-info">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                    </div>
+                </div>
+                <div class="skeleton-content">
+                    <div class="skeleton-line long"></div>
+                    <div class="skeleton-line long"></div>
+                    <div class="skeleton-line medium"></div>
+                </div>
+                <div class="skeleton-stats">
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="skeleton-actions">
+                    <div class="skeleton-btn"></div>
+                    <div class="skeleton-btn"></div>
+                </div>
+            </div>
+            <div class="skeleton-wrapper">
+                <div class="skeleton-header">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-user-info">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                    </div>
+                </div>
+                <div class="skeleton-content">
+                    <div class="skeleton-line long"></div>
+                    <div class="skeleton-line long"></div>
+                    <div class="skeleton-line medium"></div>
+                </div>
+                <div class="skeleton-stats">
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="skeleton-actions">
+                    <div class="skeleton-btn"></div>
+                    <div class="skeleton-btn"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== REAL POSTS CONTAINER (hidden initially) ===== -->
+        <div id="postsContainer" style="display:none;"></div>
     </div>
 
     <!-- ===== SCRIPTS ===== -->
@@ -471,9 +735,8 @@
     <script src="js/firebase-config.js"></script>
     <script>
         // ============================================================
-        // HOME.JS - COMPLETE FIXED (কাস্টম কনফর্ম + অ্যাড ফিল্টার)
+        // HOME.JS - COMPLETE WITH SKELETON LOADING
         // ============================================================
-
 
         let currentUser = null;
         let allPosts = [];
@@ -488,7 +751,7 @@
         let verifiedUsers = [];
         let userLikedPosts = {};
 
-        // ===== কাস্টম কনফর্ম =====
+        // ===== Custom confirm =====
         let pendingResolve = null;
 
         function customConfirm(title, message, icon = '⚠️') {
@@ -577,14 +840,81 @@
             }
         }
 
+        // ============================================================
+        // SHARE POST (custom share sheet: copy link + social apps)
+        // ============================================================
+        function sharePost(postId, event) {
+            if (event) event.stopPropagation();
+            const url = window.location.origin + '/post.html?postId=' + postId;
+            window.openShareSheet({ title: 'SociaLock', text: 'Check out this post', url });
+        }
+        window.sharePost = sharePost;
+
         function togglePostMenu(postId) {
             const menu = document.getElementById('menu-post-' + postId);
             if (menu) menu.classList.toggle('show');
         }
 
         function reportPost(postId) {
-            showAlert('🚫 Post reported!', 'info');
+            const menu = document.getElementById('menu-post-' + postId);
+            if (menu) menu.classList.remove('show');
+
+            if (!currentUser) {
+                showAlert('Please login first!', 'error');
+                return;
+            }
+
+            window.openReportModal({ targetType: 'post', targetId: postId, itemLabel: 'post' });
         }
+
+        // ============================================================
+        // LONG-PRESS ON POST TEXT TO COPY
+        // ============================================================
+        (function setupLongPressCopy() {
+            let pressTimer = null;
+            let pressedEl = null;
+            const LONG_PRESS_MS = 500;
+
+            function startPress(el) {
+                pressedEl = el;
+                pressTimer = setTimeout(() => {
+                    const text = el.innerText || el.textContent || '';
+                    if (!text.trim()) return;
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            showAlert('✅ Text copied!', 'success');
+                        }).catch(() => {});
+                    }
+                    if (navigator.vibrate) { try { navigator.vibrate(30); } catch (e) {} }
+                }, LONG_PRESS_MS);
+            }
+
+            function cancelPress() {
+                if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                pressedEl = null;
+            }
+
+            document.addEventListener('touchstart', function(e) {
+                const target = e.target.closest('.post-content');
+                if (target) startPress(target);
+            }, { passive: true });
+            document.addEventListener('touchend', cancelPress);
+            document.addEventListener('touchmove', cancelPress);
+            document.addEventListener('touchcancel', cancelPress);
+
+            document.addEventListener('mousedown', function(e) {
+                const target = e.target.closest('.post-content');
+                if (target) startPress(target);
+            });
+            document.addEventListener('mouseup', cancelPress);
+            document.addEventListener('mouseleave', cancelPress);
+
+            // Prevent the native text-selection/context menu from
+            // interrupting the long-press-to-copy gesture on mobile.
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.closest('.post-content')) e.preventDefault();
+            });
+        })();
 
         // ============================================================
         // GET BLOCKED USERS
@@ -600,8 +930,7 @@
                     blockedUsers = result.data;
                     return blockedUsers;
                 }
-            } catch (err) {
-            }
+            } catch (err) {}
             blockedUsers = [];
             return [];
         }
@@ -622,8 +951,7 @@
                     followingUsers = result.data.map(u => u.id);
                     return followingUsers;
                 }
-            } catch (err) {
-            }
+            } catch (err) {}
             followingUsers = [];
             return [];
         }
@@ -643,8 +971,7 @@
                     verifiedUsers = result.data;
                     return verifiedUsers;
                 }
-            } catch (err) {
-            }
+            } catch (err) {}
             verifiedUsers = [];
             return [];
         }
@@ -731,7 +1058,7 @@
         }
 
         // ============================================================
-        // LOCAL FEED CACHE (Facebook-style: no reload on back navigation)
+        // LOCAL FEED CACHE (app-style: no reload on back navigation)
         // ============================================================
         const HOME_CACHE_KEY = 'homeFeedCache_v1';
         const HOME_SCROLL_KEY = 'homeScrollY_v1';
@@ -749,8 +1076,7 @@
                     savedAt: Date.now()
                 };
                 sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify(cache));
-            } catch (e) {
-            }
+            } catch (e) {}
         }
 
         function clearHomeCache() {
@@ -765,7 +1091,6 @@
         function restoreHomeScrollPosition() {
             const saved = parseInt(sessionStorage.getItem(HOME_SCROLL_KEY) || '0', 10);
             if (!saved) return;
-            // Wait for layout/images to settle before jumping to the saved position
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     window.scrollTo(0, saved);
@@ -777,16 +1102,33 @@
         window.refreshHomeFeed = async function() {
             clearHomeCache();
             window.scrollTo(0, 0);
+            showSkeleton();
             await loadPosts();
             saveHomeCache();
         };
 
         // ============================================================
+        // SKELETON CONTROLS
+        // ============================================================
+        function showSkeleton() {
+            document.getElementById('skeletonCreate').style.display = 'flex';
+            document.getElementById('skeletonPostsContainer').style.display = 'block';
+            document.getElementById('realCreatePost').style.display = 'none';
+            document.getElementById('postsContainer').style.display = 'none';
+        }
+
+        function hideSkeletonAndShowReal() {
+            document.getElementById('skeletonCreate').style.display = 'none';
+            document.getElementById('skeletonPostsContainer').style.display = 'none';
+            document.getElementById('realCreatePost').style.display = 'block';
+            document.getElementById('postsContainer').style.display = 'block';
+        }
+
+        // ============================================================
         // LOAD POSTS
         // ============================================================
         async function loadPosts() {
-            const container = document.getElementById('postsContainer');
-            container.innerHTML = '<div class="loading-spinner">⏳ Loading posts...</div>';
+            showSkeleton();
 
             try {
                 await getBlockedUsers();
@@ -798,14 +1140,18 @@
                 const result = await window.apiRequest('/posts');
 
                 if (!result || !result.success) {
+                    const container = document.getElementById('postsContainer');
                     container.innerHTML = '<div class="no-posts">❌ Failed to load posts</div>';
+                    hideSkeletonAndShowReal();
                     return;
                 }
 
                 let posts = result.data || [];
 
                 if (posts.length === 0) {
+                    const container = document.getElementById('postsContainer');
                     container.innerHTML = '<div class="no-posts">📝 No posts yet. Create one!</div>';
+                    hideSkeletonAndShowReal();
                     return;
                 }
 
@@ -821,22 +1167,33 @@
                 hasMorePosts = categorizedPosts.length === 50;
 
                 if (allPosts.length === 0) {
+                    const container = document.getElementById('postsContainer');
                     container.innerHTML = '<div class="no-posts">📝 No posts to show.</div>';
+                    hideSkeletonAndShowReal();
                     return;
                 }
 
+                const container = document.getElementById('postsContainer');
                 container.innerHTML = '';
                 await displayPostsWithAds(allPosts.slice(0, POSTS_PER_PAGE));
                 saveHomeCache();
 
+                hideSkeletonAndShowReal();
+
             } catch (error) {
+                const container = document.getElementById('postsContainer');
                 container.innerHTML = '<div class="no-posts">❌ Failed to load posts: ' + error.message + '</div>';
+                hideSkeletonAndShowReal();
             }
         }
 
         function categorizeAndMixPosts(posts) {
             if (!Array.isArray(posts)) return [];
 
+            // IMPORTANT: Do not filter out posts because of their category.
+            // Every eligible post must remain in the feed. Categories only
+            // control priority/probability of placement. Interacted posts
+            // are intentionally kept at the very bottom.
             const verifiedPosts = [];
             const followingPosts = [];
             const normalPosts = [];
@@ -847,10 +1204,7 @@
 
                 if (post.user_liked || post.user_interacted) {
                     interactedPosts.push(post);
-                    continue;
-                }
-
-                if (isVerified(post.user_id)) {
+                } else if (isVerified(post.user_id)) {
                     verifiedPosts.push(post);
                 } else if (isFollowing(post.user_id)) {
                     followingPosts.push(post);
@@ -859,24 +1213,46 @@
                 }
             }
 
-            const shuffledVerified = shuffleArray(verifiedPosts);
-            const shuffledFollowing = shuffleArray(followingPosts);
-            const shuffledNormal = shuffleArray(normalPosts);
+            // Shuffle every group first so the same posts do not appear in
+            // the same order after each manual/browser refresh.
+            shuffleArray(verifiedPosts);
+            shuffleArray(followingPosts);
+            shuffleArray(normalPosts);
+            shuffleArray(interactedPosts);
 
-            const total = shuffledVerified.length + shuffledFollowing.length + shuffledNormal.length;
-            if (total === 0) return [...interactedPosts];
+            // Weighted random selection without dropping anything.
+            // Verified > Following > Random/normal. The weights affect
+            // which category is selected next, while each category remains
+            // randomized. This prevents the old 30% slicing logic from
+            // throwing away posts when only a few posts are available.
+            const mixed = [];
+            const pools = [
+                { posts: verifiedPosts, weight: 5 },
+                { posts: followingPosts, weight: 4 },
+                { posts: normalPosts, weight: 3 }
+            ];
 
-            const targetVerified = Math.round(total * 0.3);
-            const targetFollowing = Math.round(total * 0.3);
-            const targetNormal = total - targetVerified - targetFollowing;
+            while (pools.some(group => group.posts.length > 0)) {
+                const available = pools.filter(group => group.posts.length > 0);
+                const totalWeight = available.reduce((sum, group) => sum + group.weight, 0);
+                let pick = Math.random() * totalWeight;
+                let selectedGroup = available[available.length - 1];
 
-            const selectedVerified = shuffledVerified.slice(0, targetVerified);
-            const selectedFollowing = shuffledFollowing.slice(0, targetFollowing);
-            const selectedNormal = shuffledNormal.slice(0, targetNormal);
+                for (const group of available) {
+                    pick -= group.weight;
+                    if (pick < 0) {
+                        selectedGroup = group;
+                        break;
+                    }
+                }
 
-            let mixed = [...selectedVerified, ...selectedFollowing, ...selectedNormal];
-            mixed = shuffleArray(mixed);
+                // Take a random post from the selected priority group.
+                const index = Math.floor(Math.random() * selectedGroup.posts.length);
+                mixed.push(selectedGroup.posts.splice(index, 1)[0]);
+            }
 
+            // Interacted/liked posts always come after all non-interacted
+            // posts, but their internal order is still randomized.
             return [...mixed, ...interactedPosts];
         }
 
@@ -907,7 +1283,6 @@
             if (!container) return;
 
             if (!Array.isArray(posts) || posts.length === 0) {
-                container.innerHTML = '<div class="no-posts">📝 No posts to show.</div>';
                 return;
             }
 
@@ -978,8 +1353,8 @@
                     <div style="position:relative;">
                         <button class="post-more-btn" onclick="togglePostMenu('${post.id}')">•••</button>
                         <div class="post-more-menu" id="menu-post-${post.id}">
-                            <a onclick="copyPostLink('${post.id}')">🔗 Copy Link</a>
-                            ${isOwner ? `<a class="danger" onclick="deletePost('${post.id}')">🗑️ Delete</a>` : ''}
+                            <a onclick="copyPostLink('${post.id}')"> Copy Link</a>
+                            ${isOwner ? `<a class="danger" onclick="deletePost('${post.id}')">Delete</a>` : ''}
                             ${!isOwner ? `<a onclick="reportPost('${post.id}')">🚫 Report</a>` : ''}
                         </div>
                     </div>
@@ -998,6 +1373,10 @@
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg>
                         <span>Comment</span>
                     </button>
+                    <button class="post-action-btn" onclick="sharePost('${post.id}', event)">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L7.04 9.81C6.5 9.31 5.79 9 5 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                        <span>Share</span>
+                    </button>
                 </div>
             `;
 
@@ -1005,7 +1384,7 @@
         }
 
         // ============================================================
-        // TOGGLE LIKE - FIXED (লাইক করলে নোটিফিকেশন যাবে)
+        // TOGGLE LIKE
         // ============================================================
         window.toggleLike = async function(postId, btnElement) {
             if (!currentUser) {
@@ -1026,12 +1405,9 @@
 
             try {
                 if (isLiked) {
-                    // UNLIKE
                     const result = await window.apiRequest(`/posts/${postId}/like`, {
                         method: 'DELETE',
-                        body: JSON.stringify({ 
-                            user_id: currentUser.id 
-                        })
+                        body: JSON.stringify({ user_id: currentUser.id })
                     });
 
                     if (result && result.success) {
@@ -1049,13 +1425,9 @@
                         showAlert('Failed to unlike!', 'error');
                     }
                 } else {
-                    // ✅ LIKE (নোটিফিকেশন যাবে)
                     const result = await window.apiRequest(`/posts/${postId}/like`, {
                         method: 'POST',
-                        body: JSON.stringify({ 
-                            user_id: currentUser.id,
-                            username: currentUser.username  // ← Actor username for notification
-                        })
+                        body: JSON.stringify({ user_id: currentUser.id, username: currentUser.username })
                     });
 
                     if (result && result.success) {
@@ -1082,10 +1454,10 @@
         };
 
         // ============================================================
-        // DELETE POST - কাস্টম কনফর্ম সহ
+        // DELETE POST
         // ============================================================
         window.deletePost = async function(postId) {
-            const ok = await customConfirm('Delete Post', 'Are you sure you want to delete this post? This action cannot be undone.', '🗑️');
+            const ok = await customConfirm('Delete Post', 'Are you sure you want to delete this post? This action cannot be undone.', '');
             if (!ok) return;
 
             try {
@@ -1108,18 +1480,17 @@
         };
 
         // ============================================================
-        // GET RANDOM AD (কান্ট্রি + Global সমর্থন)
+        // GET RANDOM AD
         // ============================================================
         async function getRandomAd() {
             try {
                 const country = currentUser?.country || 'Bangladesh';
-                // API ইতিমধ্যে target_country = ? OR target_country = "Global" হ্যান্ডেল করে
                 const result = await window.apiRequest(`/ads?country=${country}`);
                 if (result && result.success && result.data.length > 0) {
                     const ads = result.data;
                     return ads[Math.floor(Math.random() * ads.length)];
                 }
-            } catch (e) { }
+            } catch (e) {}
             return null;
         }
 
@@ -1147,7 +1518,7 @@
                 if (result && result.success) {
                     return result.data || [];
                 }
-            } catch (e) { }
+            } catch (e) {}
             return [];
         }
 
@@ -1195,6 +1566,7 @@
             if (typeof window.apiRequest !== 'function') {
                 document.getElementById('postsContainer').innerHTML = 
                     '<div class="no-posts" style="color:#e94560;">❌ Configuration error! Please refresh the page.</div>';
+                hideSkeletonAndShowReal();
                 return;
             }
 
@@ -1219,6 +1591,21 @@
                 
                 if (result && result.success && result.data) {
                     currentUser = result.data;
+
+                    // A user banned mid-session must be signed out immediately -
+                    // they can't view or use the app anymore.
+                    if (currentUser.is_banned) {
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('cachedUser');
+                        if (window.signOutUser) { try { await window.signOutUser(); } catch (e) {} }
+                        showAlert(currentUser.ban_reason
+                            ? `Your account has been banned. Reason: ${currentUser.ban_reason}`
+                            : 'Your account has been banned.', 'error');
+                        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+                        return;
+                    }
+
                     localStorage.setItem('cachedUser', JSON.stringify(currentUser));
 
                     document.getElementById('createPostAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
@@ -1253,28 +1640,43 @@
                 return;
             }
 
+            // ===== Browser/Pull-to-Refresh =====
+            // A real browser reload (including Android pull-to-refresh)
+            // starts a fresh randomized feed instead of restoring the old
+            // session cache. Normal in-app navigation still keeps the cache.
+            let isBrowserReload = false;
+            try {
+                const navigation = performance.getEntriesByType('navigation')[0];
+                isBrowserReload = navigation && navigation.type === 'reload';
+            } catch (e) {}
 
-            // ===== Restore feed from local cache instead of reloading =====
+            if (isBrowserReload) {
+                clearHomeCache();
+            }
+
+            // ===== Restore feed from local cache =====
             let restoredFromCache = false;
             const cachedFeed = sessionStorage.getItem(HOME_CACHE_KEY);
             if (cachedFeed) {
                 try {
                     const cache = JSON.parse(cachedFeed);
                     if (cache && cache.html) {
-                        document.getElementById('postsContainer').innerHTML = cache.html;
+                        const container = document.getElementById('postsContainer');
+                        container.innerHTML = cache.html;
+                        container.style.display = 'block';
+                        document.getElementById('realCreatePost').style.display = 'block';
+                        document.getElementById('skeletonCreate').style.display = 'none';
+                        document.getElementById('skeletonPostsContainer').style.display = 'none';
                         allPosts = cache.allPosts || [];
                         currentPage = cache.currentPage || 1;
                         hasMorePosts = cache.hasMorePosts !== undefined ? cache.hasMorePosts : true;
                         userLikedPosts = cache.userLikedPosts || {};
                         restoredFromCache = true;
                     }
-                } catch (e) {
-                }
+                } catch (e) {}
             }
 
             if (restoredFromCache) {
-                // Refresh blocked/following/verified lists quietly in the background
-                // (used for future like/follow actions) without touching the displayed feed
                 getBlockedUsers();
                 getFollowingUsers();
                 getVerifiedUsers();
@@ -1319,13 +1721,10 @@
                         await loadMorePosts();
                     }
                 }
-                // Continuously remember scroll position so a later back-navigation
-                // can return to exactly where the user was
                 if (scrollSaveTimeout) clearTimeout(scrollSaveTimeout);
                 scrollSaveTimeout = setTimeout(saveHomeScrollPosition, 150);
             }, { passive: true });
 
-            // Save scroll position right before the page is navigated away from
             document.addEventListener('visibilitychange', function() {
                 if (document.visibilityState === 'hidden') saveHomeScrollPosition();
             });
@@ -1376,7 +1775,7 @@
                 });
             }
 
-            setInterval(updateNotifBadge, 30000);
+            setInterval(updateNotifBadge, 120000);
 
         });
 

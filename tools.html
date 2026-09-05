@@ -1,21 +1,76 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>🔧 Tools - SociaLock</title>
-    
-    <!-- ===== ✅ FIREBASE CDN (সবার আগে) ===== -->
+
+    <title>Tools - SociaLock</title>
+
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Discover and share developer utilities and cybersecurity tools with the SociaLock community." />
+    <meta name="keywords" content="developer tools, cybersecurity tools, security utilities, SociaLock tools" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/tools.html" />
+
+    <meta name="theme-color" content="#1877f2" />
+
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="🔧 Tools - SociaLock" />
+    <meta property="og:description" content="Discover and share developer utilities and cybersecurity tools with the SociaLock community." />
+    <meta property="og:url" content="https://socialock.pages.dev/tools.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="🔧 Tools - SociaLock" />
+    <meta name="twitter:description" content="Discover and share developer utilities and cybersecurity tools with the SociaLock community." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+
+    <!-- ===== FIREBASE CDN ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; }
-        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; display: flex; flex-direction: column; padding-top: 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            background: #18191a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #e4e6eb;
+            display: flex;
+            flex-direction: column;
+            padding-top: 0;
+        }
 
         /* ===== BOTTOM NAVBAR ===== */
+
         .navbar-bottom {
             background: #242526;
             padding: 4px 8px;
@@ -24,11 +79,12 @@
             width: 100%;
             z-index: 999;
             border-bottom: 1px solid #3a3b3c;
-            height: 46px;
+            height: 54px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+
         .nav-bottom-container {
             max-width: 600px;
             margin: 0 auto;
@@ -37,6 +93,7 @@
             align-items: center;
             width: 100%;
         }
+
         .nav-icon-bottom {
             font-size: 1.7rem;
             text-decoration: none;
@@ -50,8 +107,15 @@
             align-items: center;
             gap: 1px;
         }
-        .nav-icon-bottom:hover { background: #3a3b3c; }
-        .nav-icon-bottom.active { color: #1877f2; }
+
+        .nav-icon-bottom:hover {
+            background: #3a3b3c;
+        }
+
+        .nav-icon-bottom.active {
+            color: #1877f2;
+        }
+
         .nav-icon-bottom.active::after {
             content: '';
             position: absolute;
@@ -62,8 +126,16 @@
             background: #1877f2;
             border-radius: 2px;
         }
-        .nav-icon-bottom .label { font-size: 0.6rem; font-weight: 500; color: #b0b3b8; }
-        .nav-icon-bottom.active .label { color: #1877f2; }
+
+        .nav-icon-bottom .label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #b0b3b8;
+        }
+
+        .nav-icon-bottom.active .label {
+            color: #1877f2;
+        }
 
         .notif-badge {
             position: absolute;
@@ -84,15 +156,19 @@
             line-height: 1;
             z-index: 5;
         }
-        .notif-badge.show { display: flex; }
+
+        .notif-badge.show {
+            display: flex;
+        }
 
         .main-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            margin-top: 46px;
+            margin-top: 54px;
         }
+
         .main-container {
             max-width: 700px;
             width: 100%;
@@ -113,8 +189,25 @@
             border-bottom: 1px solid #3a3b3c;
             margin-bottom: 12px;
         }
-        .tools-header h2 { font-size: 1.3rem; color: #e4e6eb; }
-        .tools-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        .tools-header h2 {
+            font-size: 1.3rem;
+            color: #e4e6eb;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tools-header h2 i {
+            color: #1877f2;
+        }
+
+        .tools-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
         .tools-actions button {
             background: #1877f2;
             border: none;
@@ -129,7 +222,15 @@
             gap: 0.3rem;
             white-space: nowrap;
         }
-        .tools-actions button:hover { background: #166fe5; transform: scale(1.02); }
+
+        .tools-actions button:hover {
+            background: #166fe5;
+            transform: scale(1.02);
+        }
+
+        .tools-actions button i {
+            font-size: 0.8rem;
+        }
 
         .search-tools {
             width: 100%;
@@ -142,8 +243,14 @@
             margin-bottom: 0.8rem;
             outline: none;
         }
-        .search-tools:focus { border-color: #1877f2; }
-        .search-tools::placeholder { color: #b0b3b8; }
+
+        .search-tools:focus {
+            border-color: #1877f2;
+        }
+
+        .search-tools::placeholder {
+            color: #b0b3b8;
+        }
 
         .filter-bar {
             display: flex;
@@ -153,6 +260,7 @@
             padding: 0.5rem 0;
             border-bottom: 1px solid #3a3b3c;
         }
+
         .filter-chip {
             background: #3a3b3c;
             padding: 0.3rem 0.8rem;
@@ -163,9 +271,25 @@
             transition: 0.3s;
             color: #b0b3b8;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        .filter-chip:hover { border-color: #1877f2; color: #e4e6eb; }
-        .filter-chip.active { background: #1877f2; color: white; border-color: #1877f2; }
+
+        .filter-chip:hover {
+            border-color: #1877f2;
+            color: #e4e6eb;
+        }
+
+        .filter-chip.active {
+            background: #1877f2;
+            color: white;
+            border-color: #1877f2;
+        }
+
+        .filter-chip i {
+            font-size: 0.85rem;
+        }
 
         .tools-list {
             display: flex;
@@ -173,6 +297,7 @@
             gap: 0.8rem;
             margin-top: 0.5rem;
         }
+
         .tool-item {
             background: #242526;
             padding: 0.8rem 1rem;
@@ -184,9 +309,27 @@
             transition: 0.3s;
             border: 1px solid #3a3b3c;
         }
-        .tool-item:hover { background: #2a2b2c; border-color: #4a4b4c; }
-        .tool-info { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }
-        .tool-name { font-weight: bold; font-size: 1rem; word-break: break-word; color: #e4e6eb; }
+
+        .tool-item:hover {
+            background: #2a2b2c;
+            border-color: #4a4b4c;
+        }
+
+        .tool-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tool-name {
+            font-weight: bold;
+            font-size: 1rem;
+            word-break: break-word;
+            color: #e4e6eb;
+        }
+
         .tool-type {
             font-size: 0.7rem;
             color: #b0b3b8;
@@ -196,7 +339,40 @@
             display: inline-block;
             width: fit-content;
         }
-        .tool-actions { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; margin-left: 0.5rem; }
+
+        .tool-hot-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #ff512f, #f09819);
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            width: fit-content;
+        }
+
+        .tool-item.is-hot {
+            border-color: #f09819;
+        }
+
+        .tool-views-badge {
+            font-size: 0.65rem;
+            color: #8b98a8;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tool-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 0.5rem;
+        }
+
         .tool-share-btn {
             background: none;
             border: none;
@@ -207,7 +383,12 @@
             border-radius: 50%;
             transition: 0.3s;
         }
-        .tool-share-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        .tool-share-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
         .tool-delete-btn {
             background: #e94560;
             border: none;
@@ -216,8 +397,30 @@
             border-radius: 15px;
             font-size: 0.7rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        .tool-delete-btn:hover { background: #ff4757; }
+
+        .tool-delete-btn:hover {
+            background: #ff4757;
+        }
+
+        .tool-report-btn {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .tool-report-btn:hover {
+            background: rgba(233,69,96,0.15);
+            color: #e94560;
+        }
 
         .tools-ad-card {
             background: linear-gradient(135deg, #1a237e, #0d47a1);
@@ -228,10 +431,34 @@
             border: 1px solid #3a3b3c;
             transition: 0.3s;
         }
-        .tools-ad-card:hover { transform: scale(1.01); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .tools-ad-card a { color: white; text-decoration: none; display: flex; align-items: center; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
-        .tools-ad-card img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #0a0a1a; }
-        .tools-ad-card .ad-caption { font-size: 0.8rem; font-weight: 500; }
+
+        .tools-ad-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .tools-ad-card a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tools-ad-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #0a0a1a;
+        }
+
+        .tools-ad-card .ad-caption {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
 
         .my-tools-section {
             margin-top: 1.5rem;
@@ -239,10 +466,35 @@
             border-top: 2px solid #1877f2;
             display: none;
         }
-        .my-tools-section.show { display: block; }
-        .my-tools-section h3 { font-size: 1.1rem; color: #e4e6eb; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
-        .my-tools-section .tools-list { background: #18191a; border-radius: 12px; padding: 0.5rem; }
-        .my-tools-section .no-tools { text-align: center; padding: 1.5rem; color: #b0b3b8; }
+
+        .my-tools-section.show {
+            display: block;
+        }
+
+        .my-tools-section h3 {
+            font-size: 1.1rem;
+            color: #e4e6eb;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .my-tools-section h3 i {
+            color: #1877f2;
+        }
+
+        .my-tools-section .tools-list {
+            background: #18191a;
+            border-radius: 12px;
+            padding: 0.5rem;
+        }
+
+        .my-tools-section .no-tools {
+            text-align: center;
+            padding: 1.5rem;
+            color: #b0b3b8;
+        }
 
         .see-more-btn {
             background: #1877f2;
@@ -257,8 +509,18 @@
             display: block;
             width: fit-content;
         }
-        .see-more-btn:hover { background: #166fe5; transform: scale(1.02); }
-        .see-more-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .see-more-btn:hover {
+            background: #166fe5;
+            transform: scale(1.02);
+        }
+
+        .see-more-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== MODAL ===== */
 
         .modal-overlay {
             display: none;
@@ -273,7 +535,11 @@
             justify-content: center;
             padding: 1rem;
         }
-        .modal-overlay.open { display: flex; }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
         .modal-box {
             background: #242526;
             padding: 1.5rem;
@@ -284,8 +550,23 @@
             overflow-y: auto;
             border: 1px solid #3a3b3c;
         }
-        .modal-box h3 { margin-bottom: 1rem; text-align: center; color: #e4e6eb; }
-        .modal-box input, .modal-box select {
+
+        .modal-box h3 {
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #e4e6eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .modal-box h3 i {
+            color: #1877f2;
+        }
+
+        .modal-box input,
+        .modal-box select {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 0.8rem;
@@ -296,17 +577,76 @@
             font-size: 0.95rem;
             outline: none;
         }
-        .modal-box input:focus, .modal-box select:focus { border-color: #1877f2; }
-        .modal-box input::placeholder { color: #b0b3b8; }
-        .modal-box .btn-row { display: flex; gap: 0.5rem; }
-        .modal-box .btn-row button { flex: 1; padding: 0.6rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
-        .btn-primary-modal { background: #1877f2; color: white; }
-        .btn-primary-modal:hover { background: #166fe5; }
-        .btn-danger-modal { background: #e94560; color: white; }
-        .btn-danger-modal:hover { background: #ff4757; }
 
-        .no-tools { text-align: center; padding: 2rem; color: #b0b3b8; }
-        .loading-spinner { text-align: center; padding: 2rem; color: #b0b3b8; }
+        .modal-box input:focus,
+        .modal-box select:focus {
+            border-color: #1877f2;
+        }
+
+        .modal-box input::placeholder {
+            color: #b0b3b8;
+        }
+
+        .modal-box .btn-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal-box .btn-row button {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary-modal {
+            background: #1877f2;
+            color: white;
+        }
+
+        .btn-primary-modal:hover {
+            background: #166fe5;
+        }
+
+        .btn-danger-modal {
+            background: #e94560;
+            color: white;
+        }
+
+        .btn-danger-modal:hover {
+            background: #ff4757;
+        }
+
+        .no-tools {
+            text-align: center;
+            padding: 2rem;
+            color: #b0b3b8;
+        }
+
+        .no-tools i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b3b8;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: #b0b3b8;
+        }
+
+        .loading-spinner i {
+            margin-right: 8px;
+        }
+
+        /* ===== ALERT ===== */
 
         .custom-alert {
             position: fixed;
@@ -320,29 +660,41 @@
             max-width: 400px;
             margin: 0 auto;
             animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .custom-alert.success { background: #4caf50; }
-        .custom-alert.error { background: #e94560; }
-        .custom-alert.info { background: #1877f2; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        @media (max-width: 480px) {
-            .navbar-bottom { height: 42px; }
-            .nav-icon-bottom { font-size: 1.3rem; padding: 2px 8px; }
-            .nav-icon-bottom .label { font-size: 0.5rem; }
-            .main-wrapper { margin-top: 42px; }
-            .main-container { padding: 0 10px; }
-            .tools-header h2 { font-size: 1.1rem; }
-            .tools-actions button { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
-            .filter-chip { font-size: 0.6rem; padding: 0.2rem 0.6rem; }
-            .tool-item { padding: 0.6rem 0.8rem; }
-            .tool-name { font-size: 0.9rem; }
-            .tools-ad-card a { font-size: 0.75rem; }
-            .tools-ad-card img { width: 40px; height: 40px; }
-            .my-tools-section .tools-list { padding: 0.3rem; }
+        .custom-alert.success {
+            background: #4caf50;
         }
-    
-        /* ===== কাস্টম কনফার্ম মডাল ===== */
+
+        .custom-alert.error {
+            background: #e94560;
+        }
+
+        .custom-alert.info {
+            background: #1877f2;
+        }
+
+        .custom-alert i {
+            font-size: 1rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== CONFIRM MODAL ===== */
+
         .custom-modal-overlay {
             display: none;
             position: fixed;
@@ -356,7 +708,11 @@
             align-items: center;
             backdrop-filter: blur(4px);
         }
-        .custom-modal-overlay.show { display: flex; }
+
+        .custom-modal-overlay.show {
+            display: flex;
+        }
+
         .custom-modal {
             background: #242526;
             border-radius: 16px;
@@ -367,28 +723,38 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.5);
             text-align: center;
         }
+
         .custom-modal .modal-icon {
             font-size: 2.8rem;
             color: #e94560;
             margin-bottom: 8px;
         }
+
+        .custom-modal .modal-icon i {
+            font-size: 2.8rem;
+            color: #e94560;
+        }
+
         .custom-modal h3 {
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 8px;
             color: #e4e6eb;
         }
+
         .custom-modal p {
             font-size: 0.95rem;
             color: #b0b3b8;
             margin-bottom: 20px;
             line-height: 1.4;
         }
+
         .custom-modal .modal-actions {
             display: flex;
             gap: 12px;
             justify-content: center;
         }
+
         .custom-modal .modal-actions button {
             padding: 8px 24px;
             border: none;
@@ -397,672 +763,3618 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+
         .custom-modal .modal-actions .btn-cancel {
             background: #3a3b3c;
             color: #b0b3b8;
         }
-        .custom-modal .modal-actions .btn-cancel:hover { background: #4a4b4c; }
+
+        .custom-modal .modal-actions .btn-cancel:hover {
+            background: #4a4b4c;
+        }
+
         .custom-modal .modal-actions .btn-danger {
             background: #e94560;
             color: white;
         }
-        .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
-    </style>
 
+        .custom-modal .modal-actions .btn-danger:hover {
+            background: #c62828;
+        }
+
+        /* ===== SKELETON ===== */
+
+        .skeleton-tool-item {
+            background: #242526;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #3a3b3c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skeleton-tool-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .skeleton-line {
+            height: 14px;
+            border-radius: 6px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-line.short {
+            width: 50%;
+        }
+
+        .skeleton-line.medium {
+            width: 70%;
+        }
+
+        .skeleton-line.long {
+            width: 90%;
+        }
+
+        .skeleton-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.05),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        .skeleton-tool-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 0.5rem;
+        }
+
+        .skeleton-btn-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-btn-circle::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.05),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-btn-rect {
+            width: 40px;
+            height: 24px;
+            border-radius: 15px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-btn-rect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.05),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-tools-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .skeleton-filter-chips {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+        }
+
+        .skeleton-chip {
+            height: 26px;
+            width: 60px;
+            border-radius: 20px;
+            background: #3a3b3c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-chip::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.05),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-search {
+            width: 100%;
+            height: 44px;
+            border-radius: 30px;
+            background: #3a3b3c;
+            margin-bottom: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-search::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.05),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* ===== TOOL DETAIL ===== */
+
+        .tool-detail-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.6);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .tool-detail-overlay.show {
+            display: flex;
+        }
+
+        .tool-detail-modal {
+            background: #242526;
+            border: 1px solid #3a3b3c;
+            border-radius: 16px;
+            padding: 26px 22px 20px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 8px 30px rgba(0,0,0,.5);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .tool-detail-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: #1877f2;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 14px;
+        }
+
+        .tool-detail-modal h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #e4e6eb;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .tool-detail-type {
+            display: inline-block;
+            background: #3a3b3c;
+            color: #b0b3b8;
+            font-size: .75rem;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
+        .tool-detail-domain {
+            font-size: .75rem;
+            color: #8b98a8;
+            margin-bottom: 18px;
+            word-break: break-all;
+        }
+
+        .tool-detail-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tool-detail-actions button {
+            border: none;
+            border-radius: 22px;
+            padding: 11px;
+            font-weight: 600;
+            font-size: .9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tool-detail-open {
+            background: #1877f2;
+            color: #fff;
+        }
+
+        .tool-detail-open:hover {
+            background: #166fe0;
+        }
+
+        .tool-detail-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tool-detail-row button {
+            flex: 1;
+            background: #3a3b3c;
+            color: #e4e6eb;
+        }
+
+        .tool-detail-row button:hover {
+            background: #4a4b4c;
+        }
+
+        .tool-detail-close {
+            background: transparent;
+            color: #8b98a8;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .navbar-bottom {
+                height: 50px;
+            }
+
+            .nav-icon-bottom {
+                font-size: 1.5rem;
+                padding: 4px 10px;
+            }
+
+            .nav-icon-bottom .label {
+                font-size: 0.58rem;
+            }
+
+            .main-wrapper {
+                margin-top: 50px;
+            }
+
+            .main-container {
+                padding: 0 10px;
+            }
+
+            .tools-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .tools-actions button {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            .filter-chip {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.6rem;
+            }
+
+            .filter-chip i {
+                font-size: 0.8rem;
+            }
+
+            .tool-item {
+                padding: 0.6rem 0.8rem;
+            }
+
+            .tool-name {
+                font-size: 0.9rem;
+            }
+
+            .tools-ad-card a {
+                font-size: 0.75rem;
+            }
+
+            .tools-ad-card img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .my-tools-section .tools-list {
+                padding: 0.3rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
+
     <!-- ===== BOTTOM NAVBAR ===== -->
+
     <nav class="navbar-bottom">
         <div class="nav-bottom-container">
-            <a href="home.html" class="nav-icon-bottom"><i class="fas fa-home"></i><span class="label">Home</span></a>
-            <a href="messages.html" class="nav-icon-bottom"><i class="fas fa-comment-dots"></i><span class="label">Messages</span></a>
-            <a href="tools.html" class="nav-icon-bottom active"><i class="fas fa-tools"></i><span class="label">Tools</span></a>
-            <a href="notifications.html" class="nav-icon-bottom"><i class="fas fa-bell"></i><span class="label">Notifications</span><span class="notif-badge" id="notifBadge">0</span></a>
-            <a href="#" class="nav-icon-bottom" id="profileNavBtn"><i class="fas fa-user-circle"></i><span class="label">Profile</span></a>
+
+            <a href="home.html" class="nav-icon-bottom">
+                <i class="fas fa-home"></i>
+                <span class="label">Home</span>
+            </a>
+
+            <a href="messages.html" class="nav-icon-bottom">
+                <i class="fas fa-comment-dots"></i>
+                <span class="label">Messages</span>
+            </a>
+
+            <a href="tools.html" class="nav-icon-bottom active">
+                <i class="fas fa-tools"></i>
+                <span class="label">Tools</span>
+            </a>
+
+            <a href="notifications.html" class="nav-icon-bottom">
+                <i class="fas fa-bell"></i>
+                <span class="label">Notifications</span>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </a>
+
+            <a href="#" class="nav-icon-bottom" id="profileNavBtn">
+                <i class="fas fa-user-circle"></i>
+                <span class="label">Profile</span>
+            </a>
+
         </div>
     </nav>
 
     <!-- ===== MAIN CONTENT ===== -->
+
     <div class="main-wrapper">
+
         <div class="main-container" id="toolsContainer">
+
             <div class="tools-header">
-                <h2>🔧 Tools</h2>
+
+                <h2>
+                    <i class="fas fa-tools"></i>
+                    Tools
+                </h2>
+
                 <div class="tools-actions">
-                    <button id="addToolBtn">➕ Add Tool</button>
-                    <button id="myToolsToggleBtn">📁 My Tools</button>
+
+                    <button id="addToolBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Tool
+                    </button>
+
+                    <button id="myToolsToggleBtn">
+                        <i class="fas fa-folder"></i>
+                        My Tools
+                    </button>
+
                 </div>
+
             </div>
 
-            <input type="text" class="search-tools" id="searchToolsInput" placeholder="🔍 Search tools by name...">
+            <!-- ===== SKELETON SEARCH ===== -->
 
-            <div class="filter-bar" id="filterBar">
-                <span class="filter-chip active" data-type="all">All</span>
-                <span class="filter-chip" data-type="Cyber Security">🛡️ Cyber</span>
-                <span class="filter-chip" data-type="Business">💼 Business</span>
-                <span class="filter-chip" data-type="Earn">💰 Earn</span>
-                <span class="filter-chip" data-type="Job">💼 Job</span>
-                <span class="filter-chip" data-type="Web">🌐 Web</span>
-                <span class="filter-chip" data-type="Video">🎥 Video</span>
-                <span class="filter-chip" data-type="Documents">📄 Docs</span>
-                <span class="filter-chip" data-type="Government">🏛️ Gov</span>
-                <span class="filter-chip" data-type="Data">📊 Data</span>
-                <span class="filter-chip" data-type="Secret">🔒 Secret</span>
-                <span class="filter-chip" data-type="Article">📰 Article</span>
-                <span class="filter-chip" data-type="Others">📌 Other</span>
+            <div id="skeletonSearch" class="skeleton-search"></div>
+
+            <!-- ===== REAL SEARCH ===== -->
+
+            <input
+                type="text"
+                class="search-tools"
+                id="searchToolsInput"
+                placeholder="🔍 Search tools by name..."
+                style="display:none;"
+            >
+
+            <!-- ===== SKELETON FILTER ===== -->
+
+            <div id="skeletonFilterChips" class="skeleton-filter-chips">
+
+                <div class="skeleton-chip"></div>
+                <div class="skeleton-chip"></div>
+                <div class="skeleton-chip"></div>
+                <div class="skeleton-chip"></div>
+                <div class="skeleton-chip"></div>
+                <div class="skeleton-chip"></div>
+                <div class="skeleton-chip"></div>
+
             </div>
 
-            <div class="tools-list" id="toolsList"><div class="loading-spinner">⏳ Loading tools...</div></div>
-            <button class="see-more-btn" id="seeMoreBtn">See More ↓</button>
+            <!-- ===== REAL FILTER ===== -->
+
+            <div class="filter-bar" id="filterBar" style="display:none;">
+
+                <span class="filter-chip active" data-type="all">
+                    <i class="fas fa-list"></i>
+                    All
+                </span>
+
+                <span class="filter-chip" data-type="Cyber Security">
+                    <i class="fas fa-shield-alt"></i>
+                    Cyber
+                </span>
+
+                <span class="filter-chip" data-type="Games">
+                    <i class="fas fa-gamepad"></i>
+                    Games
+                </span>
+
+                <span class="filter-chip" data-type="Business">
+                    <i class="fas fa-briefcase"></i>
+                    Business
+                </span>
+
+                <span class="filter-chip" data-type="Earn">
+                    <i class="fas fa-coins"></i>
+                    Earn
+                </span>
+
+                <span class="filter-chip" data-type="Job">
+                    <i class="fas fa-user-tie"></i>
+                    Job
+                </span>
+
+                <span class="filter-chip" data-type="Apk">
+                    <i class="fas fa-mobile-alt"></i>
+                    Apk
+                </span>
+
+                <span class="filter-chip" data-type="Video">
+                    <i class="fas fa-video"></i>
+                    Video
+                </span>
+
+                <span class="filter-chip" data-type="Documents">
+                    <i class="fas fa-file-alt"></i>
+                    Docs
+                </span>
+
+                <span class="filter-chip" data-type="Government">
+                    <i class="fas fa-landmark"></i>
+                    Gov
+                </span>
+
+                <span class="filter-chip" data-type="Data">
+                    <i class="fas fa-database"></i>
+                    Data
+                </span>
+
+                <span class="filter-chip" data-type="Secret">
+                    <i class="fas fa-user-secret"></i>
+                    Secret
+                </span>
+
+                <span class="filter-chip" data-type="Article">
+                    <i class="fas fa-newspaper"></i>
+                    Article
+                </span>
+
+                <span class="filter-chip" data-type="Others">
+                    <i class="fas fa-ellipsis-h"></i>
+                    Other
+                </span>
+
+            </div>
+
+            <!-- ===== SKELETON TOOLS ===== -->
+
+            <div id="skeletonToolsList" class="skeleton-tools-list">
+
+                <div class="skeleton-tool-item">
+                    <div class="skeleton-tool-info">
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-tool-actions">
+                        <div class="skeleton-btn-circle"></div>
+                        <div class="skeleton-btn-rect"></div>
+                    </div>
+                </div>
+
+                <div class="skeleton-tool-item">
+                    <div class="skeleton-tool-info">
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-tool-actions">
+                        <div class="skeleton-btn-circle"></div>
+                        <div class="skeleton-btn-rect"></div>
+                    </div>
+                </div>
+
+                <div class="skeleton-tool-item">
+                    <div class="skeleton-tool-info">
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-tool-actions">
+                        <div class="skeleton-btn-circle"></div>
+                        <div class="skeleton-btn-rect"></div>
+                    </div>
+                </div>
+
+                <div class="skeleton-tool-item">
+                    <div class="skeleton-tool-info">
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-tool-actions">
+                        <div class="skeleton-btn-circle"></div>
+                        <div class="skeleton-btn-rect"></div>
+                    </div>
+                </div>
+
+                <div class="skeleton-tool-item">
+                    <div class="skeleton-tool-info">
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="skeleton-tool-actions">
+                        <div class="skeleton-btn-circle"></div>
+                        <div class="skeleton-btn-rect"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== REAL TOOLS ===== -->
+
+            <div
+                class="tools-list"
+                id="toolsList"
+                style="display:none;"
+            ></div>
+
+            <button
+                class="see-more-btn"
+                id="seeMoreBtn"
+                style="display:none;"
+            >
+                See More
+                <i class="fas fa-chevron-down"></i>
+            </button>
+
+            <!-- ===== MY TOOLS ===== -->
 
             <div class="my-tools-section" id="myToolsSection">
-                <h3>📁 My Published Tools</h3>
-                <div class="tools-list" id="myToolsList"><div class="no-tools">You haven't published any tools yet</div></div>
+
+                <h3>
+                    <i class="fas fa-folder-open"></i>
+                    My Published Tools
+                </h3>
+
+                <div class="tools-list" id="myToolsList">
+                    <div class="no-tools">
+                        <i class="fas fa-inbox"></i>
+                        You haven't published any tools yet
+                    </div>
+                </div>
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- Add Tool Modal -->
+    <!-- ===== ADD TOOL MODAL ===== -->
+
     <div class="modal-overlay" id="addToolModal">
+
         <div class="modal-box">
-            <h3>➕ Publish New Tool</h3>
-            <input type="text" id="toolNameInput" placeholder="Tool Name *" maxlength="100">
+
+            <h3>
+                <i class="fas fa-plus-circle"></i>
+                Publish New Tool
+            </h3>
+
+            <input
+                type="text"
+                id="toolNameInput"
+                placeholder="Tool Name *"
+                maxlength="100"
+            >
+
             <select id="toolTypeSelect">
-                <option value="Cyber Security">🛡️ Cyber Security</option>
-                <option value="Business">💼 Business</option>
-                <option value="Earn">💰 Earn</option>
-                <option value="Job">💼 Job</option>
-                <option value="Web">🌐 Web</option>
-                <option value="Video">🎥 Video</option>
-                <option value="Documents">📄 Documents</option>
-                <option value="Government">🏛️ Government</option>
-                <option value="Data">📊 Data</option>
-                <option value="Secret">🔒 Secret</option>
-                <option value="Article">📰 Article</option>
-                <option value="Others">📌 Others</option>
+
+                <option value="Cyber Security">
+                    Cyber Security
+                </option>
+
+                <option value="Games">
+                    Games
+                </option>
+
+                <option value="Business">
+                    Business
+                </option>
+
+                <option value="Earn">
+                    Earn
+                </option>
+
+                <option value="Job">
+                    Job
+                </option>
+
+                <option value="Apk">
+                    Apk
+                </option>
+
+                <option value="Video">
+                    Video
+                </option>
+
+                <option value="Documents">
+                    Documents
+                </option>
+
+                <option value="Government">
+                    Government
+                </option>
+
+                <option value="Data">
+                    Data
+                </option>
+
+                <option value="Secret">
+                    Secret
+                </option>
+
+                <option value="Article">
+                    Article
+                </option>
+
+                <option value="Others">
+                    Others
+                </option>
+
             </select>
-            <input type="url" id="toolLinkInput" placeholder="Tool Link (https://...) *">
+
+            <input
+                type="url"
+                id="toolLinkInput"
+                placeholder="Tool Link (https://...) *"
+            >
+
             <div class="btn-row">
-                <button class="btn-primary-modal" id="publishToolBtn">📤 Publish</button>
-                <button class="btn-danger-modal" id="closeAddModalBtn">Close</button>
+
+                <button
+                    class="btn-primary-modal"
+                    id="publishToolBtn"
+                >
+                    <i class="fas fa-upload"></i>
+                    Publish
+                </button>
+
+                <button
+                    class="btn-danger-modal"
+                    id="closeAddModalBtn"
+                >
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+
             </div>
+
         </div>
+
+    </div>
+
+    <!-- ===== CONFIRM MODAL ===== -->
+
+    <div class="custom-modal-overlay" id="customModal">
+
+        <div class="custom-modal">
+
+            <div class="modal-icon" id="modalIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+
+            <h3 id="modalTitle">
+                Are you sure?
+            </h3>
+
+            <p id="modalMessage">
+                This action cannot be undone.
+            </p>
+
+            <div class="modal-actions">
+
+                <button
+                    class="btn-cancel"
+                    id="modalCancel"
+                >
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+
+                <button
+                    class="btn-danger"
+                    id="modalConfirm"
+                >
+                    <i class="fas fa-check"></i>
+                    OK
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== TOOL DETAIL MODAL ===== -->
+
+    <div class="tool-detail-overlay" id="toolDetailModal">
+
+        <div class="tool-detail-modal">
+
+            <div class="tool-detail-icon">
+                <i class="fas fa-wrench"></i>
+            </div>
+
+            <h3 id="toolDetailName">
+                Tool name
+            </h3>
+
+            <div
+                style="
+                    display:flex;
+                    gap:6px;
+                    align-items:center;
+                    justify-content:center;
+                    flex-wrap:wrap;
+                    margin-bottom:6px;
+                "
+            >
+
+                <span
+                    class="tool-detail-type"
+                    id="toolDetailType"
+                    style="margin-bottom:0;"
+                >
+                    Type
+                </span>
+
+                <span class="tool-views-badge">
+
+                    <i class="fas fa-eye"></i>
+
+                    <span id="toolDetailViewsCount">
+                        0
+                    </span>
+
+                    views
+
+                </span>
+
+            </div>
+
+            <div
+                class="tool-detail-domain"
+                id="toolDetailDomain"
+            ></div>
+
+            <div class="tool-detail-actions">
+
+                <button
+                    class="tool-detail-open"
+                    id="toolDetailOpenBtn"
+                >
+                    <i class="fas fa-external-link-alt"></i>
+                    Open Tool
+                </button>
+
+                <div class="tool-detail-row">
+
+                    <button id="toolDetailShareBtn">
+                        <i class="fas fa-share-alt"></i>
+                        Share
+                    </button>
+
+                    <button id="toolDetailReportBtn">
+                        <i class="fas fa-flag"></i>
+                        Report
+                    </button>
+
+                </div>
+
+                <button
+                    class="tool-detail-close"
+                    id="toolDetailCloseBtn"
+                >
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
     <!-- ===== SCRIPTS ===== -->
+
     <script src="js/config.js"></script>
     <script src="js/firebase-config.js"></script>
-    <!-- ===== কাস্টম কনফার্ম মডাল ===== -->
-    <div class="custom-modal-overlay" id="customModal">
-        <div class="custom-modal">
-            <div class="modal-icon" id="modalIcon">⚠️</div>
-            <h3 id="modalTitle">Are you sure?</h3>
-            <p id="modalMessage">This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button class="btn-cancel" id="modalCancel">Cancel</button>
-                <button class="btn-danger" id="modalConfirm">OK</button>
-            </div>
-        </div>
-    </div>
 
     <script>
-        // ===== কাস্টম কনফার্ম =====
+        // ============================================================
+        // CUSTOM CONFIRM
+        // ============================================================
+
         let pendingConfirmResolve = null;
-        function customConfirm(title, message, icon = '⚠️') {
+
+        function customConfirm(title, message) {
+
             return new Promise(function(resolve) {
-                document.getElementById('modalIcon').textContent = icon;
-                document.getElementById('modalTitle').textContent = title;
-                document.getElementById('modalMessage').textContent = message;
-                document.getElementById('customModal').classList.add('show');
+
+                const modalIcon =
+                    document.getElementById('modalIcon');
+
+                const modalTitle =
+                    document.getElementById('modalTitle');
+
+                const modalMessage =
+                    document.getElementById('modalMessage');
+
+                if (modalIcon) {
+                    modalIcon.innerHTML =
+                        '<i class="fas fa-exclamation-triangle"></i>';
+                }
+
+                if (modalTitle) {
+                    modalTitle.textContent = title;
+                }
+
+                if (modalMessage) {
+                    modalMessage.textContent = message;
+                }
+
+                document
+                    .getElementById('customModal')
+                    .classList.add('show');
+
                 pendingConfirmResolve = resolve;
+
             });
         }
-        document.getElementById('modalCancel').addEventListener('click', function() {
-            document.getElementById('customModal').classList.remove('show');
-            if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
-        });
-        document.getElementById('modalConfirm').addEventListener('click', function() {
-            document.getElementById('customModal').classList.remove('show');
-            if (pendingConfirmResolve) { pendingConfirmResolve(true); pendingConfirmResolve = null; }
-        });
-        document.getElementById('customModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                document.getElementById('customModal').classList.remove('show');
-                if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
-            }
-        });
 
+        document
+            .getElementById('modalCancel')
+            .addEventListener('click', function() {
+
+                document
+                    .getElementById('customModal')
+                    .classList.remove('show');
+
+                if (pendingConfirmResolve) {
+
+                    pendingConfirmResolve(false);
+                    pendingConfirmResolve = null;
+
+                }
+
+            });
+
+        document
+            .getElementById('modalConfirm')
+            .addEventListener('click', function() {
+
+                document
+                    .getElementById('customModal')
+                    .classList.remove('show');
+
+                if (pendingConfirmResolve) {
+
+                    pendingConfirmResolve(true);
+                    pendingConfirmResolve = null;
+
+                }
+
+            });
+
+        document
+            .getElementById('customModal')
+            .addEventListener('click', function(e) {
+
+                if (e.target === this) {
+
+                    this.classList.remove('show');
+
+                    if (pendingConfirmResolve) {
+
+                        pendingConfirmResolve(false);
+                        pendingConfirmResolve = null;
+
+                    }
+
+                }
+
+            });
 
         // ============================================================
-        // TOOLS.JS - COMPLETE (FIXED)
+        // GLOBAL VARIABLES
         // ============================================================
-
 
         let currentUser = null;
+
         let allTools = [];
+
         let myTools = [];
+
         let currentFilter = 'all';
+
         let searchQuery = '';
+
         let showingMyTools = false;
+
         let isLoading = false;
+
         let currentPage = 0;
+
         const TOOLS_PER_PAGE = 15;
+
         let hasMoreTools = true;
+
         let filteredTools = [];
+
         let allToolsAds = [];
 
-        const toolsListEl = document.getElementById('toolsList');
-        const myToolsListEl = document.getElementById('myToolsList');
-        const myToolsSection = document.getElementById('myToolsSection');
-        const searchInput = document.getElementById('searchToolsInput');
-        const filterBar = document.getElementById('filterBar');
-        const addToolBtn = document.getElementById('addToolBtn');
-        const myToolsToggleBtn = document.getElementById('myToolsToggleBtn');
-        const addModal = document.getElementById('addToolModal');
-        const closeAddModalBtn = document.getElementById('closeAddModalBtn');
-        const publishBtn = document.getElementById('publishToolBtn');
-        const toolNameInput = document.getElementById('toolNameInput');
-        const toolTypeSelect = document.getElementById('toolTypeSelect');
-        const toolLinkInput = document.getElementById('toolLinkInput');
-        const seeMoreBtn = document.getElementById('seeMoreBtn');
+        // ============================================================
+        // ELEMENTS
+        // ============================================================
+
+        const toolsListEl =
+            document.getElementById('toolsList');
+
+        const myToolsListEl =
+            document.getElementById('myToolsList');
+
+        const myToolsSection =
+            document.getElementById('myToolsSection');
+
+        const searchInput =
+            document.getElementById('searchToolsInput');
+
+        const filterBar =
+            document.getElementById('filterBar');
+
+        const addToolBtn =
+            document.getElementById('addToolBtn');
+
+        const myToolsToggleBtn =
+            document.getElementById('myToolsToggleBtn');
+
+        const addModal =
+            document.getElementById('addToolModal');
+
+        const closeAddModalBtn =
+            document.getElementById('closeAddModalBtn');
+
+        const publishBtn =
+            document.getElementById('publishToolBtn');
+
+        const toolNameInput =
+            document.getElementById('toolNameInput');
+
+        const toolTypeSelect =
+            document.getElementById('toolTypeSelect');
+
+        const toolLinkInput =
+            document.getElementById('toolLinkInput');
+
+        const seeMoreBtn =
+            document.getElementById('seeMoreBtn');
+
+        // ============================================================
+        // SKELETON CONTROLS
+        // ============================================================
+
+        function showSkeleton() {
+
+            document.getElementById(
+                'skeletonSearch'
+            ).style.display = 'block';
+
+            document.getElementById(
+                'skeletonFilterChips'
+            ).style.display = 'flex';
+
+            document.getElementById(
+                'skeletonToolsList'
+            ).style.display = 'flex';
+
+            document.getElementById(
+                'searchToolsInput'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'filterBar'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'toolsList'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'seeMoreBtn'
+            ).style.display = 'none';
+        }
+
+        function hideSkeletonAndShowReal() {
+
+            document.getElementById(
+                'skeletonSearch'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'skeletonFilterChips'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'skeletonToolsList'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'searchToolsInput'
+            ).style.display = 'block';
+
+            document.getElementById(
+                'filterBar'
+            ).style.display = 'flex';
+
+            document.getElementById(
+                'toolsList'
+            ).style.display = 'flex';
+
+            document.getElementById(
+                'seeMoreBtn'
+            ).style.display = 'block';
+        }
 
         // ============================================================
         // API REQUEST
         // ============================================================
+
         async function apiRequest(endpoint, options = {}) {
-            const url = `${window.API_BASE_URL}${endpoint}`;
-            const userId = localStorage.getItem('userId');
-            const headers = { 'Content-Type': 'application/json', ...options.headers };
-            if (userId) headers['Authorization'] = `Bearer ${userId}`;
+
+            const url =
+                `${window.API_BASE_URL}${endpoint}`;
+
+            const userId =
+                localStorage.getItem('userId');
+
+            const token =
+                localStorage.getItem('token');
+
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (token) {
+
+                headers['Authorization'] =
+                    `Bearer ${token}`;
+
+            } else if (userId) {
+
+                headers['Authorization'] =
+                    `Bearer ${userId}`;
+
+            }
+
             try {
-                const response = await fetch(url, { ...options, headers });
-                const data = await response.json();
+
+                const response =
+                    await fetch(url, {
+                        ...options,
+                        headers
+                    });
+
+                const data =
+                    await response
+                        .json()
+                        .catch(() => null);
+
                 if (!response.ok) {
-                    return null;
+
+                    console.warn(
+                        `[tools] API ${
+                            options.method || 'GET'
+                        } ${endpoint} failed (${response.status}):`,
+                        data && data.error
+                    );
+
+                    return data;
                 }
+
                 return data;
+
             } catch (error) {
+
+                console.warn(
+                    `[tools] API ${
+                        options.method || 'GET'
+                    } ${endpoint} network error:`,
+                    error
+                );
+
                 return null;
             }
         }
 
+        // ============================================================
+        // ALERT
+        // ============================================================
+
         function showAlert(message, type = 'info') {
-            const existing = document.querySelector('.custom-alert');
-            if (existing) existing.remove();
-            const alert = document.createElement('div');
-            alert.className = `custom-alert ${type}`;
-            alert.innerHTML = message + '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;">✕</button>';
+
+            const existing =
+                document.querySelector('.custom-alert');
+
+            if (existing) {
+                existing.remove();
+            }
+
+            const alert =
+                document.createElement('div');
+
+            alert.className =
+                `custom-alert ${type}`;
+
+            const icon =
+                type === 'success'
+                    ? '<i class="fas fa-check-circle"></i>'
+                    : type === 'error'
+                        ? '<i class="fas fa-exclamation-circle"></i>'
+                        : '<i class="fas fa-info-circle"></i>';
+
+            alert.innerHTML =
+                icon +
+                ' ' +
+                message +
+                '<button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;margin-left:10px;cursor:pointer;font-size:18px;"><i class="fas fa-times"></i></button>';
+
             document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 4000);
+
+            setTimeout(() => {
+
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+
+            }, 4000);
         }
 
+        // ============================================================
+        // HELPERS
+        // ============================================================
+
         function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
+
+            if (!text) {
+                return '';
+            }
+
+            const div =
+                document.createElement('div');
+
             div.textContent = text;
+
             return div.innerHTML;
         }
 
         function shuffleArray(array) {
-            if (!Array.isArray(array)) return [];
-            const shuffled = [...array];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+
+            if (!Array.isArray(array)) {
+                return [];
             }
+
+            const shuffled =
+                [...array];
+
+            for (
+                let i = shuffled.length - 1;
+                i > 0;
+                i--
+            ) {
+
+                const j =
+                    Math.floor(
+                        Math.random() * (i + 1)
+                    );
+
+                [
+                    shuffled[i],
+                    shuffled[j]
+                ] = [
+                    shuffled[j],
+                    shuffled[i]
+                ];
+            }
+
             return shuffled;
+        }
+
+        // ============================================================
+        // CATEGORY ORDER
+        // ============================================================
+
+        const TOOL_CATEGORY_ORDER = [
+            'Cyber Security',
+            'Games',
+            'Business',
+            'Earn',
+            'Job',
+            'Apk',
+            'Video',
+            'Documents',
+            'Government',
+            'Data',
+            'Secret',
+            'Article',
+            'Others'
+        ];
+
+        // ============================================================
+        // TOP TOOLS FOR SPECIFIC CATEGORY
+        // ============================================================
+
+        function getTopToolsForType(tools, type) {
+
+            return tools
+                .filter(t => t.type === type)
+                .sort(
+                    (a, b) =>
+                        (Number(b.views_count) || 0) -
+                        (Number(a.views_count) || 0)
+                )
+                .slice(0, 3);
+        }
+
+        // ============================================================
+        // HOT TOOLS
+        //
+        // IMPORTANT UPDATE:
+        //
+        // ALL:
+        //     পুরো tool list থেকে শুধু TOP 3 views = HOT
+        //
+        // SPECIFIC CATEGORY:
+        //     ওই category-এর TOP 3 views = HOT
+        //
+        // বাকি সব আগের মতো shuffle হবে।
+        // ============================================================
+
+        function computeHotAndRest(tools, filter) {
+
+            const hotSet = new Set();
+
+            let hotList = [];
+
+            if (filter === 'all') {
+
+                // ====================================================
+                // ALL FILTER
+                //
+                // আগে এখানে প্রতিটি category থেকে 3টি করে নেওয়া হতো।
+                //
+                // এখন পুরো list থেকে views অনুযায়ী শুধুমাত্র 3টি।
+                // ====================================================
+
+                hotList =
+                    [...tools]
+                        .sort(
+                            (a, b) =>
+                                (Number(b.views_count) || 0) -
+                                (Number(a.views_count) || 0)
+                        )
+                        .slice(0, 3);
+
+                hotList.forEach(tool => {
+                    hotSet.add(tool);
+                });
+
+            } else {
+
+                // ====================================================
+                // SPECIFIC CATEGORY
+                //
+                // আগের logic অপরিবর্তিত।
+                // ====================================================
+
+                hotList =
+                    getTopToolsForType(
+                        tools,
+                        filter
+                    );
+
+                hotList.forEach(tool => {
+                    hotSet.add(tool);
+                });
+            }
+
+            // ========================================================
+            // REMAINING TOOLS
+            // ========================================================
+
+            const rest =
+                tools.filter(
+                    tool => !hotSet.has(tool)
+                );
+
+            return {
+                hotList,
+                rest
+            };
+        }
+
+        // ============================================================
+        // VIEWER KEY
+        // ============================================================
+
+        function getViewerKey() {
+
+            let key =
+                localStorage.getItem('viewerKey');
+
+            if (!key) {
+
+                key =
+                    (
+                        typeof crypto !== 'undefined' &&
+                        crypto.randomUUID
+                    )
+                        ? crypto.randomUUID()
+                        : `v-${Date.now()}-${Math.random()
+                            .toString(36)
+                            .slice(2)}`;
+
+                localStorage.setItem(
+                    'viewerKey',
+                    key
+                );
+            }
+
+            return key;
+        }
+
+        // ============================================================
+        // RECORD TOOL VIEW
+        // ============================================================
+
+        async function recordToolView(toolId) {
+
+            if (
+                toolId == null ||
+                String(toolId).trim() === ''
+            ) {
+                return;
+            }
+
+            try {
+
+                const result =
+                    await apiRequest(
+                        `/tools/${encodeURIComponent(toolId)}/view`,
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                viewer_key:
+                                    getViewerKey()
+                            })
+                        }
+                    );
+
+                if (
+                    result &&
+                    result.success &&
+                    typeof result.views_count === 'number'
+                ) {
+
+                    const t =
+                        allTools.find(
+                            t =>
+                                String(t.id) ===
+                                String(toolId)
+                        );
+
+                    if (t) {
+                        t.views_count =
+                            result.views_count;
+                    }
+
+                    document
+                        .querySelectorAll(
+                            `.tool-item[data-id="${CSS.escape(
+                                String(toolId)
+                            )}"] .tool-views-count`
+                        )
+                        .forEach(el => {
+
+                            el.textContent =
+                                result.views_count;
+
+                        });
+
+                    const modalViews =
+                        document.getElementById(
+                            'toolDetailViewsCount'
+                        );
+
+                    if (
+                        modalViews &&
+                        modalViews.dataset.toolId ===
+                            String(toolId)
+                    ) {
+
+                        modalViews.textContent =
+                            result.views_count;
+                    }
+
+                } else {
+
+                    console.warn(
+                        '[tools] View was not recorded:',
+                        toolId,
+                        result
+                    );
+                }
+
+            } catch (e) {
+
+                console.warn(
+                    '[tools] recordToolView error:',
+                    toolId,
+                    e
+                );
+            }
         }
 
         // ============================================================
         // NOTIFICATION BADGE
         // ============================================================
+
         async function updateNotifBadge() {
-            const badge = document.getElementById('notifBadge');
-            if (!badge) return;
 
-            const userId = localStorage.getItem('userId');
+            const badge =
+                document.getElementById(
+                    'notifBadge'
+                );
+
+            if (!badge) {
+                return;
+            }
+
+            const userId =
+                localStorage.getItem('userId');
+
             if (!userId) {
+
                 badge.classList.remove('show');
+
                 return;
             }
 
             try {
-                const result = await apiRequest(`/notifications?userId=${userId}`);
-                if (result && result.success) {
-                    const unread = (result.data || []).filter(n => !n.is_read).length;
+
+                const result =
+                    await apiRequest(
+                        `/notifications?userId=${userId}`
+                    );
+
+                if (
+                    result &&
+                    result.success
+                ) {
+
+                    const unread =
+                        (result.data || [])
+                            .filter(
+                                n => !n.is_read
+                            )
+                            .length;
+
                     if (unread > 0) {
-                        badge.textContent = unread > 9 ? '9+' : unread;
-                        badge.classList.add('show');
+
+                        badge.textContent =
+                            unread > 9
+                                ? '9+'
+                                : unread;
+
+                        badge.classList.add(
+                            'show'
+                        );
+
                     } else {
-                        badge.classList.remove('show');
+
+                        badge.classList.remove(
+                            'show'
+                        );
                     }
                 }
+
             } catch (err) {
+
                 badge.classList.remove('show');
             }
         }
 
         // ============================================================
-        // FETCH FUNCTIONS
+        // ADS
         // ============================================================
+
         async function fetchToolsAds(country) {
+
             try {
-                const result = await apiRequest(`/tools_ads?country=${country}`);
-                if (result && result.success) return result.data || [];
-            } catch (err) { }
+
+                const result =
+                    await apiRequest(
+                        `/tools_ads?country=${country}`
+                    );
+
+                if (
+                    result &&
+                    result.success
+                ) {
+
+                    return result.data || [];
+                }
+
+            } catch (err) {}
+
             return [];
-        }
-
-        async function fetchTools() {
-            try {
-                const result = await apiRequest('/tools');
-                if (result && result.success) return result.data || [];
-            } catch (err) { }
-            return [];
-        }
-
-        async function fetchMyTools(userId) {
-            if (!userId) return [];
-            try {
-                const result = await apiRequest(`/users/${userId}/tools`);
-                if (result && result.success && Array.isArray(result.data)) {
-                    return result.data;
-                }
-                return [];
-            } catch (err) {
-                return [];
-            }
-        }
-
-        async function publishTool(name, type, link) {
-            if (!currentUser) return false;
-            try {
-                // Check if tool with same name exists
-                const existing = allTools.find(t => t.name.toLowerCase() === name.toLowerCase());
-                if (existing) {
-                    showAlert('❌ A tool with this name already exists!', 'error');
-                    return false;
-                }
-
-                const result = await apiRequest('/tools', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        user_id: currentUser.id,
-                        name: name.trim(),
-                        type: type,
-                        link: link.trim()
-                    })
-                });
-                if (result && result.success) return true;
-                if (result && result.errors) {
-                    showAlert(result.errors.join(', '), 'error');
-                }
-            } catch (err) {
-                showAlert('Failed to publish tool!', 'error');
-            }
-            return false;
-        }
-
-        async function deleteTool(toolId) {
-            if (!currentUser) return false;
-            try {
-                const result = await apiRequest(`/tools/${toolId}`, {
-                    method: 'DELETE',
-                    body: JSON.stringify({ user_id: currentUser.id })
-                });
-                if (result && result.success) return true;
-            } catch (err) {
-                showAlert('Failed to delete tool!', 'error');
-            }
-            return false;
-        }
-
-        // ============================================================
-        // SHARE FUNCTION
-        // ============================================================
-        function getToolShareUrl(toolId) {
-            const baseUrl = window.location.origin + window.location.pathname.replace('tools.html', '');
-            return `${baseUrl}tool.html?id=${toolId}`;
-        }
-
-        async function shareTool(toolId, event) {
-            if (event) event.stopPropagation();
-
-            const tool = allTools.find(t => t.id === toolId) || myTools.find(t => t.id === toolId);
-            if (!tool) {
-                showAlert('Tool not found!', 'error');
-                return;
-            }
-
-            const shareUrl = getToolShareUrl(toolId);
-            const shareData = {
-                title: tool.name,
-                text: `🔧 ${tool.name} - ${tool.type}`,
-                url: shareUrl
-            };
-
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                    return;
-                } catch (err) { if (err.name === 'AbortError') return; }
-            }
-
-            try {
-                await navigator.clipboard.writeText(shareUrl);
-                showAlert('✅ Link copied to clipboard!', 'success');
-            } catch (err) {
-                prompt('Copy this link:', shareUrl);
-            }
-        }
-
-        // ============================================================
-        // RENDER FUNCTIONS
-        // ============================================================
-        function renderTools(tools, container, showDelete = false, append = false, isMyTools = false) {
-            if (!append) container.innerHTML = '';
-            if (!tools || tools.length === 0) {
-                if (!append) {
-                    container.innerHTML = isMyTools ?
-                        '<div class="no-tools">You haven\'t published any tools yet</div>' :
-                        '<div class="no-tools">🔧 No tools found</div>';
-                }
-                return;
-            }
-
-            tools.forEach((tool, index) => {
-                const item = document.createElement('div');
-                item.className = 'tool-item';
-                item.setAttribute('data-id', tool.id);
-
-                let domain = '';
-                try { if (tool.link) domain = new URL(tool.link).hostname; } catch (e) {}
-
-                item.innerHTML = `
-                    <div class="tool-info">
-                        <div class="tool-name">${escapeHtml(tool.name)}</div>
-                        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-                            <span class="tool-type">${escapeHtml(tool.type)}</span>
-                            ${domain ? `<span style="font-size:0.6rem; color:#b0b3b8;">${escapeHtml(domain)}</span>` : ''}
-                        </div>
-                    </div>
-                    <div class="tool-actions">
-                        <button class="tool-share-btn" onclick="shareTool('${tool.id}', event)" title="Share">
-                            <i class="fas fa-share-alt"></i>
-                        </button>
-                        ${showDelete ? `<button class="tool-delete-btn" data-id="${tool.id}" title="Delete">🗑️</button>` : ''}
-                    </div>
-                `;
-
-                item.addEventListener('click', (e) => {
-                    if (e.target.closest('.tool-share-btn') || e.target.closest('.tool-delete-btn')) return;
-                    if (tool.link) window.open(tool.link, '_blank');
-                    else showAlert('No link available!', 'error');
-                });
-
-                const deleteBtn = item.querySelector('.tool-delete-btn');
-                if (deleteBtn) {
-                    deleteBtn.addEventListener('click', async (e) => {
-                        e.stopPropagation();
-                        const id = deleteBtn.getAttribute('data-id');
-                        if (await customConfirm('Delete Tool', 'Delete this tool? This cannot be undone.', '🗑️')) {
-                            const success = await deleteTool(id);
-                            if (success) {
-                                showAlert('✅ Tool deleted!', 'success');
-                                await refreshAll();
-                            }
-                        }
-                    });
-                }
-
-                container.appendChild(item);
-
-                if (!showDelete && !isMyTools && Math.random() < 0.15 && index < tools.length - 1) {
-                    const ad = getRandomToolsAd();
-                    if (ad) {
-                        const adDiv = createToolsAdElement(ad);
-                        container.appendChild(adDiv);
-                    }
-                }
-            });
-        }
-
-        function getRandomToolsAd() {
-            if (!allToolsAds || allToolsAds.length === 0) return null;
-            return allToolsAds[Math.floor(Math.random() * allToolsAds.length)];
-        }
-
-        function createToolsAdElement(ad) {
-            if (!ad) return null;
-            const adDiv = document.createElement('div');
-            adDiv.className = 'tools-ad-card';
-            const imgHtml = ad.image_url ?
-                `<img src="${escapeHtml(ad.image_url)}" alt="${escapeHtml(ad.caption)}" loading="lazy" onerror="this.style.display='none'">` :
-                '<span class="ad-emoji">📢</span>';
-            adDiv.innerHTML = `
-                <a href="${escapeHtml(ad.link || '#')}" target="_blank" rel="noopener noreferrer">
-                    ${imgHtml}
-                    <span class="ad-caption">${escapeHtml(ad.caption || 'Advertisement')}</span>
-                </a>
-            `;
-            return adDiv;
         }
 
         async function loadToolsAdsRandomly() {
+
             try {
-                const country = currentUser?.country || 'Bangladesh';
-                allToolsAds = await fetchToolsAds(country);
-            } catch (err) { }
+
+                const country =
+                    currentUser?.country ||
+                    'Bangladesh';
+
+                const [
+                    globalResult,
+                    countryResult
+                ] = await Promise.all([
+
+                    apiRequest(
+                        `/tools_ads?country=Global`
+                    ),
+
+                    apiRequest(
+                        `/tools_ads?country=${country}`
+                    )
+
+                ]);
+
+                const globalAds =
+                    globalResult?.success
+                        ? globalResult.data || []
+                        : [];
+
+                const countryAds =
+                    countryResult?.success
+                        ? countryResult.data || []
+                        : [];
+
+                const combined = [
+                    ...globalAds,
+                    ...countryAds
+                ];
+
+                const uniqueMap =
+                    new Map();
+
+                combined.forEach(ad => {
+
+                    if (!uniqueMap.has(ad.id)) {
+
+                        uniqueMap.set(
+                            ad.id,
+                            ad
+                        );
+                    }
+
+                });
+
+                allToolsAds =
+                    Array.from(
+                        uniqueMap.values()
+                    );
+
+                console.log(
+                    `📢 Ads loaded: ${
+                        allToolsAds.length
+                    } (Global: ${
+                        globalAds.length
+                    }, ${country}: ${
+                        countryAds.length
+                    })`
+                );
+
+            } catch (err) {
+
+                console.error(
+                    '❌ Failed to load ads:',
+                    err
+                );
+
+                allToolsAds = [];
+            }
+        }
+
+        // ============================================================
+        // FETCH TOOLS
+        // ============================================================
+
+        async function fetchTools() {
+
+            try {
+
+                const result =
+                    await apiRequest('/tools');
+
+                if (
+                    result &&
+                    result.success
+                ) {
+
+                    return result.data || [];
+                }
+
+            } catch (err) {}
+
+            return [];
+        }
+
+        // ============================================================
+        // FETCH MY TOOLS
+        // ============================================================
+
+        async function fetchMyTools(userId) {
+
+            if (!userId) {
+                return [];
+            }
+
+            try {
+
+                const result =
+                    await apiRequest(
+                        `/users/${userId}/tools`
+                    );
+
+                if (
+                    result &&
+                    result.success &&
+                    Array.isArray(result.data)
+                ) {
+
+                    return result.data;
+                }
+
+                return [];
+
+            } catch (err) {
+
+                return [];
+            }
+        }
+
+        // ============================================================
+        // PUBLISH TOOL
+        // ============================================================
+
+        async function publishTool(
+            name,
+            type,
+            link
+        ) {
+
+            if (!currentUser) {
+                return false;
+            }
+
+            try {
+
+                const existing =
+                    allTools.find(
+                        t =>
+                            t.name.toLowerCase() ===
+                            name.toLowerCase()
+                    );
+
+                if (existing) {
+
+                    showAlert(
+                        '❌ A tool with this name already exists!',
+                        'error'
+                    );
+
+                    return false;
+                }
+
+                const result =
+                    await apiRequest(
+                        '/tools',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({
+
+                                user_id:
+                                    currentUser.id,
+
+                                name:
+                                    name.trim(),
+
+                                type:
+                                    type,
+
+                                link:
+                                    link.trim()
+
+                            })
+                        }
+                    );
+
+                if (
+                    result &&
+                    result.success
+                ) {
+
+                    return true;
+                }
+
+                if (
+                    result &&
+                    result.errors
+                ) {
+
+                    showAlert(
+                        result.errors.join(', '),
+                        'error'
+                    );
+                }
+
+            } catch (err) {
+
+                showAlert(
+                    'Failed to publish tool!',
+                    'error'
+                );
+            }
+
+            return false;
+        }
+
+        // ============================================================
+        // DELETE TOOL
+        // ============================================================
+
+        async function deleteTool(toolId) {
+
+            if (!currentUser) {
+                return false;
+            }
+
+            try {
+
+                const result =
+                    await apiRequest(
+                        `/tools/${toolId}`,
+                        {
+                            method: 'DELETE',
+                            body: JSON.stringify({
+                                user_id:
+                                    currentUser.id
+                            })
+                        }
+                    );
+
+                if (
+                    result &&
+                    result.success
+                ) {
+
+                    return true;
+                }
+
+            } catch (err) {
+
+                showAlert(
+                    'Failed to delete tool!',
+                    'error'
+                );
+            }
+
+            return false;
+        }
+
+        // ============================================================
+        // SHARE URL
+        // ============================================================
+
+        function getToolShareUrl(tool) {
+
+            const path =
+                window.location.pathname;
+
+            const directory =
+                path.substring(
+                    0,
+                    path.lastIndexOf('/') + 1
+                );
+
+            const baseUrl =
+                `${window.location.origin}${directory}tool.html`;
+
+            const id =
+                tool &&
+                tool.id != null &&
+                String(tool.id).trim() !== ''
+                    ? String(tool.id).trim()
+                    : '';
+
+            if (
+                id &&
+                id.toLowerCase() !== 'null' &&
+                id.toLowerCase() !== 'undefined'
+            ) {
+
+                return `${baseUrl}?id=${encodeURIComponent(id)}`;
+            }
+
+            const name =
+                tool?.name
+                    ? String(tool.name)
+                    : '';
+
+            const link =
+                tool?.link
+                    ? String(tool.link)
+                    : '';
+
+            if (!name || !link) {
+                return null;
+            }
+
+            return (
+                `${baseUrl}?name=${encodeURIComponent(name)}` +
+                `&link=${encodeURIComponent(link)}`
+            );
+        }
+
+        function findToolForShare(
+            toolId,
+            fallbackTool = null,
+            button = null
+        ) {
+
+            if (
+                fallbackTool &&
+                typeof fallbackTool === 'object'
+            ) {
+
+                return fallbackTool;
+            }
+
+            if (
+                button?.dataset?.toolName
+            ) {
+
+                return {
+
+                    id:
+                        button.dataset.toolId ||
+                        null,
+
+                    name:
+                        button.dataset.toolName ||
+                        '',
+
+                    type:
+                        button.dataset.toolType ||
+                        'Tool',
+
+                    link:
+                        button.dataset.toolLink ||
+                        ''
+                };
+            }
+
+            if (
+                toolId != null &&
+                String(toolId).trim() !== ''
+            ) {
+
+                const id =
+                    String(toolId);
+
+                return (
+                    allTools.find(
+                        t =>
+                            t &&
+                            t.id != null &&
+                            String(t.id) === id
+                    )
+                    ||
+                    myTools.find(
+                        t =>
+                            t &&
+                            t.id != null &&
+                            String(t.id) === id
+                    )
+                    ||
+                    null
+                );
+            }
+
+            return null;
+        }
+
+        // ============================================================
+        // SHARE TOOL
+        // ============================================================
+
+        function shareTool(
+            toolId,
+            event,
+            fallbackTool = null
+        ) {
+
+            if (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const button =
+                event?.currentTarget ||
+                null;
+
+            const tool =
+                findToolForShare(
+                    toolId,
+                    fallbackTool,
+                    button
+                );
+
+            if (
+                !tool ||
+                !tool.name ||
+                !tool.link
+            ) {
+
+                showAlert(
+                    'Unable to create share link: Tool information is missing.',
+                    'error'
+                );
+
+                return;
+            }
+
+            const shareUrl =
+                getToolShareUrl(tool);
+
+            if (!shareUrl) {
+
+                showAlert(
+                    'Unable to create share link: Tool name or link is missing.',
+                    'error'
+                );
+
+                return;
+            }
+
+            const shareData = {
+
+                title:
+                    tool.name,
+
+                text:
+                    `🔧 ${tool.name} - ${
+                        tool.type || 'Tool'
+                    }`,
+
+                url:
+                    shareUrl
+            };
+
+            if (
+                typeof window.openShareSheet ===
+                'function'
+            ) {
+
+                window.openShareSheet(
+                    shareData
+                );
+
+                return;
+            }
+
+            if (navigator.share) {
+
+                navigator
+                    .share(shareData)
+                    .catch(() => {});
+
+                return;
+            }
+
+            if (navigator.clipboard) {
+
+                navigator.clipboard
+                    .writeText(shareUrl)
+                    .then(() => {
+
+                        showAlert(
+                            '✅ Tool link copied!',
+                            'success'
+                        );
+
+                    })
+                    .catch(() => {
+
+                        window.prompt(
+                            'Copy this tool link:',
+                            shareUrl
+                        );
+
+                    });
+
+            } else {
+
+                window.prompt(
+                    'Copy this tool link:',
+                    shareUrl
+                );
+            }
+        }
+
+        // ============================================================
+        // RANDOM AD
+        // ============================================================
+
+        function getRandomToolsAd() {
+
+            if (
+                !allToolsAds ||
+                allToolsAds.length === 0
+            ) {
+
+                return null;
+            }
+
+            return allToolsAds[
+                Math.floor(
+                    Math.random() *
+                    allToolsAds.length
+                )
+            ];
+        }
+
+        // ============================================================
+        // CREATE AD
+        // ============================================================
+
+        function createToolsAdElement(ad) {
+
+            if (!ad) {
+                return null;
+            }
+
+            const adDiv =
+                document.createElement('div');
+
+            adDiv.className =
+                'tools-ad-card';
+
+            const imgHtml =
+                ad.image_url
+
+                    ? `<img src="${escapeHtml(
+                        ad.image_url
+                    )}"
+                        alt="${escapeHtml(
+                            ad.caption
+                        )}"
+                        loading="lazy"
+                        onerror="this.style.display='none'">`
+
+                    : '<i class="fas fa-ad" style="font-size:2rem;color:rgba(255,255,255,0.5);"></i>';
+
+            adDiv.innerHTML = `
+
+                <a
+                    href="${escapeHtml(
+                        ad.link || '#'
+                    )}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+
+                    ${imgHtml}
+
+                    <span class="ad-caption">
+                        ${escapeHtml(
+                            ad.caption ||
+                            'Advertisement'
+                        )}
+                    </span>
+
+                    ${
+                        ad.country === 'Global'
+                            ? '<span style="font-size:0.6rem;background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:10px;margin-left:4px;">🌍</span>'
+                            : ''
+                    }
+
+                </a>
+
+            `;
+
+            return adDiv;
+        }
+
+        // ============================================================
+        // RENDER TOOLS
+        // ============================================================
+
+        function renderTools(
+            tools,
+            container,
+            showDelete = false,
+            append = false,
+            isMyTools = false
+        ) {
+
+            if (!append) {
+                container.innerHTML = '';
+            }
+
+            if (
+                !tools ||
+                tools.length === 0
+            ) {
+
+                if (!append) {
+
+                    container.innerHTML =
+                        isMyTools
+
+                            ? '<div class="no-tools"><i class="fas fa-inbox"></i> You haven\'t published any tools yet</div>'
+
+                            : '<div class="no-tools"><i class="fas fa-search"></i> No tools found</div>';
+                }
+
+                return;
+            }
+
+            tools.forEach(
+                (tool, index) => {
+
+                    const item =
+                        document.createElement(
+                            'div'
+                        );
+
+                    item.className =
+                        'tool-item' +
+                        (
+                            tool._isHot
+                                ? ' is-hot'
+                                : ''
+                        );
+
+                    item.setAttribute(
+                        'data-id',
+                        tool.id
+                    );
+
+                    let domain = '';
+
+                    try {
+
+                        if (tool.link) {
+
+                            domain =
+                                new URL(
+                                    tool.link
+                                ).hostname;
+                        }
+
+                    } catch (e) {}
+
+                    const viewsCount =
+                        Number(
+                            tool.views_count
+                        ) || 0;
+
+                    item.innerHTML = `
+
+                        <div class="tool-info">
+
+                            <div class="tool-name">
+                                ${escapeHtml(
+                                    tool.name
+                                )}
+                            </div>
+
+                            <div
+                                style="
+                                    display:flex;
+                                    gap:0.5rem;
+                                    align-items:center;
+                                    flex-wrap:wrap;
+                                "
+                            >
+
+                                ${
+                                    tool._isHot
+
+                                        ? `<span class="tool-hot-badge">
+                                            <i class="fas fa-fire"></i>
+                                            Hot
+                                          </span>`
+
+                                        : ''
+                                }
+
+                                <span class="tool-type">
+                                    ${escapeHtml(
+                                        tool.type
+                                    )}
+                                </span>
+
+                                ${
+                                    domain
+
+                                        ? `<span style="font-size:0.6rem;color:#b0b3b8;">
+                                            ${escapeHtml(
+                                                domain
+                                            )}
+                                           </span>`
+
+                                        : ''
+                                }
+
+                                <span class="tool-views-badge">
+
+                                    <i class="fas fa-eye"></i>
+
+                                    <span class="tool-views-count">
+                                        ${viewsCount}
+                                    </span>
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="tool-actions">
+
+                            <button
+                                class="tool-share-btn"
+                                data-tool-id="${escapeHtml(
+                                    tool.id ?? ''
+                                )}"
+                                data-tool-name="${escapeHtml(
+                                    tool.name ?? ''
+                                )}"
+                                data-tool-type="${escapeHtml(
+                                    tool.type ?? 'Tool'
+                                )}"
+                                data-tool-link="${escapeHtml(
+                                    tool.link ?? ''
+                                )}"
+                                onclick="shareTool('${String(
+                                    tool.id ?? ''
+                                ).replace(
+                                    /'/g,
+                                    "\\'"
+                                )}', event)"
+                                title="Share"
+                            >
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+
+                            ${
+                                showDelete
+
+                                    ? `<button
+                                        class="tool-delete-btn"
+                                        data-id="${tool.id}"
+                                        title="Delete"
+                                      >
+                                        <i class="fas fa-trash-alt"></i>
+                                      </button>`
+
+                                    : `<button
+                                        class="tool-report-btn"
+                                        data-id="${tool.id}"
+                                        title="Report"
+                                      >
+                                        <i class="fas fa-flag"></i>
+                                      </button>`
+                            }
+
+                        </div>
+                    `;
+
+                    // =================================================
+                    // TOOL CLICK
+                    // =================================================
+
+                    item.addEventListener(
+                        'click',
+                        (e) => {
+
+                            if (
+                                e.target.closest(
+                                    '.tool-share-btn'
+                                ) ||
+                                e.target.closest(
+                                    '.tool-delete-btn'
+                                ) ||
+                                e.target.closest(
+                                    '.tool-report-btn'
+                                )
+                            ) {
+
+                                return;
+                            }
+
+                            if (tool.link) {
+
+                                window.open(
+                                    tool.link,
+                                    '_blank'
+                                );
+
+                                recordToolView(
+                                    tool.id
+                                );
+
+                            } else {
+
+                                showAlert(
+                                    'No link available!',
+                                    'error'
+                                );
+                            }
+
+                        }
+                    );
+
+                    // =================================================
+                    // REPORT
+                    // =================================================
+
+                    const reportBtn =
+                        item.querySelector(
+                            '.tool-report-btn'
+                        );
+
+                    if (reportBtn) {
+
+                        reportBtn.addEventListener(
+                            'click',
+                            (e) => {
+
+                                e.stopPropagation();
+
+                                if (!currentUser) {
+
+                                    showAlert(
+                                        'Please login first!',
+                                        'error'
+                                    );
+
+                                    return;
+                                }
+
+                                const id =
+                                    reportBtn.getAttribute(
+                                        'data-id'
+                                    );
+
+                                window.openReportModal({
+                                    targetType:
+                                        'tool',
+
+                                    targetId:
+                                        id,
+
+                                    itemLabel:
+                                        'tool'
+                                });
+
+                            }
+                        );
+                    }
+
+                    // =================================================
+                    // DELETE
+                    // =================================================
+
+                    const deleteBtn =
+                        item.querySelector(
+                            '.tool-delete-btn'
+                        );
+
+                    if (deleteBtn) {
+
+                        deleteBtn.addEventListener(
+                            'click',
+                            async (e) => {
+
+                                e.stopPropagation();
+
+                                const id =
+                                    deleteBtn.getAttribute(
+                                        'data-id'
+                                    );
+
+                                const confirmed =
+                                    await customConfirm(
+                                        'Delete Tool',
+                                        'Delete this tool? This cannot be undone.'
+                                    );
+
+                                if (!confirmed) {
+                                    return;
+                                }
+
+                                const success =
+                                    await deleteTool(
+                                        id
+                                    );
+
+                                if (success) {
+
+                                    showAlert(
+                                        '✅ Tool deleted!',
+                                        'success'
+                                    );
+
+                                    await refreshAll();
+                                }
+
+                            }
+                        );
+                    }
+
+                    container.appendChild(
+                        item
+                    );
+
+                    // =================================================
+                    // ADS
+                    // =================================================
+
+                    if (
+                        !showDelete &&
+                        !isMyTools &&
+                        Math.random() < 0.15 &&
+                        index < tools.length - 1
+                    ) {
+
+                        const ad =
+                            getRandomToolsAd();
+
+                        if (ad) {
+
+                            const adDiv =
+                                createToolsAdElement(
+                                    ad
+                                );
+
+                            if (adDiv) {
+
+                                container.appendChild(
+                                    adDiv
+                                );
+                            }
+                        }
+                    }
+
+                }
+            );
         }
 
         // ============================================================
         // PAGINATION
         // ============================================================
+
         function loadMoreTools() {
-            if (isLoading || !hasMoreTools) return;
-            const start = currentPage * TOOLS_PER_PAGE;
-            const end = start + TOOLS_PER_PAGE;
-            const nextBatch = filteredTools.slice(start, end);
-            if (nextBatch.length === 0) {
-                hasMoreTools = false;
-                seeMoreBtn.textContent = 'No more tools';
-                seeMoreBtn.disabled = true;
+
+            if (
+                isLoading ||
+                !hasMoreTools
+            ) {
+
                 return;
             }
-            renderTools(nextBatch, toolsListEl, false, true, false);
-            currentPage++;
-            if (end >= filteredTools.length) {
+
+            const start =
+                currentPage *
+                TOOLS_PER_PAGE;
+
+            const end =
+                start +
+                TOOLS_PER_PAGE;
+
+            const nextBatch =
+                filteredTools.slice(
+                    start,
+                    end
+                );
+
+            if (
+                nextBatch.length === 0
+            ) {
+
                 hasMoreTools = false;
-                seeMoreBtn.textContent = 'No more tools';
-                seeMoreBtn.disabled = true;
+
+                seeMoreBtn.innerHTML =
+                    'No more tools';
+
+                seeMoreBtn.disabled =
+                    true;
+
+                return;
+            }
+
+            renderTools(
+                nextBatch,
+                toolsListEl,
+                false,
+                true,
+                false
+            );
+
+            currentPage++;
+
+            if (
+                end >=
+                filteredTools.length
+            ) {
+
+                hasMoreTools = false;
+
+                seeMoreBtn.innerHTML =
+                    'No more tools';
+
+                seeMoreBtn.disabled =
+                    true;
+
             } else {
-                seeMoreBtn.textContent = `See More ↓ (${filteredTools.length - end} remaining)`;
-                seeMoreBtn.disabled = false;
+
+                seeMoreBtn.innerHTML =
+                    `See More <i class="fas fa-chevron-down"></i> (${
+                        filteredTools.length - end
+                    } remaining)`;
+
+                seeMoreBtn.disabled =
+                    false;
             }
         }
 
         // ============================================================
-        // REFRESH & FILTER
+        // TOOL DETAIL MODAL
         // ============================================================
-        async function refreshAll() {
-            if (isLoading) return;
-            isLoading = true;
+
+        function closeToolDetailModal() {
+
+            document
+                .getElementById(
+                    'toolDetailModal'
+                )
+                .classList.remove('show');
+        }
+
+        function openToolDetailModal(tool) {
+
+            let domain = '';
+
             try {
+
+                if (tool.link) {
+
+                    domain =
+                        new URL(
+                            tool.link
+                        ).hostname;
+                }
+
+            } catch (e) {}
+
+            document
+                .getElementById(
+                    'toolDetailName'
+                )
+                .textContent =
+                    tool.name;
+
+            document
+                .getElementById(
+                    'toolDetailType'
+                )
+                .textContent =
+                    tool.type;
+
+            document
+                .getElementById(
+                    'toolDetailDomain'
+                )
+                .textContent =
+                    domain;
+
+            const viewsCountEl =
+                document.getElementById(
+                    'toolDetailViewsCount'
+                );
+
+            viewsCountEl.textContent =
+                Number(
+                    tool.views_count
+                ) || 0;
+
+            viewsCountEl.dataset.toolId =
+                String(
+                    tool.id ?? ''
+                );
+
+            const openBtn =
+                document.getElementById(
+                    'toolDetailOpenBtn'
+                );
+
+            openBtn.onclick =
+                () => {
+
+                    if (tool.link) {
+
+                        window.open(
+                            tool.link,
+                            '_blank'
+                        );
+
+                        recordToolView(
+                            tool.id
+                        );
+
+                    } else {
+
+                        showAlert(
+                            'No link available!',
+                            'error'
+                        );
+                    }
+                };
+
+            document
+                .getElementById(
+                    'toolDetailShareBtn'
+                )
+                .onclick =
+                    (e) =>
+                        shareTool(
+                            tool?.id ?? null,
+                            e,
+                            tool
+                        );
+
+            document
+                .getElementById(
+                    'toolDetailReportBtn'
+                )
+                .onclick =
+                    () => {
+
+                        if (!currentUser) {
+
+                            showAlert(
+                                'Please login first!',
+                                'error'
+                            );
+
+                            return;
+                        }
+
+                        window.openReportModal({
+                            targetType:
+                                'tool',
+
+                            targetId:
+                                tool.id,
+
+                            itemLabel:
+                                'tool'
+                        });
+                    };
+
+            document
+                .getElementById(
+                    'toolDetailModal'
+                )
+                .classList.add('show');
+        }
+
+        document
+            .getElementById(
+                'toolDetailCloseBtn'
+            )
+            .addEventListener(
+                'click',
+                closeToolDetailModal
+            );
+
+        document
+            .getElementById(
+                'toolDetailModal'
+            )
+            .addEventListener(
+                'click',
+                (e) => {
+
+                    if (
+                        e.target ===
+                        document.getElementById(
+                            'toolDetailModal'
+                        )
+                    ) {
+
+                        closeToolDetailModal();
+                    }
+                }
+            );
+
+        // ============================================================
+        // SHARED TOOL
+        // ============================================================
+
+        async function checkSharedToolLink() {
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+            const sharedId =
+                params.get('id');
+
+            if (!sharedId) {
+                return;
+            }
+
+            const normalizedSharedId =
+                String(sharedId);
+
+            let tool =
+                allTools.find(
+                    t =>
+                        String(t.id) ===
+                        normalizedSharedId
+                )
+                ||
+                myTools.find(
+                    t =>
+                        String(t.id) ===
+                        normalizedSharedId
+                );
+
+            if (!tool) {
+
+                try {
+
+                    const result =
+                        await apiRequest(
+                            `/tools/${encodeURIComponent(
+                                normalizedSharedId
+                            )}`
+                        );
+
+                    if (
+                        result &&
+                        result.success &&
+                        result.data
+                    ) {
+
+                        tool =
+                            result.data;
+                    }
+
+                } catch (e) {}
+            }
+
+            if (tool) {
+
+                openToolDetailModal(
+                    tool
+                );
+
+            } else {
+
+                showAlert(
+                    'Tool not found. It may have been removed.',
+                    'error'
+                );
+            }
+        }
+
+        // ============================================================
+        // REFRESH
+        // ============================================================
+
+        async function refreshAll() {
+
+            if (isLoading) {
+                return;
+            }
+
+            isLoading = true;
+
+            try {
+
                 if (!currentUser) {
-                    toolsListEl.innerHTML = `<div class="no-tools">🔒 Please login</div>`;
+
+                    toolsListEl.innerHTML =
+                        '<div class="no-tools"><i class="fas fa-lock"></i> Please login</div>';
+
+                    hideSkeletonAndShowReal();
+
                     return;
                 }
-                allTools = await fetchTools();
-                myTools = await fetchMyTools(currentUser.id) || [];
+
+                allTools =
+                    await fetchTools();
+
+                myTools =
+                    await fetchMyTools(
+                        currentUser.id
+                    ) || [];
+
                 await loadToolsAdsRandomly();
+
                 applyFilters();
+
+                hideSkeletonAndShowReal();
+
             } catch (err) {
-                toolsListEl.innerHTML = `<div class="no-tools">❌ Failed to load tools</div>`;
+
+                toolsListEl.innerHTML =
+                    '<div class="no-tools"><i class="fas fa-exclamation-circle"></i> Failed to load tools</div>';
+
+                hideSkeletonAndShowReal();
+
             } finally {
+
                 isLoading = false;
             }
         }
 
-        function applyFilters() {
-            currentPage = 0;
-            hasMoreTools = true;
-            seeMoreBtn.textContent = 'See More ↓';
-            seeMoreBtn.disabled = false;
+        // ============================================================
+        // APPLY FILTERS
+        // ============================================================
 
-            let shuffledTools = Array.isArray(allTools) ? shuffleArray(allTools) : [];
+        function applyFilters() {
+
+            currentPage = 0;
+
+            hasMoreTools = true;
+
+            seeMoreBtn.innerHTML =
+                'See More <i class="fas fa-chevron-down"></i>';
+
+            seeMoreBtn.disabled =
+                false;
+
+            let baseTools =
+                Array.isArray(allTools)
+                    ? [...allTools]
+                    : [];
+
+            // ========================================================
+            // SEARCH
+            // ========================================================
 
             if (searchQuery.trim()) {
-                const q = searchQuery.trim().toLowerCase();
-                shuffledTools = shuffledTools.filter(t => t.name.toLowerCase().includes(q));
+
+                const q =
+                    searchQuery
+                        .trim()
+                        .toLowerCase();
+
+                baseTools =
+                    baseTools.filter(
+                        t =>
+                            t.name
+                                .toLowerCase()
+                                .includes(q)
+                    );
             }
 
-            if (currentFilter !== 'all') {
-                shuffledTools = shuffledTools.filter(t => t.type === currentFilter);
+            let combinedTools;
+
+            // ========================================================
+            // SEARCH MODE
+            // ========================================================
+
+            if (searchQuery.trim()) {
+
+                let searchResults =
+                    currentFilter !== 'all'
+
+                        ? baseTools.filter(
+                            t =>
+                                t.type ===
+                                currentFilter
+                        )
+
+                        : baseTools;
+
+                searchResults =
+                    shuffleArray(
+                        searchResults
+                    );
+
+                searchResults.forEach(
+                    t => {
+                        t._isHot = false;
+                    }
+                );
+
+                combinedTools =
+                    searchResults;
+
+            } else {
+
+                // ====================================================
+                // CATEGORY POOL
+                // ====================================================
+
+                const categoryPool =
+                    currentFilter !== 'all'
+
+                        ? baseTools.filter(
+                            t =>
+                                t.type ===
+                                currentFilter
+                        )
+
+                        : baseTools;
+
+                // ====================================================
+                // UPDATED HOT LOGIC
+                //
+                // All:
+                //     পুরো list-এর Top 3
+                //
+                // Category:
+                //     category-এর Top 3
+                // ====================================================
+
+                const {
+                    hotList,
+                    rest
+                } =
+                    computeHotAndRest(
+                        categoryPool,
+                        currentFilter
+                    );
+
+                // ====================================================
+                // BAKI TOOLS RANDOM
+                // ====================================================
+
+                const shuffledRest =
+                    shuffleArray(rest);
+
+                // ====================================================
+                // ONLY TOP 3 HOT
+                // ====================================================
+
+                hotList.forEach(
+                    t => {
+                        t._isHot = true;
+                    }
+                );
+
+                // ====================================================
+                // ALL OTHER TOOLS NON-HOT
+                // ====================================================
+
+                shuffledRest.forEach(
+                    t => {
+                        t._isHot = false;
+                    }
+                );
+
+                // ====================================================
+                // HOT FIRST + REST AFTER
+                // ====================================================
+
+                combinedTools = [
+                    ...hotList,
+                    ...shuffledRest
+                ];
             }
 
-            filteredTools = shuffledTools;
+            filteredTools =
+                combinedTools;
+
+            // ========================================================
+            // MY TOOLS
+            // ========================================================
 
             if (showingMyTools) {
-                myToolsSection.classList.add('show');
 
-                let filteredMyTools = Array.isArray(myTools) ? [...myTools] : [];
-                
+                myToolsSection
+                    .classList
+                    .add('show');
+
+                let filteredMyTools =
+                    Array.isArray(myTools)
+                        ? [...myTools]
+                        : [];
+
                 if (searchQuery.trim()) {
-                    const q = searchQuery.trim().toLowerCase();
-                    filteredMyTools = filteredMyTools.filter(t => t.name.toLowerCase().includes(q));
-                }
-                if (currentFilter !== 'all') {
-                    filteredMyTools = filteredMyTools.filter(t => t.type === currentFilter);
+
+                    const q =
+                        searchQuery
+                            .trim()
+                            .toLowerCase();
+
+                    filteredMyTools =
+                        filteredMyTools.filter(
+                            t =>
+                                t.name
+                                    .toLowerCase()
+                                    .includes(q)
+                        );
                 }
 
-                renderTools(filteredMyTools, myToolsListEl, true, false, true);
-                toolsListEl.style.display = 'none';
-                seeMoreBtn.style.display = 'none';
+                if (
+                    currentFilter !==
+                    'all'
+                ) {
+
+                    filteredMyTools =
+                        filteredMyTools.filter(
+                            t =>
+                                t.type ===
+                                currentFilter
+                        );
+                }
+
+                renderTools(
+                    filteredMyTools,
+                    myToolsListEl,
+                    true,
+                    false,
+                    true
+                );
+
+                toolsListEl.style.display =
+                    'none';
+
+                seeMoreBtn.style.display =
+                    'none';
+
             } else {
-                myToolsSection.classList.remove('show');
-                toolsListEl.style.display = 'flex';
-                seeMoreBtn.style.display = 'block';
 
-                const firstBatch = filteredTools.slice(0, TOOLS_PER_PAGE);
-                renderTools(firstBatch, toolsListEl, false, false, false);
+                myToolsSection
+                    .classList
+                    .remove('show');
+
+                toolsListEl.style.display =
+                    'flex';
+
+                seeMoreBtn.style.display =
+                    'block';
+
+                const firstBatch =
+                    filteredTools.slice(
+                        0,
+                        TOOLS_PER_PAGE
+                    );
+
+                renderTools(
+                    firstBatch,
+                    toolsListEl,
+                    false,
+                    false,
+                    false
+                );
+
                 currentPage = 1;
 
-                if (filteredTools.length <= TOOLS_PER_PAGE) {
+                if (
+                    filteredTools.length <=
+                    TOOLS_PER_PAGE
+                ) {
+
                     hasMoreTools = false;
-                    seeMoreBtn.textContent = 'No more tools';
-                    seeMoreBtn.disabled = true;
+
+                    seeMoreBtn.innerHTML =
+                        'No more tools';
+
+                    seeMoreBtn.disabled =
+                        true;
+
                 } else {
+
                     hasMoreTools = true;
-                    seeMoreBtn.textContent = `See More ↓ (${filteredTools.length - TOOLS_PER_PAGE} remaining)`;
-                    seeMoreBtn.disabled = false;
+
+                    seeMoreBtn.innerHTML =
+                        `See More <i class="fas fa-chevron-down"></i> (${
+                            filteredTools.length -
+                            TOOLS_PER_PAGE
+                        } remaining)`;
+
+                    seeMoreBtn.disabled =
+                        false;
                 }
             }
         }
 
         // ============================================================
-        // EVENT LISTENERS
+        // SEARCH EVENT
         // ============================================================
-        searchInput.addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            applyFilters();
-        });
 
-        filterBar.addEventListener('click', (e) => {
-            const chip = e.target.closest('.filter-chip');
-            if (!chip) return;
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            currentFilter = chip.getAttribute('data-type');
-            applyFilters();
-        });
+        searchInput.addEventListener(
+            'input',
+            (e) => {
 
-        myToolsToggleBtn.addEventListener('click', () => {
-            showingMyTools = !showingMyTools;
-            myToolsToggleBtn.textContent = showingMyTools ? '📁 All Tools' : '📁 My Tools';
-            if (showingMyTools) {
-                myToolsToggleBtn.style.background = '#4caf50';
-            } else {
-                myToolsToggleBtn.style.background = '#1877f2';
+                searchQuery =
+                    e.target.value;
+
+                applyFilters();
             }
-            applyFilters();
-        });
+        );
 
-        seeMoreBtn.addEventListener('click', loadMoreTools);
+        // ============================================================
+        // FILTER EVENT
+        // ============================================================
 
-        addToolBtn.addEventListener('click', () => {
-            addModal.classList.add('open');
-            toolNameInput.value = '';
-            toolLinkInput.value = '';
-            toolTypeSelect.value = 'Cyber Security';
-            toolNameInput.focus();
-        });
+        filterBar.addEventListener(
+            'click',
+            (e) => {
 
-        closeAddModalBtn.addEventListener('click', () => addModal.classList.remove('open'));
-        addModal.addEventListener('click', (e) => { if (e.target === addModal) addModal.classList.remove('open'); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && addModal.classList.contains('open')) addModal.classList.remove('open'); });
+                const chip =
+                    e.target.closest(
+                        '.filter-chip'
+                    );
 
-        publishBtn.addEventListener('click', async () => {
-            const name = toolNameInput.value.trim();
-            const type = toolTypeSelect.value;
-            const link = toolLinkInput.value.trim();
-            if (!name) { showAlert('Please enter tool name!', 'error'); toolNameInput.focus(); return; }
-            if (name.length < 2) { showAlert('Name must be at least 2 characters!', 'error'); toolNameInput.focus(); return; }
-            if (!link) { showAlert('Please enter tool link!', 'error'); toolLinkInput.focus(); return; }
-            try { new URL(link); } catch { showAlert('Please enter a valid link (http/https)', 'error'); toolLinkInput.focus(); return; }
+                if (!chip) {
+                    return;
+                }
 
-            publishBtn.disabled = true;
-            publishBtn.textContent = '⏳ Publishing...';
-            const success = await publishTool(name, type, link);
-            if (success) {
-                showAlert('✅ Tool published!', 'success');
-                addModal.classList.remove('open');
-                await refreshAll();
-                if (showingMyTools) applyFilters();
+                document
+                    .querySelectorAll(
+                        '.filter-chip'
+                    )
+                    .forEach(
+                        c =>
+                            c.classList.remove(
+                                'active'
+                            )
+                    );
+
+                chip.classList.add(
+                    'active'
+                );
+
+                currentFilter =
+                    chip.getAttribute(
+                        'data-type'
+                    );
+
+                applyFilters();
             }
-            publishBtn.disabled = false;
-            publishBtn.textContent = '📤 Publish';
-        });
+        );
 
-        // ===== Profile Nav =====
-        document.getElementById('profileNavBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (currentUser) {
-                window.location.href = `userprofile.html?userId=${currentUser.id}`;
+        // ============================================================
+        // MY TOOLS TOGGLE
+        // ============================================================
+
+        myToolsToggleBtn.addEventListener(
+            'click',
+            () => {
+
+                showingMyTools =
+                    !showingMyTools;
+
+                myToolsToggleBtn.innerHTML =
+                    showingMyTools
+
+                        ? '<i class="fas fa-list"></i> All Tools'
+
+                        : '<i class="fas fa-folder"></i> My Tools';
+
+                if (showingMyTools) {
+
+                    myToolsToggleBtn.style.background =
+                        '#4caf50';
+
+                } else {
+
+                    myToolsToggleBtn.style.background =
+                        '#1877f2';
+                }
+
+                applyFilters();
             }
-        });
+        );
+
+        // ============================================================
+        // SEE MORE
+        // ============================================================
+
+        seeMoreBtn.addEventListener(
+            'click',
+            loadMoreTools
+        );
+
+        // ============================================================
+        // ADD TOOL
+        // ============================================================
+
+        addToolBtn.addEventListener(
+            'click',
+            () => {
+
+                addModal.classList.add(
+                    'open'
+                );
+
+                toolNameInput.value =
+                    '';
+
+                toolLinkInput.value =
+                    '';
+
+                toolTypeSelect.value =
+                    'Cyber Security';
+
+                toolNameInput.focus();
+            }
+        );
+
+        // ============================================================
+        // CLOSE ADD MODAL
+        // ============================================================
+
+        closeAddModalBtn.addEventListener(
+            'click',
+            () =>
+                addModal.classList.remove(
+                    'open'
+                )
+        );
+
+        addModal.addEventListener(
+            'click',
+            (e) => {
+
+                if (e.target === addModal) {
+
+                    addModal.classList.remove(
+                        'open'
+                    );
+                }
+            }
+        );
+
+        document.addEventListener(
+            'keydown',
+            (e) => {
+
+                if (
+                    e.key === 'Escape' &&
+                    addModal.classList.contains(
+                        'open'
+                    )
+                ) {
+
+                    addModal.classList.remove(
+                        'open'
+                    );
+                }
+            }
+        );
+
+        // ============================================================
+        // PUBLISH TOOL
+        // ============================================================
+
+        publishBtn.addEventListener(
+            'click',
+            async () => {
+
+                const name =
+                    toolNameInput.value.trim();
+
+                const type =
+                    toolTypeSelect.value;
+
+                const link =
+                    toolLinkInput.value.trim();
+
+                if (!name) {
+
+                    showAlert(
+                        'Please enter tool name!',
+                        'error'
+                    );
+
+                    toolNameInput.focus();
+
+                    return;
+                }
+
+                if (name.length < 2) {
+
+                    showAlert(
+                        'Name must be at least 2 characters!',
+                        'error'
+                    );
+
+                    toolNameInput.focus();
+
+                    return;
+                }
+
+                if (!link) {
+
+                    showAlert(
+                        'Please enter tool link!',
+                        'error'
+                    );
+
+                    toolLinkInput.focus();
+
+                    return;
+                }
+
+                try {
+
+                    new URL(link);
+
+                } catch {
+
+                    showAlert(
+                        'Please enter a valid link (http/https)',
+                        'error'
+                    );
+
+                    toolLinkInput.focus();
+
+                    return;
+                }
+
+                publishBtn.disabled =
+                    true;
+
+                publishBtn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+
+                const success =
+                    await publishTool(
+                        name,
+                        type,
+                        link
+                    );
+
+                if (success) {
+
+                    showAlert(
+                        '✅ Tool published!',
+                        'success'
+                    );
+
+                    addModal.classList.remove(
+                        'open'
+                    );
+
+                    await refreshAll();
+
+                    if (showingMyTools) {
+                        applyFilters();
+                    }
+                }
+
+                publishBtn.disabled =
+                    false;
+
+                publishBtn.innerHTML =
+                    '<i class="fas fa-upload"></i> Publish';
+            }
+        );
+
+        // ============================================================
+        // PROFILE NAV
+        // ============================================================
+
+        document
+            .getElementById(
+                'profileNavBtn'
+            )
+            .addEventListener(
+                'click',
+                function(e) {
+
+                    e.preventDefault();
+
+                    if (currentUser) {
+
+                        window.location.href =
+                            `userprofile.html?userId=${
+                                currentUser.id
+                            }`;
+                    }
+                }
+            );
 
         // ============================================================
         // PAGE LOAD
         // ============================================================
-        document.addEventListener('DOMContentLoaded', async () => {
 
-            const userId = localStorage.getItem('userId');
-            if (!userId) {
-                window.location.href = 'login.html';
-                return;
-            }
+        document.addEventListener(
+            'DOMContentLoaded',
+            async () => {
 
-            try {
-                const userResult = await apiRequest(`/users/${userId}`);
-                if (userResult && userResult.success) {
-                    currentUser = userResult.data;
-                } else {
-                    localStorage.removeItem('userId');
-                    window.location.href = 'login.html';
+                const userId =
+                    localStorage.getItem(
+                        'userId'
+                    );
+
+                if (!userId) {
+
+                    window.location.href =
+                        'login.html';
+
                     return;
                 }
 
-                await refreshAll();
-                await updateNotifBadge();
-                setInterval(updateNotifBadge, 30000);
+                // Show skeleton immediately
 
-            } catch (err) {
-                showAlert('Failed to load page!', 'error');
-                toolsListEl.innerHTML = `<div class="no-tools">❌ Load failed</div>`;
+                showSkeleton();
+
+                try {
+
+                    const userResult =
+                        await apiRequest(
+                            `/users/${userId}`
+                        );
+
+                    if (
+                        userResult &&
+                        userResult.success
+                    ) {
+
+                        currentUser =
+                            userResult.data;
+
+                    } else {
+
+                        localStorage.removeItem(
+                            'userId'
+                        );
+
+                        window.location.href =
+                            'login.html';
+
+                        return;
+                    }
+
+                    await refreshAll();
+
+                    await checkSharedToolLink();
+
+                    await updateNotifBadge();
+
+                    setInterval(
+                        updateNotifBadge,
+                        120000
+                    );
+
+                } catch (err) {
+
+                    showAlert(
+                        'Failed to load page!',
+                        'error'
+                    );
+
+                    toolsListEl.innerHTML =
+                        '<div class="no-tools"><i class="fas fa-exclamation-circle"></i> Load failed</div>';
+
+                    hideSkeletonAndShowReal();
+                }
             }
-        });
+        );
+
+        // ============================================================
+        // GLOBAL SHARE FUNCTION
+        // ============================================================
+
+        window.shareTool =
+            shareTool;
 
     </script>
+
 </body>
 </html>

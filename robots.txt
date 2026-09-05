@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+Allow: /login.html
+Allow: /contact.html
+Allow: /donate.html
+Allow: /privacypolicy.html
+
+# App pages require login and carry their own noindex tag;
+# disallowed here too so crawlers never spend budget on them.
+Disallow: /index.html
+Disallow: /home.html
+Disallow: /messages.html
+Disallow: /notifications.html
+Disallow: /settings.html
+Disallow: /editprofile.html
+Disallow: /changeemail.html
+Disallow: /changepassword.html
+Disallow: /deleteaccount.html
+Disallow: /blockedusers.html
+Disallow: /createpost.html
+Disallow: /following.html
+Disallow: /gchat.html
+Disallow: /p2p.html
+Disallow: /live.html
+Disallow: /resetpassword.html
+Disallow: /tools.html
+Disallow: /help.html
+Disallow: /privacy.html
+Disallow: /userprofile.html
+Disallow: /post.html
+
+Sitemap: https://socialock.pages.dev/sitemap.xml

@@ -1,150 +1,1283 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Global Chat - SociaLock</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Global Chat · Anonymous</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Join the SociaLock global chat and talk in real time with developers and cybersecurity professionals worldwide." />
+    <meta name="keywords" content="global chat, developer chat, cybersecurity chat room" />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/gchat.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SociaLock" />
+    <meta property="og:title" content="Global Chat · Anonymous" />
+    <meta property="og:description" content="Join the SociaLock global chat and talk in real time with developers and cybersecurity professionals worldwide." />
+    <meta property="og:url" content="https://socialock.pages.dev/gchat.html" />
+    <meta property="og:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Global Chat · Anonymous" />
+    <meta name="twitter:description" content="Join the SociaLock global chat and talk in real time with developers and cybersecurity professionals worldwide." />
+    <meta name="twitter:image" content="https://socialock.pages.dev/assets/og-image.png" />
+    <!-- ===== SEO END ===== -->
 
-    <!-- ===== FIREBASE CDN (ঐচ্ছিক, কিন্তু অন্যান্য পেজের সাথে সামঞ্জস্যের জন্য) ===== -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #18191a;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #e4e6eb;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+<!-- DOMPurify for XSS protection -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js">
+</script>
 
-        .app-header {
-            background: #242526;
-            padding: 12px 20px;
-            border-bottom: 1px solid #3a3b3c;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        .app-header .back-btn {
-            background: none;
-            border: none;
-            color: #b0b3b8;
-            font-size: 1.4rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 50%;
-            transition: 0.2s;
-        }
-        .app-header .back-btn:hover { background: #3a3b3c; color: #fff; }
-        .app-header h1 { font-size: 1.2rem; font-weight: 600; flex: 1; }
+<!-- Font Awesome -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-        .coming-soon-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
-        .coming-soon-icon {
-            font-size: 4rem;
-            color: #1877f2;
-            margin-bottom: 16px;
-        }
-        .coming-soon-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #1877f2, #4caf50);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .coming-soon-sub {
-            font-size: 1rem;
-            color: #b0b3b8;
-            max-width: 400px;
-            line-height: 1.6;
-        }
-        .coming-soon-features {
-            margin-top: 24px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: center;
-        }
-        .feature-chip {
-            background: #242526;
-            border: 1px solid #3a3b3c;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            color: #b0b3b8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .feature-chip i { color: #1877f2; }
+<style>
+/* ============================================================
+   RESET & BASE
+============================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .footer-note {
-            margin-top: 32px;
-            font-size: 0.75rem;
-            color: #606770;
-        }
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
 
-        @media (max-width: 480px) {
-            .coming-soon-title { font-size: 1.5rem; }
-            .coming-soon-icon { font-size: 3rem; }
-            .feature-chip { font-size: 0.7rem; padding: 6px 12px; }
-        }
-    </style>
+body {
+    background: #07090d;
+    color: #e9edf3;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ============================================================
+   APP
+============================================================ */
+.app {
+    width: min(760px, 100%);
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #080b10;
+    border: 1px solid rgba(255, 255, 255, .07);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, .55);
+    position: relative;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.header {
+    flex: 0 0 64px;
+    height: 64px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: rgba(13, 17, 24, .97);
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+    position: relative;
+    z-index: 20;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.header-left .globe-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4c97ff, #635de7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.header-title {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.header-title .name {
+    color: #edf1f7;
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-title .status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #687588;
+    font-size: 10px;
+    line-height: 14px;
+}
+
+.header-title .status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.header-title .status .dot.online {
+    background: #42d392;
+    box-shadow: 0 0 7px rgba(66, 211, 146, .6);
+}
+
+.header-title .status .dot.offline {
+    background: #687588;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.header-right .username-badge {
+    background: rgba(255, 255, 255, .06);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: #aab5c5;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid rgba(255, 255, 255, .06);
+}
+
+.header-right button {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    color: #7f8a9b;
+    font-size: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-right button:hover {
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+}
+
+/* ============================================================
+   MESSENGER
+============================================================ */
+.messenger {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(79, 156, 255, .035), transparent 48%),
+        #080b10;
+}
+
+/* ============================================================
+   MESSAGE AREA — SCROLLS
+============================================================ */
+.messages-area {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 15px 16px 12px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(79, 156, 255, .025), transparent 50%);
+}
+
+.messages-area::-webkit-scrollbar {
+    width: 4px;
+}
+
+.messages-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-area::-webkit-scrollbar-thumb {
+    background: rgba(130, 145, 170, .24);
+    border-radius: 20px;
+}
+
+/* ============================================================
+   EMPTY
+============================================================ */
+.empty-state {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.empty-state .greeting-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #263344;
+    background: rgba(255, 255, 255, .025);
+    border: 1px solid rgba(255, 255, 255, .04);
+    font-size: 27px;
+    margin-bottom: 15px;
+}
+
+.empty-state .greeting-title {
+    color: #8490a2;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.empty-state .greeting-sub {
+    max-width: 280px;
+    color: #4f5a6b;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   MESSAGE
+============================================================ */
+.msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 9px;
+    animation: fadeIn .18s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.msg .avatar {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 11px;
+    background: #151c27;
+    border: 1px solid rgba(255, 255, 255, .05);
+    color: #7d8ba0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.msg .bubble {
+    max-width: min(78%, 520px);
+    padding: 7px 12px 7px;
+    border-radius: 17px 17px 17px 5px;
+    background: #111722;
+    border: 1px solid rgba(255, 255, 255, .06);
+    color: #e7ebf1;
+    line-height: 1.45;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .13);
+}
+
+.msg .bubble .sender {
+    display: block;
+    color: #5d9cff;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.msg .bubble .text {
+    display: block;
+    word-break: break-word;
+    font-size: 13px;
+}
+
+.msg .bubble .time {
+    display: block;
+    color: #566173;
+    font-size: 7px;
+    margin-top: 3px;
+    text-align: right;
+}
+
+.msg.self {
+    flex-direction: row-reverse;
+}
+
+.msg.self .bubble {
+    border-radius: 17px 17px 5px 17px;
+    background: linear-gradient(145deg, #29496f, #263b57);
+    border-color: rgba(110, 165, 230, .15);
+}
+
+.msg.self .bubble .sender {
+    color: #8ab9ef;
+}
+
+/* ============================================================
+   DELETED / BLOCKED
+============================================================ */
+.msg .bubble.deleted {
+    opacity: .5;
+    font-style: italic;
+    color: #566173;
+}
+
+.msg .bubble.deleted .sender {
+    color: #566173;
+}
+
+/* ============================================================
+   INPUT ROW — FIXED BOTTOM
+============================================================ */
+.input-row {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding:
+        8px
+        12px
+        calc(8px + env(safe-area-inset-bottom));
+    background: rgba(8, 11, 16, .98);
+    border-top: 1px solid rgba(255, 255, 255, .06);
+    position: relative;
+    z-index: 30;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.input-row input[type="text"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, .075);
+    background: #111722;
+    color: #edf2f8;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+    transition: .2s;
+}
+
+.input-row input[type="text"]:focus {
+    border-color: rgba(79, 156, 255, .42);
+    background: #131b28;
+    box-shadow: 0 0 0 3px rgba(79, 156, 255, .06);
+}
+
+.input-row input[type="text"]::placeholder {
+    color: #667286;
+}
+
+.input-row input[type="text"]:disabled {
+    opacity: .4;
+}
+
+.input-row button {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4d98ff, #6559e8);
+    color: #fff;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 5px 18px rgba(67, 130, 230, .25),
+        inset 0 1px 0 rgba(255, 255, 255, .18);
+    transition: .2s;
+}
+
+.input-row button:hover {
+    transform: scale(1.04);
+}
+
+.input-row button:active {
+    transform: scale(.96);
+}
+
+.input-row button:disabled {
+    opacity: .4;
+    transform: none;
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translate(-50%, 12px);
+    max-width: 90%;
+    padding: 9px 18px;
+    border-radius: 12px;
+    background: #151a22;
+    border: 1px solid rgba(255, 255, 255, .08);
+    color: #e6ebf2;
+    font-size: 11px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: .25s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+@media(max-width:600px) {
+
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        display: block;
+        padding: 0;
+        background: #080b10;
+    }
+
+    .app {
+        width: 100%;
+        height: 100dvh;
+        min-height: 0;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+        overflow: hidden;
+    }
+
+    .header {
+        flex: 0 0 60px;
+        height: 60px;
+        min-height: 60px;
+        padding: 0 9px;
+    }
+
+    .header-title .name {
+        font-size: 14px;
+    }
+
+    .header-right .username-badge {
+        font-size: 10px;
+        padding: 3px 10px;
+        max-width: 80px;
+    }
+
+    .messages-area {
+        padding: 11px 9px 8px;
+    }
+
+    .input-row {
+        min-height: 60px;
+        padding:
+            7px
+            8px
+            calc(7px + env(safe-area-inset-bottom));
+        gap: 4px;
+    }
+
+    .input-row input[type="text"] {
+        height: 42px;
+        border-radius: 21px;
+        padding: 0 14px;
+        font-size: 13px;
+    }
+
+    .input-row button {
+        width: 41px;
+        height: 41px;
+        flex-basis: 41px;
+    }
+
+    .msg {
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .msg .avatar {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+        border-radius: 10px;
+        font-size: 11px;
+    }
+
+    .msg .bubble {
+        max-width: 84%;
+        padding: 7px 10px;
+        border-radius: 15px 15px 15px 4px;
+    }
+
+    .msg.self .bubble {
+        border-radius: 15px 15px 4px 15px;
+    }
+
+    .msg .bubble .sender {
+        font-size: 9px;
+    }
+
+    .msg .bubble .text {
+        font-size: 13px;
+    }
+
+    .msg .bubble .time {
+        font-size: 7px;
+    }
+}
+
+@media(max-width:380px) {
+    .header {
+        flex-basis: 58px;
+        height: 58px;
+        min-height: 58px;
+    }
+
+    .input-row {
+        min-height: 58px;
+    }
+
+    .input-row input[type="text"] {
+        height: 40px;
+    }
+
+    .input-row button {
+        width: 39px;
+        height: 39px;
+        flex-basis: 39px;
+    }
+
+    .msg .bubble {
+        max-width: 88%;
+    }
+
+    .header-right .username-badge {
+        max-width: 60px;
+        font-size: 9px;
+        padding: 2px 8px;
+    }
+}
+</style>
 </head>
 <body>
 
-    <div class="app-header">
-        <button class="back-btn" onclick="window.location.href='messages.html'"><i class="fas fa-arrow-left"></i></button>
-        <h1>🌍 Global Chat</h1>
+    <!-- ============================================================
+    APP
+    ============================================================ -->
+    <div class="app">
+
+        <!-- HEADER -->
+        <div class="header">
+
+            <div class="header-left">
+
+                <div class="globe-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+
+                <div class="header-title">
+
+                    <span class="name">
+                        Global Chat
+                    </span>
+
+                    <span class="status">
+                        <span class="dot online" id="statusDot"></span>
+                        <span id="statusText">Live</span>
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="header-right">
+
+                <span class="username-badge" id="userBadge">Anonymous</span>
+
+                <button id="refreshBtn" title="Refresh messages">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- MESSENGER -->
+        <div class="messenger">
+
+            <!-- MESSAGES AREA -->
+            <div id="messageContainer" class="messages-area">
+
+                <div class="empty-state">
+
+                    <div class="greeting-icon">
+                        <i class="fas fa-globe-asia"></i>
+                    </div>
+
+                    <div class="greeting-title">
+                        Welcome to Global Chat
+                    </div>
+
+                    <div class="greeting-sub">
+                        You are anonymous. Everyone sees a random name.
+                        <br>
+                        Be kind. Stay safe.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- INPUT ROW -->
+            <div class="input-row">
+
+                <input
+                type="text"
+                id="chatInput"
+                placeholder="Type a message..."
+                autofocus
+                />
+
+                <button id="sendMsgBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="coming-soon-container">
-        <div class="coming-soon-icon"><i class="fas fa-globe-asia"></i></div>
-        <div class="coming-soon-title">Coming Soon</div>
-        <div class="coming-soon-sub">
-            We're working on a real-time global chat experience.
-            Stay tuned for updates!
-        </div>
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
 
-        <div class="coming-soon-features">
-            <span class="feature-chip"><i class="fas fa-user-friends"></i> 100+ users</span>
-            <span class="feature-chip"><i class="fas fa-link"></i> Link preview</span>
-            <span class="feature-chip"><i class="fas fa-shield-alt"></i> Safe & secure</span>
-            <span class="feature-chip"><i class="fas fa-bolt"></i> Real-time</span>
-        </div>
 
-        <div class="footer-note">
-            <i class="fas fa-code"></i> SociaLock · Global Chat
-        </div>
-    </div>
-
-    <!-- ===== স্ক্রিপ্ট (শুধু ইউজার চেক) ===== -->
-    <script src="js/config.js"></script>
-    <script src="js/firebase-config.js"></script>
+    <!-- ============================================================
+    SCRIPTS
+    ============================================================ -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var userId = localStorage.getItem('userId');
-            if (!userId) {
-                window.location.href = 'login.html';
+        /* ============================================================
+           🔐 SUPABASE CREDENTIALS
+        ============================================================ */
+
+        const SUPABASE_URL =
+            'https://mjuowfrzvgnqrazqnunr.supabase.co';
+
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qdW93ZnJ6dmducXJhenFudW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNDY4MzgsImV4cCI6MjA5NTYyMjgzOH0.D9leYQRFsql9ONIsG4pPYdkQdWI_8SDL23wS8rlO7pk';
+
+
+        /* ============================================================
+           🧩 SUPABASE CLIENT
+        ============================================================ */
+
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY, {
+                    auth: {
+                        autoRefreshToken: false,
+                        persistSession: false
+                    }
+                }
+            );
+
+
+        /* ============================================================
+           📦 DOM REFS
+        ============================================================ */
+
+        const $ = id => document.getElementById(id);
+
+        const messageContainer = $('messageContainer');
+        const chatInput = $('chatInput');
+        const sendMsgBtn = $('sendMsgBtn');
+        const refreshBtn = $('refreshBtn');
+        const userBadge = $('userBadge');
+        const statusDot = $('statusDot');
+        const statusText = $('statusText');
+        const toast = $('toast');
+
+
+        /* ============================================================
+           🌐 STATE
+        ============================================================ */
+
+        const MAX_MESSAGES = 150;
+        let myUsername = '';
+        let messages = [];
+        let channel = null;
+        let isSubscribed = false;
+
+        // Rate limiting
+        let lastMessageTime = 0;
+        const MIN_INTERVAL = 2000; // 2 seconds
+
+        // Bad word list
+        const BAD_WORDS = [
+            'fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy',
+            'motherfucker', 'nigga', 'nigger', 'chutiya', 'bhosdike',
+            'madarchod', 'benchod', 'lund', 'gandu', 'harami', 'kutta',
+            'rascal', 'bastard', 'whore', 'slut', 'fag', 'retard'
+        ];
+
+        // Harmful link patterns
+        const HARMFUL_PATTERNS = [
+            /\.onion/i,
+            /bit\.ly/i,
+            /tinyurl\.com/i,
+            /goo\.gl/i,
+            /shorturl\.at/i,
+            /rb\.gy/i,
+            /cutt\.ly/i,
+            /ow\.ly/i,
+            /is\.gd/i,
+            /buff\.ly/i,
+            /adf\.ly/i,
+            /shorte\.st/i,
+            /bc\.vc/i,
+            /t\.co/i,
+            /tiny\.cc/i,
+            /cli\.gs/i,
+            /url\.go\.link/i
+        ];
+
+
+        /* ============================================================
+           🛠 UTILITY
+        ============================================================ */
+
+        function generateRandomUsername() {
+            const adjectives = [
+                'Happy', 'Sad', 'Angry', 'Calm', 'Brave', 'Clever', 'Wise',
+                'Wild', 'Tame', 'Swift', 'Bold', 'Mighty', 'Noble', 'Fierce',
+                'Gentle', 'Silly', 'Funny', 'Serious', 'Shy', 'Loud', 'Quiet',
+                'Lucky', 'Dark', 'Light', 'Bright', 'Dawn', 'Dusk', 'Star',
+                'Moon', 'Sun', 'Sky', 'Ocean', 'Forest', 'Mountain', 'River'
+            ];
+
+            const nouns = [
+                'Tiger', 'Lion', 'Wolf', 'Fox', 'Hawk', 'Eagle', 'Owl',
+                'Bear', 'Deer', 'Falcon', 'Panther', 'Phoenix', 'Dragon',
+                'Wizard', 'Knight', 'Ranger', 'Hunter', 'Seeker', 'Wanderer',
+                'Dreamer', 'Runner', 'Flyer', 'Swimmer', 'Climber'
+            ];
+
+            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+            const num = Math.floor(Math.random() * 9000 + 1000);
+
+            return `${adj}${noun}${num}`;
+        }
+
+
+        function formatTime(timestamp) {
+            if (!timestamp) return '';
+            const d = new Date(timestamp);
+            return d.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+
+        function sanitizeInput(text) {
+            if (window.DOMPurify) {
+                return window.DOMPurify.sanitize(text);
+            }
+            return text;
+        }
+
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+
+        function containsBadWord(text) {
+            const lower = text.toLowerCase();
+            return BAD_WORDS.some(word => lower.includes(word));
+        }
+
+
+        function containsHarmfulLink(text) {
+            return HARMFUL_PATTERNS.some(pattern => pattern.test(text));
+        }
+
+
+        /* ============================================================
+           🔒 CONTENT FILTER
+        ============================================================ */
+
+        function filterMessage(text) {
+            if (containsBadWord(text)) {
+                return { allowed: false, reason: 'Profanity detected' };
+            }
+
+            if (containsHarmfulLink(text)) {
+                return { allowed: false, reason: 'Harmful link detected' };
+            }
+
+            return { allowed: true };
+        }
+
+
+        /* ============================================================
+           📡 DATABASE FUNCTIONS
+        ============================================================ */
+
+        // Load last 150 messages from database
+        async function loadMessages() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('global_messages')
+                    .select('*')
+                    .order('created_at', { ascending: true })
+                    .limit(MAX_MESSAGES);
+
+                if (error) {
+                    console.error('Error loading messages:', error);
+                    showToast('⚠️ Could not load messages');
+                    return;
+                }
+
+                messages = data || [];
+                renderMessages();
+
+                console.log(`📥 Loaded ${messages.length} messages from database`);
+
+            } catch (err) {
+                console.error('Load error:', err);
+                showToast('⚠️ Error loading messages');
+            }
+        }
+
+
+        // Send message to database
+        async function sendMessageToDB(text) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('global_messages')
+                    .insert([{
+                        username: myUsername,
+                        text: text,
+                        created_at: new Date().toISOString(),
+                        is_deleted: false
+                    }])
+                    .select();
+
+                if (error) {
+                    console.error('Insert error:', error);
+                    showToast('⚠️ Error: ' + error.message);
+                    return false;
+                }
+
+                // Add to local messages (realtime will also add it)
+                if (data && data.length > 0) {
+                    messages.push(data[0]);
+                    if (messages.length > MAX_MESSAGES) {
+                        messages = messages.slice(-MAX_MESSAGES);
+                    }
+                    renderMessages();
+                }
+
+                return true;
+
+            } catch (err) {
+                console.error('Send error:', err);
+                showToast('⚠️ Error sending message');
+                return false;
+            }
+        }
+
+
+        /* ============================================================
+           📡 REALTIME SUBSCRIPTION (Postgres Changes)
+        ============================================================ */
+
+        function subscribeToMessages() {
+            if (channel) {
+                try {
+                    channel.unsubscribe();
+                } catch (_) {}
+                channel = null;
+            }
+
+            channel = supabaseClient
+                .channel('global-messages-channel')
+                .on(
+                    'postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'global_messages'
+                    },
+                    (payload) => {
+                        const newMsg = payload.new;
+
+                        // Avoid duplicate if we just inserted it
+                        const exists = messages.some(m => m.id === newMsg.id);
+                        if (exists) return;
+
+                        messages.push(newMsg);
+
+                        // Keep only last 150
+                        if (messages.length > MAX_MESSAGES) {
+                            messages = messages.slice(-MAX_MESSAGES);
+                        }
+
+                        renderMessages();
+                    }
+                )
+                .on(
+                    'postgres_changes', {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'global_messages'
+                    },
+                    (payload) => {
+                        const updated = payload.new;
+                        const index = messages.findIndex(m => m.id === updated.id);
+                        if (index !== -1) {
+                            messages[index] = updated;
+                            renderMessages();
+                        }
+                    }
+                )
+                .on(
+                    'postgres_changes', {
+                        event: 'DELETE',
+                        schema: 'public',
+                        table: 'global_messages'
+                    },
+                    (payload) => {
+                        const deletedId = payload.old.id;
+                        messages = messages.filter(m => m.id !== deletedId);
+                        renderMessages();
+                    }
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('✅ Subscribed to global_messages');
+                        isSubscribed = true;
+                        statusDot.className = 'dot online';
+                        statusText.textContent = 'Live';
+                    } else {
+                        console.warn('Subscribe status:', status);
+                    }
+                });
+        }
+
+
+        /* ============================================================
+           🧹 RENDER MESSAGES
+        ============================================================ */
+
+        function renderMessages() {
+            if (!messageContainer) return;
+
+            if (!messages || messages.length === 0) {
+                messageContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="greeting-icon">
+                            <i class="fas fa-globe-asia"></i>
+                        </div>
+                        <div class="greeting-title">
+                            Welcome to Global Chat
+                        </div>
+                        <div class="greeting-sub">
+                            You are anonymous. Everyone sees a random name.
+                            <br>
+                            Be kind. Stay safe.
+                        </div>
+                    </div>
+                `;
                 return;
             }
-            // বাকি কিছু না – শুধু কামিং সুন পেজ
+
+            const currentUser = myUsername || 'Anonymous';
+            let html = '';
+
+            messages.forEach((msg) => {
+                const isSelf = msg.username === currentUser;
+                const avatarLetter = msg.username ? msg.username.charAt(0).toUpperCase() : '?';
+                const timeStr = msg.created_at ? formatTime(msg.created_at) : '';
+
+                let content = '';
+
+                if (msg.is_deleted) {
+                    content = `
+                        <span class="text" style="font-style:italic;color:#566173;">
+                            This message was removed
+                        </span>
+                    `;
+                } else {
+                    let displayText = msg.text || '';
+                    let isFiltered = false;
+
+                    if (displayText) {
+                        const filterResult = filterMessage(displayText);
+                        if (!filterResult.allowed) {
+                            displayText = '⛔ This message was blocked by content filter';
+                            isFiltered = true;
+                        }
+                    }
+
+                    const cleanText = sanitizeInput(displayText);
+
+                    content = `
+                        <span class="text ${isFiltered ? 'deleted' : ''}">
+                            ${cleanText}
+                        </span>
+                    `;
+                }
+
+                const cleanUsername = sanitizeInput(msg.username || 'Unknown');
+
+                html += `
+                    <div class="msg ${isSelf ? 'self' : ''}">
+                        <div class="avatar">${escapeHtml(avatarLetter)}</div>
+                        <div class="bubble ${msg.is_deleted ? 'deleted' : ''}">
+                            <span class="sender">${cleanUsername}</span>
+                            ${content}
+                            <span class="time">${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const cleanHtml = sanitizeInput(html);
+            messageContainer.innerHTML = cleanHtml;
+
+            requestAnimationFrame(() => {
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            });
+        }
+
+
+        /* ============================================================
+           📤 SEND MESSAGE
+        ============================================================ */
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+
+            if (!text) {
+                chatInput.focus();
+                return;
+            }
+
+            // Rate limiting
+            const now = Date.now();
+            if (now - lastMessageTime < MIN_INTERVAL) {
+                showToast('⏳ Please wait 2 seconds between messages');
+                return;
+            }
+
+            // Content filter
+            const filterResult = filterMessage(text);
+            if (!filterResult.allowed) {
+                showToast(`⛔ ${filterResult.reason}`);
+                chatInput.value = '';
+                chatInput.focus();
+                return;
+            }
+
+            lastMessageTime = now;
+
+            const success = await sendMessageToDB(text);
+
+            if (success) {
+                chatInput.value = '';
+                chatInput.focus();
+            }
+        }
+
+
+        /* ============================================================
+           🚀 INIT
+        ============================================================ */
+
+        async function init() {
+            // Generate random username
+            myUsername = generateRandomUsername();
+            userBadge.textContent = myUsername;
+
+            console.log(`👤 Your username: ${myUsername}`);
+
+            // Load messages from database
+            await loadMessages();
+
+            // Setup realtime subscription
+            subscribeToMessages();
+
+            chatInput.focus();
+        }
+
+
+        /* ============================================================
+           TOAST
+        ============================================================ */
+
+        function showToast(msg, duration = 3000) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+
+        /* ============================================================
+           🎯 EVENT LISTENERS
+        ============================================================ */
+
+        sendMsgBtn.addEventListener('click', sendMessage);
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
         });
+
+        refreshBtn.addEventListener('click', async () => {
+            showToast('🔄 Refreshing...');
+            await loadMessages();
+            showToast('✅ Refreshed');
+        });
+
+        document.addEventListener('click', () => {
+            if (document.activeElement !== chatInput) {
+                chatInput.focus();
+            }
+        });
+
+
+        /* ============================================================
+           🧹 CLEANUP
+        ============================================================ */
+
+        window.addEventListener('beforeunload', () => {
+            if (channel) {
+                try {
+                    channel.unsubscribe();
+                } catch (_) {}
+            }
+        });
+
+
+        /* ============================================================
+           🚀 START
+        ============================================================ */
+
+        console.log('🌍 Global Chat · Database Powered');
+        console.log('🔒 Security features:');
+        console.log('  • Random anonymous usernames');
+        console.log('  • Rate limiting (2s between messages)');
+        console.log('  • Bad word filtering');
+        console.log('  • Harmful link detection');
+        console.log('  • XSS protection (DOMPurify)');
+        console.log('  • Max 150 messages (database auto-cleanup)');
+        console.log('  • Real-time updates (Postgres Changes)');
+
+        init();
     </script>
 
 </body>

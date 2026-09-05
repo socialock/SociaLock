@@ -1,9 +1,28 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Edit Profile - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Edit your SociaLock profile." />
+    <meta name="keywords" content="edit profile" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/editprofile.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <!-- ===== SEO END ===== -->
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -48,6 +67,18 @@
         .field-status.ok { color: #4caf50; }
         .field-status.bad { color: #e94560; }
 
+
+        .country-select-wrapper { position: relative; }
+        .country-dropdown {
+            display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+            max-height: 230px; overflow-y: auto; background: #242526; border: 1px solid #3a3b3c;
+            border-radius: 10px; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,.35);
+        }
+        .country-dropdown.open { display: block; }
+        .country-option { padding: 10px 14px; cursor: pointer; color: #e4e6eb; font-size: .95rem; }
+        .country-option:hover, .country-option.selected { background: #1877f2; color: #fff; }
+        .country-no-result { padding: 12px 14px; color: #b0b3b8; text-align: center; }
+
         .btn-save {
             width: 100%; margin-top: 22px; padding: 12px; background: #1877f2; border: none;
             border-radius: 10px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s;
@@ -90,6 +121,14 @@
                 <textarea id="bioInput" maxlength="300" placeholder="Tell people about yourself..."></textarea>
                 <div class="char-count"><span id="bioCharCount">0</span>/300</div>
             </div>
+
+            <div class="form-group">
+                <label for="countryInput"><i class="fas fa-earth-americas"></i> Country</label>
+                <div class="country-select-wrapper">
+                    <input type="text" id="countryInput" placeholder="Type to search country..." autocomplete="off">
+                    <div class="country-dropdown" id="countryDropdown"></div>
+                </div>
+            </div>
         </div>
 
         <button class="btn-save" id="saveBtn"><i class="fas fa-check"></i> Save Changes</button>
@@ -107,9 +146,88 @@
         const bioCharCount = document.getElementById('bioCharCount');
         const saveBtn = document.getElementById('saveBtn');
         const avatarInitial = document.getElementById('avatarInitial');
+        const countryInput = document.getElementById('countryInput');
+        const countryDropdown = document.getElementById('countryDropdown');
+
+        // Keep this list identical to the 197-country list used on login/register.
+        const countryList = [
+            "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",
+            "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+            "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados",
+            "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+            "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
+            "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
+            "Cameroon", "Canada", "Central African Republic", "Chad", "Chile",
+            "China", "Colombia", "Comoros", "Congo", "Costa Rica",
+            "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark",
+            "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt",
+            "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini",
+            "Ethiopia", "Fiji", "Finland", "France", "Gabon",
+            "Gambia", "Georgia", "Germany", "Ghana", "Greece",
+            "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
+            "Haiti", "Honduras", "Hungary", "Iceland", "India",
+            "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
+            "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
+            "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait",
+            "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho",
+            "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+            "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
+            "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico",
+            "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro",
+            "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru",
+            "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger",
+            "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan",
+            "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay",
+            "Peru", "Philippines", "Poland", "Portugal", "Qatar",
+            "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
+            "Saint Vincent", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+            "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore",
+            "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa",
+            "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname",
+            "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
+            "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga",
+            "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States",
+            "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+            "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        ];
+
+        let selectedCountry = '';
+
+        function renderCountryList(filter = '') {
+            const q = String(filter).toLowerCase().trim();
+            const filtered = q ? countryList.filter(c => c.toLowerCase().includes(q)) : countryList;
+            if (!filtered.length) {
+                countryDropdown.innerHTML = '<div class="country-no-result">No country found</div>';
+                countryDropdown.classList.add('open');
+                return;
+            }
+            countryDropdown.innerHTML = filtered.map(c =>
+                `<div class="country-option ${c === selectedCountry ? 'selected' : ''}" data-value="${escapeHtml(c)}">${escapeHtml(c)}</div>`
+            ).join('');
+            countryDropdown.classList.add('open');
+            countryDropdown.querySelectorAll('.country-option').forEach(el => {
+                el.addEventListener('click', () => {
+                    selectedCountry = el.dataset.value;
+                    countryInput.value = selectedCountry;
+                    countryDropdown.classList.remove('open');
+                });
+            });
+        }
+
+        countryInput.addEventListener('focus', () => renderCountryList(countryInput.value));
+        countryInput.addEventListener('input', () => {
+            selectedCountry = countryInput.value.trim();
+            renderCountryList(countryInput.value);
+        });
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.country-select-wrapper')) countryDropdown.classList.remove('open');
+        });
+
 
         let originalUsername = '';
         let originalBio = '';
+        let originalCountry = '';
         let usernameValid = true;
 
         bioInput.addEventListener('input', () => {
@@ -135,6 +253,9 @@
             if (result && result.success) {
                 originalUsername = result.data.username || '';
                 originalBio = result.data.bio || '';
+                originalCountry = result.data.country || '';
+                selectedCountry = originalCountry;
+                countryInput.value = originalCountry;
                 usernameInput.value = originalUsername;
                 bioInput.value = originalBio;
                 bioCharCount.textContent = originalBio.length;
@@ -145,6 +266,12 @@
         saveBtn.addEventListener('click', async () => {
             const newUsername = usernameInput.value.trim();
             const newBio = bioInput.value;
+            const newCountry = countryInput.value.trim();
+
+            if (newCountry && !countryList.includes(newCountry)) {
+                showAlert('Please select a country from the list.', 'error');
+                return;
+            }
 
             if (!usernameValid || newUsername.length < 2) {
                 showAlert('Please enter a valid username (2-20 characters).', 'error');
@@ -173,10 +300,20 @@
                     if (!res || !res.success) ok = false;
                 }
 
+                if (ok && newCountry !== originalCountry) {
+                    const res = await window.apiRequest(`/users/${userId}/country`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ country: newCountry })
+                    });
+                    if (!res || !res.success) ok = false;
+                }
+
                 if (ok) {
                     showAlert('Profile updated successfully!', 'success');
                     originalUsername = newUsername;
                     originalBio = newBio;
+                    originalCountry = newCountry;
+                    selectedCountry = newCountry;
                     setTimeout(() => { window.location.href = 'settings.html'; }, 900);
                 }
             } catch (err) {

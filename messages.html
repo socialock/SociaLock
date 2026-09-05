@@ -1,9 +1,28 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Messages - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Your private messages on SociaLock." />
+    <meta name="keywords" content="SociaLock messages, direct messages" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/messages.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <!-- ===== SEO END ===== -->
     
     <!-- ===== FIREBASE CDN ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -23,7 +42,7 @@
             width: 100%;
             z-index: 999;
             border-bottom: 1px solid #3a3b3c;
-            height: 46px;
+            height: 54px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -91,7 +110,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            margin-top: 46px;
+            margin-top: 54px;
         }
         .main-container {
             max-width: 700px;
@@ -165,6 +184,10 @@
             font-size: 1.6rem;
             flex-shrink: 0;
         }
+        .chat-option .icon-box.global {
+            background: rgba(76,175,80,0.15);
+            color: #4caf50;
+        }
         .chat-option .icon-box.p2p {
             background: rgba(24,119,242,0.15);
             color: #1877f2;
@@ -172,10 +195,6 @@
         .chat-option .icon-box.live {
             background: rgba(233,69,96,0.15);
             color: #e94560;
-        }
-        .chat-option .icon-box.global {
-            background: rgba(76,175,80,0.15);
-            color: #4caf50;
         }
         .chat-option .option-info {
             flex: 1;
@@ -221,10 +240,10 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         @media (max-width: 480px) {
-            .navbar-bottom { height: 42px; }
-            .nav-icon-bottom { font-size: 1.3rem; padding: 2px 8px; }
-            .nav-icon-bottom .label { font-size: 0.5rem; }
-            .main-wrapper { margin-top: 42px; }
+            .navbar-bottom { height: 50px; }
+            .nav-icon-bottom { font-size: 1.5rem; padding: 4px 10px; }
+            .nav-icon-bottom .label { font-size: 0.58rem; }
+            .main-wrapper { margin-top: 50px; }
             .main-container { padding: 0 12px; }
             .messages-header h1 { font-size: 1.2rem; }
             .chat-option { padding: 16px 14px; }
@@ -272,7 +291,21 @@
             </div>
 
             <div class="chat-options">
-                <!-- ===== 1. P2P Chat ===== -->
+                <!-- ===== 1. GLOBAL CHAT (FIRST) ===== -->
+                <a href="gchat.html" class="chat-option">
+                    <div class="icon-box global">
+                        <i class="fas fa-globe-asia"></i>
+                    </div>
+                    <div class="option-info">
+                        <h3>Global Chat</h3>
+                        <p>Chat with everyone around the world</p>
+                    </div>
+                    <div class="arrow-icon">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+
+                <!-- ===== 2. P2P Chat ===== -->
                 <a href="p2p.html" class="chat-option">
                     <div class="icon-box p2p">
                         <i class="fas fa-user-friends"></i>
@@ -286,7 +319,7 @@
                     </div>
                 </a>
 
-                <!-- ===== 2. Live Rooms ===== -->
+                <!-- ===== 3. Live Rooms ===== -->
                 <a href="live.html" class="chat-option">
                     <div class="icon-box live">
                         <i class="fas fa-broadcast-tower"></i>
@@ -294,20 +327,6 @@
                     <div class="option-info">
                         <h3>Live Rooms</h3>
                         <p>Join real-time audio/video rooms</p>
-                    </div>
-                    <div class="arrow-icon">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </a>
-
-                <!-- ===== 3. Global Chat ===== -->
-                <a href="gchat.html" class="chat-option">
-                    <div class="icon-box global">
-                        <i class="fas fa-globe-asia"></i>
-                    </div>
-                    <div class="option-info">
-                        <h3>Global Chat</h3>
-                        <p>Chat with everyone around the world</p>
                     </div>
                     <div class="arrow-icon">
                         <i class="fas fa-chevron-right"></i>
@@ -327,9 +346,8 @@
     <script src="js/firebase-config.js"></script>
     <script>
         // ============================================================
-        // MESSAGES.JS - Complete
+        // MESSAGES.JS - Complete (Global chat moved to top)
         // ============================================================
-
 
         var currentUser = null;
 
@@ -396,10 +414,8 @@
 
             // Update badge
             updateNotifBadge();
-            setInterval(updateNotifBadge, 30000);
-
+            setInterval(updateNotifBadge, 120000);
         });
-
     </script>
 </body>
 </html>

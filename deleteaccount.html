@@ -1,0 +1,231 @@
+<!--
+    SociaLock
+    Copyright © 2026 SociaLock. All Rights Reserved.
+
+    Unauthorized copying, reproduction, modification, or redistribution
+    of this source code is prohibited without prior written permission.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Delete Account - SociaLock</title>
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Delete your SociaLock account." />
+    <meta name="keywords" content="delete account" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="author" content="SociaLock" />
+    <link rel="canonical" href="https://socialock.pages.dev/deleteaccount.html" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icon-180.png" />
+    <!-- ===== SEO END ===== -->
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { background: #18191a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e6eb; min-height: 100vh; }
+        .back-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #3a3b3c; position: sticky; top: 0; background: #18191a; z-index: 5; }
+        .back-header .back-btn { background: none; border: none; color: #b0b3b8; font-size: 22px; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: 0.2s; text-decoration: none; display: flex; }
+        .back-header .back-btn:hover { background: #3a3b3c; color: #e4e6eb; }
+        .back-header .back-title { font-size: 18px; font-weight: 600; }
+        .main-container { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; }
+
+        .warning-banner { display: flex; gap: 10px; align-items: flex-start; background: rgba(233,69,96,0.1); border: 1px solid rgba(233,69,96,0.35); border-radius: 12px; padding: 14px; margin-bottom: 20px; }
+        .warning-banner i { color: #e94560; font-size: 1.1rem; margin-top: 2px; flex-shrink: 0; }
+        .warning-banner .title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; color: #e94560; }
+        .warning-banner p { font-size: 0.85rem; color: #b0b3b8; line-height: 1.4; }
+
+        .consequence-list { background: #242526; border: 1px solid #3a3b3c; border-radius: 14px; padding: 16px 18px; margin-bottom: 20px; }
+        .consequence-list li { list-style: none; display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #e4e6eb; padding: 6px 0; }
+        .consequence-list li i { color: #e94560; width: 16px; text-align: center; flex-shrink: 0; }
+
+        .form-card { background: #242526; border: 1px solid #3a3b3c; border-radius: 14px; padding: 20px 18px; }
+        .form-group { margin-bottom: 16px; position: relative; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #b0b3b8; margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 11px 40px 11px 14px; border-radius: 10px; border: 1px solid #3a3b3c; background: #18191a; color: #e4e6eb; font-size: 0.95rem; outline: none; }
+        .form-group input:focus { border-color: #e94560; }
+        .toggle-eye { position: absolute; right: 12px; top: 38px; background: none; border: none; color: #8a8d91; cursor: pointer; font-size: 0.95rem; }
+        .hint { font-size: 0.75rem; color: #8a8d91; margin-top: 4px; }
+
+        .btn-delete { width: 100%; margin-top: 22px; padding: 12px; background: #e94560; border: none; border-radius: 10px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-delete:hover:not(:disabled) { background: #c62828; }
+        .btn-delete:disabled { opacity: 0.5; cursor: not-allowed; }
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .custom-alert { position: fixed; top: 20px; right: 20px; left: 20px; padding: 12px 16px; border-radius: 12px; color: white; z-index: 9999; max-width: 440px; margin: 0 auto; font-size: 0.95rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; }
+        .custom-alert.success { background: #2e7d32; }
+        .custom-alert.error { background: #c62828; }
+        .custom-alert.info { background: #0d47a1; }
+
+        .custom-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .custom-modal-overlay.show { display: flex; }
+        .custom-modal { background: #242526; border-radius: 16px; padding: 28px 24px 20px; max-width: 380px; width: 90%; border: 1px solid #3a3b3c; box-shadow: 0 8px 30px rgba(0,0,0,0.5); text-align: center; }
+        .custom-modal .modal-icon { font-size: 2.8rem; color: #e94560; margin-bottom: 8px; }
+        .custom-modal h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; color: #e4e6eb; }
+        .custom-modal p { font-size: 0.95rem; color: #b0b3b8; margin-bottom: 20px; line-height: 1.4; }
+        .custom-modal .modal-actions { display: flex; gap: 12px; justify-content: center; }
+        .custom-modal .modal-actions button { padding: 8px 24px; border: none; border-radius: 20px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+        .custom-modal .modal-actions .btn-cancel { background: #3a3b3c; color: #b0b3b8; }
+        .custom-modal .modal-actions .btn-cancel:hover { background: #4a4b4c; }
+        .custom-modal .modal-actions .btn-danger { background: #e94560; color: white; }
+        .custom-modal .modal-actions .btn-danger:hover { background: #c62828; }
+    </style>
+</head>
+<body>
+
+    <div class="back-header">
+        <a href="settings.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <div class="back-title">Delete Account</div>
+    </div>
+
+    <div class="main-container">
+        <div class="warning-banner">
+            <i class="fas fa-triangle-exclamation"></i>
+            <div>
+                <div class="title">This action is permanent</div>
+                <p>Once deleted, your account cannot be recovered. Please make sure this is what you want.</p>
+            </div>
+        </div>
+
+        <ul class="consequence-list">
+            <li><i class="fas fa-times"></i> Your profile, bio and photos will be removed</li>
+            <li><i class="fas fa-times"></i> All your posts, comments and replies will be deleted</li>
+            <li><i class="fas fa-times"></i> All your likes and notifications will be deleted</li>
+            <li><i class="fas fa-times"></i> Your followers/following connections will be removed</li>
+            <li><i class="fas fa-times"></i> Your published tools will be removed</li>
+        </ul>
+
+        <div class="form-card">
+            <div class="form-group">
+                <label for="password">Confirm your password</label>
+                <input type="password" id="password" placeholder="Enter your current password" autocomplete="current-password">
+                <button type="button" class="toggle-eye" data-target="password"><i class="fas fa-eye"></i></button>
+                <div class="hint">We need this to verify it's really you.</div>
+            </div>
+        </div>
+
+        <button class="btn-delete" id="deleteBtn"><i class="fas fa-user-slash"></i> Permanently Delete My Account</button>
+    </div>
+
+    <!-- Confirmation modal (second, explicit confirmation) -->
+    <div class="custom-modal-overlay" id="customModal">
+        <div class="custom-modal">
+            <div class="modal-icon"><i class="fas fa-triangle-exclamation"></i></div>
+            <h3>Delete your account?</h3>
+            <p>This cannot be undone. All your posts, comments, likes, notifications, tools and connections will be permanently removed.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="modalCancel">Cancel</button>
+                <button class="btn-danger" id="modalConfirm">Delete Forever</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        const userId = localStorage.getItem('userId');
+        if (!userId) window.location.href = 'login.html';
+
+        document.querySelectorAll('.toggle-eye').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = document.getElementById(btn.dataset.target);
+                const icon = btn.querySelector('i');
+                if (target.type === 'password') {
+                    target.type = 'text';
+                    icon.className = 'fas fa-eye-slash';
+                } else {
+                    target.type = 'password';
+                    icon.className = 'fas fa-eye';
+                }
+            });
+        });
+
+        let pendingConfirmResolve = null;
+        function customConfirm() {
+            return new Promise(function(resolve) {
+                document.getElementById('customModal').classList.add('show');
+                pendingConfirmResolve = resolve;
+            });
+        }
+        document.getElementById('modalCancel').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+        });
+        document.getElementById('modalConfirm').addEventListener('click', function() {
+            document.getElementById('customModal').classList.remove('show');
+            if (pendingConfirmResolve) { pendingConfirmResolve(true); pendingConfirmResolve = null; }
+        });
+        document.getElementById('customModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('customModal').classList.remove('show');
+                if (pendingConfirmResolve) { pendingConfirmResolve(false); pendingConfirmResolve = null; }
+            }
+        });
+
+        const deleteBtn = document.getElementById('deleteBtn');
+
+        deleteBtn.addEventListener('click', async () => {
+            const password = document.getElementById('password').value;
+
+            if (!password) {
+                showAlert('Please enter your password.', 'error');
+                return;
+            }
+
+            const confirmed = await customConfirm();
+            if (!confirmed) return;
+
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<span class="spinner"></span> Deleting...';
+
+            try {
+                const result = await window.apiRequest(`/users/${userId}`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ password })
+                });
+
+                if (!result || !result.success) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.innerHTML = '<i class="fas fa-user-slash"></i> Permanently Delete My Account';
+                    return;
+                }
+
+                // Best-effort: also remove the Firebase Auth account so the
+                // email/password can't be used to sign in anymore.
+                try {
+                    const fbUser = firebase.auth().currentUser;
+                    if (fbUser && fbUser.email) {
+                        const credential = firebase.auth.EmailAuthProvider.credential(fbUser.email, password);
+                        await fbUser.reauthenticateWithCredential(credential);
+                        await fbUser.delete();
+                    }
+                } catch (fbErr) {
+                    console.warn('Firebase account cleanup failed:', fbErr);
+                }
+
+                localStorage.removeItem('userId');
+                localStorage.removeItem('token');
+                localStorage.removeItem('cachedUser');
+
+                showAlert('Your account has been deleted.', 'success');
+                setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+            } catch (err) {
+                showAlert('Something went wrong. Please try again.', 'error');
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = '<i class="fas fa-user-slash"></i> Permanently Delete My Account';
+            }
+        });
+    </script>
+</body>
+</html>
