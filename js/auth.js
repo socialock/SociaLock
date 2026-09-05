@@ -1,3 +1,11 @@
+/*
+ * SociaLock
+ * Copyright © 2026 SociaLock. All Rights Reserved.
+ *
+ * Unauthorized copying, reproduction, modification, or redistribution
+ * of this source code is prohibited without prior written permission.
+ */
+
 // Placeholder for auth.js
 // ============================================================
 // 📁 js/auth.js - Authentication (Firebase + Worker API)
